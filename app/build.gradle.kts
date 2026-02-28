@@ -5,7 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val abis = setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+val abis = setOf("arm64-v8a")
 
 configure<ApplicationExtension> {
     namespace = "io.github.dovecoteescapee.byedpi"
@@ -16,8 +16,8 @@ configure<ApplicationExtension> {
         minSdk = 23
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = 1704
-        versionName = "1.7.4"
+        versionCode = 1705
+        versionName = "1.7.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
