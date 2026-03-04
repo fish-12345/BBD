@@ -394,7 +394,17 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("settings/test") {
-                        TestSettingsScreen(onBack = { navController.popBackStack() })
+                        TestSettingsScreen(
+                            onBack = { navController.popBackStack() },
+                            onNavigateToDomainLists = {
+                                navController.navigate("settings/domain-lists")
+                            }
+                        )
+                    }
+                    composable("settings/domain-lists") {
+                        DomainListsScreen(
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                     composable("profiles") {
                         ProfilesScreen(

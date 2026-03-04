@@ -26,8 +26,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.dovecoteescapee.byedpi.R
-import io.github.dovecoteescapee.byedpi.core.ByeDpiProxyUIPreferences.DesyncMethod.*
-import io.github.dovecoteescapee.byedpi.core.ByeDpiProxyUIPreferences.HostsMode.*
+import io.github.dovecoteescapee.byedpi.data.UISettings.DesyncMethod.*
+import io.github.dovecoteescapee.byedpi.data.UISettings.HostsMode.*
 import io.github.dovecoteescapee.byedpi.ui.components.*
 import io.github.dovecoteescapee.byedpi.ui.viewmodel.UISettingsViewModel
 import io.github.dovecoteescapee.byedpi.utility.isTv
@@ -272,7 +272,7 @@ fun UISettingsScreen(
             }
 
             val desyncAllProtocols = !viewModel.desyncHttp && !viewModel.desyncHttps && !viewModel.desyncUdp
-            
+
             item {
                 SettingsCard(title = stringResource(R.string.desync_http_category)) {
                     val httpEnabled = desyncAllProtocols || viewModel.desyncHttp

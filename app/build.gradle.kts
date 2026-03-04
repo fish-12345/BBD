@@ -16,8 +16,8 @@ configure<ApplicationExtension> {
         minSdk = 23
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = 1705
-        versionName = "1.7.5"
+        versionCode = 1707
+        versionName = "1.7.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-service:2.10.0")
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation("androidx.compose.material3:material3:1.4.0")
 
     val composeBom = platform("androidx.compose:compose-bom:2025.12.01")
     implementation(composeBom)

@@ -207,7 +207,7 @@ class ByeDpiProxyService : LifecycleService() {
     }
 
     private fun getByeDpiPreferences(): ByeDpiProxyPreferences =
-        ByeDpiProxyPreferences.fromSharedPreferences(getPreferences())
+        ByeDpiProxyPreferences.fromSharedPreferences(getPreferences(), this)
 
     private fun updateStatus(newStatus: ServiceStatus) {
         Log.d(TAG, "Proxy status changed from $status to $newStatus")
@@ -235,6 +235,10 @@ class ByeDpiProxyService : LifecycleService() {
         )
         intent.putExtra(SENDER, Sender.Proxy.ordinal)
         sendBroadcast(intent)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            QuickTileService.updateTile()
+        }
     }
 
     private fun createNotification(

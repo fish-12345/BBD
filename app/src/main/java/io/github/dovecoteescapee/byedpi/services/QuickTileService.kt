@@ -15,28 +15,28 @@ class QuickTileService : TileService() {
 
     companion object {
         private const val TAG = "QuickTileService"
+        private var instance: QuickTileService? = null
+
+        fun updateTile() {
+            instance?.updateStatus()
+        }
     }
 
     private var appTile: Tile? = null
 
-    override fun onTileAdded() {
-        super.onTileAdded()
-        Log.i(TAG, "Tile added")
-    }
-
-    override fun onTileRemoved() {
-        super.onTileRemoved()
-        Log.i(TAG, "Tile removed")
-    }
-
     override fun onStartListening() {
         super.onStartListening()
+
+        instance = this
         appTile = qsTile
+
         updateStatus()
     }
 
     override fun onStopListening() {
         super.onStopListening()
+
+        instance = null
         appTile = null
     }
 
@@ -47,40 +47,44 @@ class QuickTileService : TileService() {
 
     private fun handleClick() {
         val (status) = appStatus
+        val mode = getPreferences().mode()
 
         when (status) {
-            AppStatus.Halted -> {
-                val mode = getPreferences().mode()
-
-                if (mode == Mode.VPN && VpnService.prepare(this) != null) {
-                    return
-                }
-
-                ServiceManager.start(this, mode)
-                setState(Tile.STATE_ACTIVE)
-            }
-            AppStatus.Running -> {
-                ServiceManager.stop(this)
-                setState(Tile.STATE_INACTIVE)
-            }
+            AppStatus.Halted -> startService(mode)
+            AppStatus.Running -> stopService()
         }
 
-        Log.i(TAG, "Toggle tile")
+        Log.i(TAG, "Tile clicked")
+    }
+
+    private fun startService(mode: Mode) {
+        if (mode == Mode.VPN && VpnService.prepare(this) != null) {
+            return
+        }
+
+        ServiceManager.start(this, mode)
+        setState(Tile.STATE_ACTIVE)
+    }
+
+    private fun stopService() {
+        ServiceManager.stop(this)
+        setState(Tile.STATE_INACTIVE)
     }
 
     private fun updateStatus() {
         val (status) = appStatus
 
-        if (status == AppStatus.Running) {
-            setState(Tile.STATE_ACTIVE)
-        } else {
-            setState(Tile.STATE_INACTIVE)
+        val newState = when (status) {
+            AppStatus.Running -> Tile.STATE_ACTIVE
+            AppStatus.Halted -> Tile.STATE_INACTIVE
         }
+
+        setState(newState)
     }
 
-    private fun setState(newState: Int) {
+    private fun setState(state: Int) {
         appTile?.apply {
-            state = newState
+            this.state = state
             updateTile()
         }
     }

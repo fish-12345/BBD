@@ -14,13 +14,6 @@
     #include <arpa/inet.h>
 #endif
 
-#define ANTOHS(data, i) \
-    (((uint16_t)data[i] << 8) + (uint8_t)data[i + 1])
-    
-#define SHTONA(data, i, x) \
-    data[i] = (uint8_t)((x) >> 8); \
-    data[i + 1] = ((x) & 0xff)
-
 
 char tls_data[517] = {
     "\x16\x03\x01\x02\x00\x01\x00\x01\xfc\x03\x03\x03\x5f"

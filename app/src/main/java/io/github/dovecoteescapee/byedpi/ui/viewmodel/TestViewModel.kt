@@ -20,6 +20,7 @@ import io.github.dovecoteescapee.byedpi.R
 import io.github.dovecoteescapee.byedpi.data.AppStatus
 import io.github.dovecoteescapee.byedpi.data.Mode
 import io.github.dovecoteescapee.byedpi.services.ServiceManager
+import io.github.dovecoteescapee.byedpi.utility.DomainListUtils
 import io.github.dovecoteescapee.byedpi.services.appStatus
 import io.github.dovecoteescapee.byedpi.utility.*
 import kotlinx.coroutines.*
@@ -300,21 +301,10 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadSites(): List<String> {
         val context = getApplication<Application>()
-        val prefs = context.getPreferences()
-        val defaultDomainLists = setOf("youtube", "googlevideo", "social")
-        val selectedDomainLists = prefs.getStringSet("byedpi_proxytest_domain_lists", defaultDomainLists) ?: emptySet()
-        val allDomains = mutableListOf<String>()
-        for (domainList in selectedDomainLists) {
-            val domains = when (domainList) {
-                "custom" -> prefs.getString("byedpi_proxytest_domains", "").orEmpty().lines().map { it.trim() }.filter { it.isNotEmpty() }
-                else -> context.assets.open("proxytest_$domainList.sites").bufferedReader().useLines { lines ->
-                    lines.map { it.trim() }.filter { it.isNotEmpty() }.toList()
-                }
-            }
-            allDomains.addAll(domains)
-        }
-        return allDomains.distinct().filter { checkDomain(it) }
+        DomainListUtils.initializeDefaultLists(context)
+        return DomainListUtils.getActiveDomains(context).filter { checkDomain(it) }
     }
+
 
     private fun loadCmds(): List<String> {
         val context = getApplication<Application>()

@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import io.github.dovecoteescapee.byedpi.core.ByeDpiProxyUIPreferences
+import io.github.dovecoteescapee.byedpi.data.UISettings
 import io.github.dovecoteescapee.byedpi.utility.UIPreferences
 import io.github.dovecoteescapee.byedpi.utility.getPreferences
 
@@ -22,12 +22,12 @@ class UISettingsViewModel(application: Application) : AndroidViewModel(applicati
         private set
 
     var desyncMethod by mutableStateOf(
-        ByeDpiProxyUIPreferences.DesyncMethod.fromName(uiPrefs.desyncMethod)
+        UISettings.DesyncMethod.fromName(uiPrefs.desyncMethod)
     )
         private set
 
     var hostsMode by mutableStateOf(
-        ByeDpiProxyUIPreferences.HostsMode.fromName(uiPrefs.hostsMode)
+        UISettings.HostsMode.fromName(uiPrefs.hostsMode)
     )
         private set
 
@@ -101,7 +101,7 @@ class UISettingsViewModel(application: Application) : AndroidViewModel(applicati
 
     fun updateHostsMode(value: String) {
         uiPrefs.hostsMode = value
-        hostsMode = ByeDpiProxyUIPreferences.HostsMode.fromName(value)
+        hostsMode = UISettings.HostsMode.fromName(value)
     }
 
     fun updateHostsBlacklist(value: List<String>) {
@@ -123,7 +123,7 @@ class UISettingsViewModel(application: Application) : AndroidViewModel(applicati
 
     fun updateDesyncMethod(value: String) {
         uiPrefs.desyncMethod = value
-        desyncMethod = ByeDpiProxyUIPreferences.DesyncMethod.fromName(value)
+        desyncMethod = UISettings.DesyncMethod.fromName(value)
     }
 
     fun updateSplitPosition(value: String) {

@@ -89,6 +89,11 @@ struct eval {
     uint64_t dp_mask;
     int detect;
     bool mark; //
+    int to_count; 
+    
+    int tls_rec_size;
+    int tls_rec_pos;
+    uint8_t tls_rec[5];
     
     bool restore_ttl;
     bool restore_md5;

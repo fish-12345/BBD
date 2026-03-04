@@ -5,8 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.dovecoteescapee.byedpi.utility.TestPreferences
 import io.github.dovecoteescapee.byedpi.utility.getPreferences
+import io.github.dovecoteescapee.byedpi.utility.DomainListUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TestSettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val testPrefs = TestPreferences(application.getPreferences())
@@ -35,7 +40,7 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
     var showAll by mutableStateOf(testPrefs.showAll)
         private set
 
-    var domainLists by mutableStateOf(testPrefs.domainLists)
+    var domainListsSummary by mutableStateOf("No lists selected")
         private set
 
     var domainsList by mutableStateOf(testPrefs.domains.split("\n").filter { it.isNotBlank() })
@@ -49,6 +54,10 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
 
     var concurrentRequests by mutableStateOf(testPrefs.concurrentRequests)
         private set
+
+    init {
+        updateDomainListsSummary()
+    }
 
     fun updateDelay(newValue: String) {
         testPrefs.delay = newValue
@@ -90,25 +99,29 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
         showAll = newValue
     }
 
-    fun updateDomainLists(newValue: Set<String>) {
-        testPrefs.domainLists = newValue
-        domainLists = newValue
+    fun updateDomainListsSummary() {
+        viewModelScope.launch(Dispatchers.IO) {
+            DomainListUtils.initializeDefaultLists(getApplication())
+            val activeLists = DomainListUtils.getLists(getApplication()).filter { it.isActive }
+
+            // Вычисляем строку в фоновом потоке
+            val summaryText = if (activeLists.isEmpty()) {
+                "No lists selected"
+            } else {
+                activeLists.joinToString(", ") { it.name }
+            }
+
+            // ПУБЛИКУЕМ результат в Главном потоке (Main)
+            withContext(Dispatchers.Main) {
+                domainListsSummary = summaryText
+            }
+        }
     }
+
 
     fun updateDomainsList(newList: List<String>) {
         domainsList = newList
         testPrefs.domains = newList.joinToString("\n")
-    }
-
-    fun addDomain(domain: String) {
-        if (domain.isBlank() || domainsList.contains(domain)) return
-        val newList = domainsList + domain
-        updateDomainsList(newList)
-    }
-
-    fun removeDomain(domain: String) {
-        val newList = domainsList - domain
-        updateDomainsList(newList)
     }
 
     fun updateStrategyLists(newValue: Set<String>) {
