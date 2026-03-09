@@ -289,9 +289,9 @@ fun TestStatusCard(viewModel: TestViewModel) {
             }
 
             AnimatedVisibility(visible = viewModel.isTestingState) {
-                Column() {
+                Column {
                     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        Column() {
+                        Column {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -319,7 +319,7 @@ fun TestStatusCard(viewModel: TestViewModel) {
                                 ),
                             )
                         }
-                        Column() {
+                        Column {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()

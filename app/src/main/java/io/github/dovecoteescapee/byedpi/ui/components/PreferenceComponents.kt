@@ -96,7 +96,7 @@ fun NavigationPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Column(

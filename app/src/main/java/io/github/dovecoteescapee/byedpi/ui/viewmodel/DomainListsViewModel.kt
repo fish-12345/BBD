@@ -53,17 +53,17 @@ class DomainListsViewModel(application: Application) : AndroidViewModel(applicat
             DomainListUtils.initializeDefaultLists(getApplication())
             val lists = DomainListUtils.getLists(getApplication())
 
-            val sortedLists = lists.sortedWith(
-                compareByDescending<DomainList> { it.isActive }
-                    .thenBy { it.name.lowercase() }
-            )
+            val userLists = lists.filter { !it.isBuiltIn }
+                .sortedByDescending { it.lastModified }
+            val builtInLists = lists.filter { it.isBuiltIn }
+                .sortedBy { it.name.lowercase() }
+            val sortedLists = userLists + builtInLists
 
             withContext(Dispatchers.Main) {
                 domainLists = sortedLists
             }
         }
     }
-
     fun toggleListActive(domainList: DomainList) {
         viewModelScope.launch(Dispatchers.IO) {
             DomainListUtils.toggleListActive(getApplication(), domainList.id)

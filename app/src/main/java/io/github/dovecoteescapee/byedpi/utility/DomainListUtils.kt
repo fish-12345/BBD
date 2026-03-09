@@ -13,6 +13,9 @@ object DomainListUtils {
 
     private val gson = Gson()
 
+    private fun Context.getPreferences() =
+        getSharedPreferences("domain_list_prefs", Context.MODE_PRIVATE)
+
     fun initializeDefaultLists(context: Context) {
         val prefs = context.getPreferences()
         val isInitialized = prefs.getBoolean(KEY_INITIAL_LOADED, false)
@@ -44,13 +47,13 @@ object DomainListUtils {
                     },
                     domains = domains,
                     isActive = listName in setOf("youtube", "googlevideo"),
-                    isBuiltIn = true
+                    isBuiltIn = true,
+                    lastModified = System.currentTimeMillis() // встроенные листы
                 )
             )
         }
 
         saveLists(context, defaultLists)
-
         prefs.edit { putBoolean(KEY_INITIAL_LOADED, true) }
     }
 
@@ -95,7 +98,8 @@ object DomainListUtils {
                 name = name,
                 domains = domains,
                 isActive = true,
-                isBuiltIn = false
+                isBuiltIn = false,
+                lastModified = System.currentTimeMillis() // обновляем время
             )
         )
 
@@ -110,7 +114,12 @@ object DomainListUtils {
         if (index == -1) return false
 
         val oldList = lists[index]
-        lists[index] = oldList.copy(name = name, domains = domains)
+        lists[index] = oldList.copy(
+            name = name,
+            domains = domains,
+            // обновляем lastModified только для пользовательских листов
+            lastModified = if (!oldList.isBuiltIn) System.currentTimeMillis() else oldList.lastModified
+        )
 
         saveLists(context, lists)
         return true
@@ -131,7 +140,6 @@ object DomainListUtils {
 
     fun deleteList(context: Context, id: String): Boolean {
         val lists = getLists(context).toMutableList()
-
         val iterator = lists.iterator()
         var removed = false
 
@@ -143,9 +151,7 @@ object DomainListUtils {
             }
         }
 
-        if (removed) {
-            saveLists(context, lists)
-        }
+        if (removed) saveLists(context, lists)
 
         return removed
     }
