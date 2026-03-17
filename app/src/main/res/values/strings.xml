@@ -1,6 +1,6 @@
 <resources>
-    <string name="byedpi_docs">https://github.com/hufrea/byedpi/blob/main/README.md</string>
-    <string name="app_name">ByeByeDPI</string>
+    <string name="byedpi_docs" translatable="false">https://github.com/hufrea/byedpi/blob/main/README.md</string>
+    <string name="app_name" translatable="false">ByeByeDPI</string>
     <string name="cmd_documentation">Документация ByeDPI</string>
     <string name="toggle_connect">Вкл/Выкл</string>
     <string name="vpn_connect">Подключить</string>
@@ -15,10 +15,9 @@
     <string name="service_pause_btn">Пауза</string>
     <string name="service_stop_btn">Стоп</string>
     <string name="service_paused_text">Приостановлен</string>
-    <string name="open_editor">Редактор</string>
+    <string name="open_editor">Открыть редактор</string>
     <string name="settings">Настройки</string>
     <string name="vpn_permission_denied">Нет разрешения на активацию VPN</string>
-    <string name="service_restart">Сервис перезапущен с новыми параметрами</string>
     <string name="settings_unavailable">Сначала отключитесь, чтобы зайти в настройки</string>
     <string name="title_settings">Настройки</string>
     <string name="save_logs">Сохранить логи</string>
@@ -27,12 +26,15 @@
     <string name="export_settings">Экспорт настроек</string>
     <string name="import_settings">Импорт настроек</string>
     <string name="logs_failed">Не удалось собрать логи</string>
-    <string name="proxy_address">%1$s:%2$s</string>
+    <string name="proxy_address" translatable="false">%1$s:%2$s</string>
     <string name="lang_settings">Язык</string>
     <string name="theme_settings">Тема</string>
+    <string name="color_scheme_settings">Цветовая схема</string>
+    <string name="dynamic_colors_settings">Динамические цвета</string>
     <string name="mode_setting">Режим</string>
-    <string name="dbs_ip_setting">DNS</string>
-    <string name="byedpi_version">ByeDPI</string>
+    <string name="dbs_ip_setting" translatable="false">DNS</string>
+    <string name="dns_solution_setting">DNS сервер</string>
+    <string name="byedpi_version" translatable="false">ByeDPI</string>
     <string name="bye_dpi_proxy_ip_setting">Прослушиваемый IP</string>
     <string name="byedpi_proxy_port_setting">Порт</string>
     <string name="byedpi_http_connect_setting">HTTP прокси</string>
@@ -51,17 +53,18 @@
     <string name="byedpi_tlsrec_enabled_setting">Разделить TLS запись</string>
     <string name="byedpi_tlsrec_position_setting">Позиция разделения TLS записи</string>
     <string name="byedpi_tlsrec_at_sni_setting">Разделить TLS запись в SNI</string>
-    <string name="version">ByeByeDPI</string>
+    <string name="version" translatable="false">ByeByeDPI</string>
     <string name="source_code_link">Исходный код</string>
     <string name="byedpi_readme_link">Что все это значит?</string>
     <string name="failed_to_start">Не удалось запустить %1$s</string>
-    <string name="vpn_channel_name">VPN</string>
+    <string name="vpn_channel_name" translatable="false">VPN</string>
     <string name="proxy_channel_name">Прокси</string>
-    <string name="notification_title">ByeByeDPI</string>
+    <string name="notification_title" translatable="false">ByeByeDPI</string>
     <string name="vpn_notification_content">VPN работает</string>
     <string name="proxy_notification_content">Прокси работает</string>
     <string name="general_category">Общие</string>
-    <string name="byedpi_category">ByeDPI</string>
+    <string name="appearance_category">Внешний вид</string>
+    <string name="byedpi_category" translatable="false">ByeDPI</string>
     <string name="about_category">О программе</string>
     <string name="command_line_editor">Редактор командной строки</string>
     <string name="ui_editor">Стандартный редактор</string>
@@ -77,14 +80,14 @@
     <string name="byedpi_hosts_mode_setting">Хосты</string>
     <string name="byedpi_hosts_blacklist_setting">Черный список хостов</string>
     <string name="byedpi_hosts_whitelist_setting">Белый список хостов</string>
-    <string name="byedpi_tcp_fast_open_setting">TCP Fast Open</string>
+    <string name="byedpi_tcp_fast_open_setting" translatable="false">TCP Fast Open</string>
     <string name="byedpi_udp_fake_count">Количество поддельных UDP</string>
-    <string name="ipv6_setting">IPv6</string>
+    <string name="ipv6_setting" translatable="false">IPv6</string>
     <string name="byedpi_fake_offset_setting">Смещение поддельных пакетов</string>
     <string name="byedpi_drop_sack_setting">Отбрасывать SACK</string>
-    <string name="desync_udp_category">UDP</string>
-    <string name="desync_http_category">HTTP</string>
-    <string name="desync_https_category">HTTPS</string>
+    <string name="desync_udp_category" translatable="false">UDP</string>
+    <string name="desync_http_category" translatable="false">HTTP</string>
+    <string name="desync_https_category" translatable="false">HTTPS</string>
     <string name="byedpi_protocols_category">Протоколы</string>
     <string name="byedpi_protocols_hint">Снимите все галочки, чтобы десинхронизировать весь трафик</string>
     <string name="automation">Автоматизация</string>
@@ -97,8 +100,8 @@
     <string name="storage_access">Доступ к файлам</string>
     <string name="storage_access_summary">Предоставьте доступ к хранилищу, если вы хотите использовать файлы в стратегиях</string>
     <string name="storage_access_allowed_summary">Разрешен</string>
-    <string name="cmd_args_clear">Очистить</string>
     <string name="cmd_args_paste">Вставить</string>
+    <string name="cmd_args_clear">Очистить</string>
     <string name="cmd_history_title">Список стратегий</string>
     <string name="cmd_history_title_summary">Нажмите для управления историей</string>
     <string name="cmd_history_delete_all">Очистить историю</string>
@@ -111,7 +114,6 @@
     <string name="cmd_history_pin">Закрепить</string>
     <string name="cmd_history_unpin">Открепить</string>
     <string name="cmd_history_pinned">Закреплено</string>
-    <string name="cmd_history_applied">Применена</string>
     <string name="cmd_history_delete">Удалить</string>
     <string name="telegram_link">Группа Telegram</string>
     <string name="title_test">Подбор стратегий (Beta)</string>
@@ -129,15 +131,11 @@
         Приложение вылетело во время тестирования?
         \n\nПерейдите в настройки теста и увеличивайте время ожидания между проверками шагом в 2 секунды (2, 4, 6..).
     </string>
-    <string name="test_process">Проверка %1$d/%2$d</string>
+    <string name="test_process">Проверка</string>
     <string name="test_proxy_error">Ошибка прокси. Тест остановлен</string>
     <string name="test_good_cmds">Стратегии с наилучшим результатом, применяйте от большего к меньшему</string>
     <string name="test_complete">Проверка завершена</string>
     <string name="test_complete_info">Нажмите на стратегию, чтобы скопировать ее или применить</string>
-    <string name="test_cmd_connect">Применить и запустить</string>
-    <string name="test_cmd_apply">Применить без запуска</string>
-    <string name="test_cmd_connected">Подключено</string>
-    <string name="toast_copied">Скопировано</string>
     <string name="test_settings_sni">SNI фейк пакетов</string>
     <string name="test_settings_fulllog">Вывод ответа хостов</string>
     <string name="test_settings_logclickable">Все стратегии кликабельны</string>
@@ -148,37 +146,73 @@
     <string name="test_settings_commands">Список стратегий</string>
     <string name="test_delay">Ожидание между проверками</string>
     <string name="test_requests">Количество запросов к домену</string>
-    <string name="test_requests_limit">Максимум парралельных запросов</string>
     <string name="test_timeout">Таймаут ответа домена</string>
-    <string name="test_show_details">Показать детали</string>
-    <string name="test_hide_details">Скрыть детали</string>
-    <string name="test_expand">Развернуть</string>
+    <string name="test_concurrent_requests">Количество одновременных проверок</string>
+    <string name="test_settings_autosort">Автоматическая сортировка</string>
+    <string name="test_settings_showall">Показывать все результаты</string>
+    <string name="clear_selection">Очистить выбор</string>
+    <string name="filter_selected">Выбранные</string>
+    <string name="filter_system">Системные</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_ok">OK</string>
+    <string name="quick_actions">Быстрые действия</string>
+    <string name="vpn_mode">Режим VPN</string>
+    <string name="proxy_mode">Режим прокси</string>
+    <string name="editor">Редактор</string>
+    <string name="test_status">Статус</string>
+    <string name="test_results">Результаты</string>
+    <string name="test_hide_logs">Скрыть логи</string>
+    <string name="test_show_logs">Показать логи</string>
     <string name="battery_optimization">Оптимизация батареи</string>
-    <string name="battery_optimization_summary">Включите для улучшения стабильности</string>
-    <string name="battery_optimization_disabled_summary">Отключена</string>
-    <string name="permission_category">Разрешения</string>
-    <string name="documentation_link">Документация</string>
-    <string name="proxytest_delay_desc">Увеличение значения повышает стабильность</string>
-    <string name="proxytest_requests_desc">Увеличение значения повышает точность, но может снизить стабильность</string>
-    <string name="proxytest_limit_desc">Увеличение значения ускоряет тест, но может снизить стабильность</string>
-    <string name="proxytest_timeout_desc">Увеличение значения замедляет тест, но повышает стабильность и точность</string>
-    <string name="domain_lists">Списки доменов</string>
-    <string name="domain_lists_summary">Управление списками доменов для тестирования</string>
-    <string name="domain_list_add_new">Добавить список</string>
-    <string name="domain_list_add_new_summary">Создать пользовательский список доменов для тестирования</string>
-    <string name="domain_list_edit">Редактировать</string>
-    <string name="domain_list_delete">Удалить</string>
-    <string name="domain_list_name_hint">Название списка</string>
-    <string name="domain_list_domains_hint">Домены, каждый с новой строки</string>
-    <string name="domain_list_summary">%d доменов</string>
-    <string name="domain_list_name_empty">Название списка не может быть пустым</string>
-    <string name="domain_list_domains_empty">Список доменов не может быть пустым</string>
-    <string name="domain_list_already_exists">Список с таким названием уже существует</string>
-    <string name="domain_list_added">Список доменов добавлен</string>
-    <string name="domain_list_updated">Список доменов обновлен</string>
-    <string name="domain_list_update_failed">Не удалось обновить список доменов</string>
-    <string name="domain_list_deleted">Список доменов удален</string>
-    <string name="domain_list_delete_failed">Не удалось удалить список доменов</string>
-    <string name="main_btn_test">Подбор</string>
-    <string name="main_btn_list">Списки</string>
+    <string name="battery_optimization_summary">Отключите оптимизацию батареи, чтобы предотвратить остановку приложения
+        системой в фоновом режиме
+    </string>
+    <string name="battery_optimization_dialog_title">Отключить оптимизацию батареи</string>
+    <string name="battery_optimization_dialog_message">Для обеспечения стабильной работы в фоновом режиме рекомендуется
+        отключить оптимизацию батареи. Это предотвратит остановку сервиса системой при выключенном экране и в фоновом
+        режиме.
+    </string>
+    <string name="battery_optimization_disable">Отключить</string>
+    <string name="test_details">Детализация по доменам</string>
+    <string name="test_connected">Доступен</string>
+    <string name="test_not_connected">Недоступен</string>
+    <string name="test_all_connected">Все домены доступны</string>
+    <string name="some_domain" translatable="false">youtube.com</string>
+    <string name="some_strategy" translatable="false">-d3+s -a1 -a5</string>
+    <string name="some_ip" translatable="false">127.0.0.1</string>
+    <string name="add">Добавить</string>
+    <string name="empty">Пусто</string>
+    <string name="byedpi_proxy_port_setting_hint" translatable="false">(0-65535)</string>
+    <string name="profiles_title">Профили</string>
+    <string name="profiles_add">Добавить профиль</string>
+    <string name="profiles_edit">Редактировать профиль</string>
+    <string name="profiles_delete_confirm">Удалить профиль?</string>
+    <string name="profiles_delete_message">Вы уверены, что хотите удалить профиль \"%1$s\"?</string>
+    <string name="profiles_name">Название</string>
+    <string name="profiles_command">Команда</string>
+    <string name="profiles_unnamed">Без названия</string>
+    <string name="apply">Применить</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="profiles_auto_switch">Автопереключение</string>
+    <string name="profiles_wifi" translatable="false">Wi-Fi</string>
+    <string name="profiles_mobile">Мобильный интернет</string>
+    <string name="profiles_none">Не выбрано</string>
+    <string name="profiles_list">Список профилей</string>
+    <string name="profiles_empty">У вас пока нет профилей. Вы можете добавить их вручную или найти рабочую стратегию в разделе тестирования.</string>
+    <string name="restarting_service">Перезапуск сервиса...</string>
+    <string name="private_dns">Персональный DNS</string>
+    <string name="private_dns_off">Отключен</string>
+    <string name="private_dns_auto">Автоматический</string>
+    <string name="private_dns_provider">Имя хоста поставщика персонального DNS</string>
+    <string name="private_dns_suggest_cloudflare">Рекомендуется использовать Cloudflare DNS для работы ByeByeDPI</string>
+    <string name="private_dns_how_to_use">Как включить: Нажмите на эту карточку -> Персональный DNS сервер -> Имя хоста поставщика персонального DNS -> Введите 1dot1dot1dot1.cloudflare-dns.com</string>
+    <string name="copy_cloudflare_dns">Копировать DNS</string>
+    <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
+    <string name="status_connected">Подключено</string>
+    <string name="status_disconnected">Отключено</string>
+    <string name="test_process_strategy">Прогресс стратегий</string>
+    <string name="test_process_domain">Прогресс доменов</string>
+    <string name="traffic_monitoring_setting">Мониторинг трафика</string>
+    <string name="domain_lists" translatable="false">Domain Lists</string>
 </resources>

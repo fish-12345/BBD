@@ -6,7 +6,6 @@
         <item name="en">English</item>
         <item name="tr">Türkçe</item>
         <item name="kk">Қазақша</item>
-        <item name="vi">Tiếng Việt</item>
     </array>
     <array name="languages_entries">
         <item name="system">system</item>
@@ -14,7 +13,6 @@
         <item name="en">en</item>
         <item name="tr">tr</item>
         <item name="kk">kk</item>
-        <item name="vi">vi</item>
     </array>
 
     <array name="themes">
@@ -26,6 +24,25 @@
         <item name="system">system</item>
         <item name="light">light</item>
         <item name="dark">dark</item>
+    </array>
+
+    <array name="color_schemes">
+        <item>Default</item>
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Yellow</item>
+        <item>Orange</item>
+        <item>Purple</item>
+        <item>Pink</item>
+    </array>
+    <array name="color_schemes_entries">
+        <item>Default</item>
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Yellow</item>
+        <item>Orange</item>
+        <item>Purple</item>
+        <item>Pink</item>
     </array>
 
     <array name="byedpi_modes">
@@ -74,5 +91,54 @@
         <item name="disable">disable</item>
         <item name="blacklist">blacklist</item>
         <item name="whitelist">whitelist</item>
+    </array>
+
+    <array name="domain_lists_entries">
+        <item>YouTube</item>
+        <item>GoogleVideo</item>
+        <item>Discord</item>
+        <item>Cloudflare</item>
+        <item>Торренты</item>
+        <item>Соцсети</item>
+        <item>Свой список</item>
+    </array>
+    <array name="domain_lists_values">
+        <item>youtube</item>
+        <item>googlevideo</item>
+        <item>discord</item>
+        <item>cloudflare</item>
+        <item>torrents</item>
+        <item>social</item>
+        <item>custom</item>
+    </array>
+    <array name="domain_lists_default">
+        <item>youtube</item>
+        <item>googlevideo</item>
+    </array>
+
+    <array name="strategy_lists_entries">
+        <item>Встроенные</item>
+        <item>Свой список</item>
+    </array>
+    <array name="strategy_lists_values">
+        <item>builtin</item>
+        <item>custom</item>
+    </array>
+
+    <array name="dns_solutions">
+        <item>Google</item>
+        <item>Yandex</item>
+        <item>Cloudflare</item>
+        <item>AdGuard</item>
+        <item>OpenDNS</item>
+        <item>Custom</item>
+    </array>
+    <array name="dns_solutions_entries">
+        <item>8.8.8.8</item>
+        <item>77.88.8.8</item>
+        <item>1.1.1.1</item>
+        <item>94.140.14.14</item>
+        <item>208.67.222.222</item>
+        <item>custom</item>
     </array>
 </resources>

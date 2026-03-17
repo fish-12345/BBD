@@ -6,7 +6,6 @@
         <item name="en">English</item>
         <item name="tr">Türkçe</item>
         <item name="kk">Қазақша</item>
-        <item name="vi">Tiếng Việt</item>
     </array>
 
     <array name="themes">
@@ -25,5 +24,20 @@
         <item name="disable">Kapalı</item>
         <item name="blacklist">Karaliste</item>
         <item name="whitelist">Beyazliste</item>
+    </array>
+
+    <array name="domain_lists_entries">
+        <item>YouTube</item>
+        <item>GoogleVideo</item>
+        <item>Discord</item>
+        <item>Cloudflare</item>
+        <item>Torrentler</item>
+        <item>Sosyal Medya</item>
+        <item>Özel liste</item>
+    </array>
+
+    <array name="strategy_lists_entries">
+        <item>Yerleşik</item>
+        <item>Özel liste</item>
     </array>
 </resources>
