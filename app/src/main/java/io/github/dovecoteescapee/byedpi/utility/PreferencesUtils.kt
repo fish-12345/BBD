@@ -124,10 +124,6 @@ class AppPreferences(private val prefs: SharedPreferences) {
         get() = prefs.getString("byedpi_proxy_port", "1080") ?: "1080"
         set(value) = prefs.edit { putString("byedpi_proxy_port", value) }
 
-    var httpConnect: Boolean
-        get() = prefs.getBoolean("byedpi_http_connect", false)
-        set(value) = prefs.edit { putBoolean("byedpi_http_connect", value) }
-
     var cmdArgs: String
         get() = prefs.getString("byedpi_cmd_args", "") ?: ""
         set(value) = prefs.edit { putString("byedpi_cmd_args", value) }
@@ -188,10 +184,6 @@ class TestPreferences(private val prefs: SharedPreferences) {
     var showAll: Boolean
         get() = prefs.getBoolean("byedpi_proxytest_showall", false)
         set(value) = prefs.edit { putBoolean("byedpi_proxytest_showall", value) }
-
-    var domainLists: Set<String>
-        get() = prefs.getStringSet("byedpi_proxytest_domain_lists", setOf("youtube", "googlevideo", "social")) ?: setOf("youtube", "googlevideo", "social")
-        set(value) = prefs.edit { putStringSet("byedpi_proxytest_domain_lists", value) }
 
     var domains: String
         get() = prefs.getString("byedpi_proxytest_domains", "") ?: ""

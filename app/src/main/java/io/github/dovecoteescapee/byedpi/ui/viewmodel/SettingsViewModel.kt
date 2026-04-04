@@ -40,17 +40,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         private set
     var proxyPort by mutableStateOf(appPrefs.proxyPort)
         private set
-    var httpConnect by mutableStateOf(appPrefs.httpConnect)
-        private set
     var dynamicColors by mutableStateOf(themeManager.getDynamicColor())
         private set
     var isBatteryOptimizationEnabled by mutableStateOf(application.isBatteryOptimizationEnabled())
         private set
     var hasStorageAccess by mutableStateOf(application.hasStorageAccess())
-        private set
-    var privateDnsMode by mutableStateOf(application.getPrivateDnsMode())
-        private set
-    var privateDnsSpecifier by mutableStateOf(application.getPrivateDnsSpecifier())
         private set
     var trafficMonitoring by mutableStateOf(appPrefs.trafficMonitoring)
         private set
@@ -138,11 +132,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         proxyPort = newValue
     }
 
-    fun updateHttpConnect(newValue: Boolean) {
-        appPrefs.httpConnect = newValue
-        httpConnect = newValue
-    }
-
     fun updateTrafficMonitoring(newValue: Boolean) {
         appPrefs.trafficMonitoring = newValue
         trafficMonitoring = newValue
@@ -154,10 +143,5 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun refreshStorageAccessStatus() {
         hasStorageAccess = getApplication<Application>().hasStorageAccess()
-    }
-
-    fun refreshPrivateDnsStatus() {
-        privateDnsMode = getApplication<Application>().getPrivateDnsMode()
-        privateDnsSpecifier = getApplication<Application>().getPrivateDnsSpecifier()
     }
 }

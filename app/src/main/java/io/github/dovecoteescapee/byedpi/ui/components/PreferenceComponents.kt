@@ -63,21 +63,6 @@ fun SettingsCard(
 }
 
 @Composable
-fun PreferenceCategory(
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 8.dp)
-    )
-}
-
-@Composable
 fun NavigationPreference(
     title: String,
     summary: String,
@@ -95,6 +80,7 @@ fun NavigationPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
+            modifier = Modifier.padding(end = 16.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
@@ -103,7 +89,7 @@ fun NavigationPreference(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = summary,

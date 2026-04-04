@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import io.github.dovecoteescapee.byedpi.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,8 +35,6 @@ fun DomainListsScreen(
 ) {
     val context = LocalContext.current
 
-    // ПОДПИСКА НА СОБЫТИЯ TOAST
-    // Этот блок следит за toastEvent во ViewModel и показывает Toast в UI-потоке
     LaunchedEffect(Unit) {
         viewModel.toastEvent.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -44,10 +44,10 @@ fun DomainListsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Domain Lists") },
+                title = { Text(stringResource(R.string.domain_lists)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад")
                     }
                 }
             )
@@ -56,7 +56,7 @@ fun DomainListsScreen(
             FloatingActionButton(
                 onClick = { viewModel.showAddDialogAction() }
             ) {
-                Icon(Icons.Default.Add, "Add new list")
+                Icon(Icons.Default.Add, "Добавить список")
             }
         }
     ) { paddingValues ->
@@ -79,7 +79,7 @@ fun DomainListsScreen(
         // Add Dialog
         if (viewModel.showAddDialog) {
             DomainListEditDialog(
-                title = "Add New Domain List",
+                title = "Добавить список",
                 initialName = "",
                 initialDomains = "",
                 onDismiss = { viewModel.hideAddDialog() },
@@ -99,7 +99,7 @@ fun DomainListsScreen(
         if (viewModel.showEditDialog && viewModel.editingList != null) {
             val list = viewModel.editingList!!
             DomainListEditDialog(
-                title = "Edit Domain List",
+                title = "Редактировать список",
                 initialName = list.name,
                 initialDomains = list.domains.joinToString("\n"),
                 onDismiss = { viewModel.hideEditDialog() },
@@ -126,7 +126,7 @@ fun DomainListsScreen(
 
                         ListItem(
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                            headlineContent = { Text("Edit") },
+                            headlineContent = { Text("Редактировать") },
                             leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -138,7 +138,7 @@ fun DomainListsScreen(
 
                         ListItem(
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                            headlineContent = { Text("Copy") },
+                            headlineContent = { Text("Копировать") },
                             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -152,7 +152,7 @@ fun DomainListsScreen(
                                     clipboardManager.setPrimaryClip(clip)
 
                                     viewModel.hideActionDialog()
-                                    Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
                                 }
                         )
 
@@ -165,7 +165,7 @@ fun DomainListsScreen(
 
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                headlineContent = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                                headlineContent = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
                                 leadingContent = {
                                     Icon(
                                         Icons.Default.Delete,
@@ -178,7 +178,7 @@ fun DomainListsScreen(
                                     .clickable {
                                         viewModel.deleteList(list.id)
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Domain list deleted", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
                                     }
                             )
                         }
@@ -187,7 +187,7 @@ fun DomainListsScreen(
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { viewModel.hideActionDialog() }) {
-                        Text("Cancel")
+                        Text("Отмена")
                     }
                 }
             )
@@ -263,14 +263,14 @@ fun DomainListEditDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("List Name") },
+                    label = { Text("Название") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = domains,
                     onValueChange = { domains = it },
-                    label = { Text("Domains (one per line)") },
+                    label = { Text("Домены (1 на линию)") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp),
@@ -282,12 +282,12 @@ fun DomainListEditDialog(
             TextButton(
                 onClick = { onConfirm(name, domains) }
             ) {
-                Text("OK")
+                Text("ОК")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Отмена")
             }
         }
     )

@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -48,12 +48,26 @@ import io.github.dovecoteescapee.byedpi.ui.theme.TrackerTheme
 import io.github.dovecoteescapee.byedpi.utility.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Locale
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
 
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val lang = newBase.getPreferences().getString("language", "system") ?: "system"
+        if (lang == "system") {
+            super.attachBaseContext(newBase)
+            return
+        }
+        val locale = Locale.forLanguageTag(lang)
+        Locale.setDefault(locale)
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
     }
 
     private val vpnRegister =
@@ -358,10 +372,10 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("settings/ui")
                             },
                             onOpenTelegram = {
-                                openUrl("https://t.me/gdlbo")
+                                openUrl("https://t.me/ByeByeDPI_group")
                             },
                             onOpenSourceCode = {
-                                openUrl("https://github.com/gdlbo/ByeByeDPI")
+                                openUrl("https://github.com/romanvht/ByeByeDPI")
                             },
                             onRequestStorageAccess = {
                                 requestStoragePermission()
@@ -506,7 +520,7 @@ class MainActivity : ComponentActivity() {
 
     private fun openUrl(url: String) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(intent)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open URL: $url", e)
@@ -533,7 +547,7 @@ class MainActivity : ComponentActivity() {
     private fun requestDisableBatteryOptimization() {
         try {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-            intent.data = Uri.parse("package:$packageName")
+            intent.data = "package:$packageName".toUri()
             startActivity(intent)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to request ignore battery optimizations", e)

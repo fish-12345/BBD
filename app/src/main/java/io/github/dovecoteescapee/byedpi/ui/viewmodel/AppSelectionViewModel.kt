@@ -2,7 +2,6 @@ package io.github.dovecoteescapee.byedpi.ui.viewmodel
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +14,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.content.edit
 
 class AppSelectionViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
@@ -69,7 +69,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
         val newSelected = prefs.getStringSet("selected_apps", setOf())?.toMutableSet() ?: mutableSetOf()
         if (isChecked) newSelected.add(app.packageName)
         else newSelected.remove(app.packageName)
-        prefs.edit().putStringSet("selected_apps", newSelected).apply()
+        prefs.edit { putStringSet("selected_apps", newSelected) }
 
         apps = apps.map {
             if (it.packageName == app.packageName) it.copy(isSelected = isChecked)
@@ -78,7 +78,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun clearSelection() {
-        prefs.edit().remove("selected_apps").apply()
+        prefs.edit {remove("selected_apps")}
         apps = apps.map { it.copy(isSelected = false) }
     }
 

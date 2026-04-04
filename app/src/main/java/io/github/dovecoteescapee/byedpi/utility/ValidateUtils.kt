@@ -1,7 +1,5 @@
 package io.github.dovecoteescapee.byedpi.utility
 
-import android.net.InetAddresses
-import android.os.Build
 import java.util.regex.Pattern
 
 private val DOMAIN_NAME_PATTERN = Pattern.compile(

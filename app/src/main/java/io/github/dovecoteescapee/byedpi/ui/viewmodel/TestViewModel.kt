@@ -5,6 +5,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -57,21 +59,21 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     var showAll by mutableStateOf(false)
         private set
 
-    var currentStrategyProgress by mutableStateOf(0f)
+    var currentStrategyProgress by mutableFloatStateOf(0f)
         private set
-    var overallProgress by mutableStateOf(0f)
-        private set
-
-    var totalSitesCount by mutableStateOf(0)
+    var overallProgress by mutableFloatStateOf(0f)
         private set
 
-    var checkedSitesCount by mutableStateOf(0)
+    var totalSitesCount by mutableIntStateOf(0)
         private set
 
-    var totalCmdCount by mutableStateOf(0)
+    var checkedSitesCount by mutableIntStateOf(0)
         private set
 
-    var checkedCmdCount by mutableStateOf(0)
+    var totalCmdCount by mutableIntStateOf(0)
+        private set
+
+    var checkedCmdCount by mutableIntStateOf(0)
         private set
 
     private val _toastEvent = MutableSharedFlow<Int>()

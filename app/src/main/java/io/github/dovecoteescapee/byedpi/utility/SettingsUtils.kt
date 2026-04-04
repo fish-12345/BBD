@@ -116,12 +116,16 @@ object SettingsUtils {
                             is Float -> putFloat(key, value)
                             is Long -> putLong(key, value)
                             is Double -> {
-                                if (value == value.toInt().toDouble()) {
-                                    putInt(key, value.toInt())
-                                } else if (value == value.toLong().toDouble()) {
-                                    putLong(key, value.toLong())
-                                } else {
-                                    putFloat(key, value.toFloat())
+                                when (value) {
+                                    value.toInt().toDouble() -> {
+                                        putInt(key, value.toInt())
+                                    }
+                                    value.toLong().toDouble() -> {
+                                        putLong(key, value.toLong())
+                                    }
+                                    else -> {
+                                        putFloat(key, value.toFloat())
+                                    }
                                 }
                             }
                             is Collection<*> -> {

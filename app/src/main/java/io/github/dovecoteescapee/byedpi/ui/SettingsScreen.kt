@@ -1,14 +1,8 @@
 package io.github.dovecoteescapee.byedpi.ui
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.app.Activity
 import android.os.Build
-import android.provider.Settings.ACTION_WIRELESS_SETTINGS
-import android.widget.Toast
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -62,7 +56,6 @@ fun SettingsScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.refreshBatteryOptimizationStatus()
         viewModel.refreshStorageAccessStatus()
-        viewModel.refreshPrivateDnsStatus()
     }
 
     Scaffold(
@@ -118,85 +111,6 @@ fun SettingsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (!isTv && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        SettingsCard(
-                            modifier = Modifier.widthIn(max = 800.dp),
-                            title = stringResource(R.string.private_dns)
-                        ) {
-                            val privateDnsMode = viewModel.privateDnsMode ?: "off"
-                            val privateDnsSummary = when (privateDnsMode) {
-                                "off" -> stringResource(R.string.private_dns_off)
-                                "opportunistic" -> stringResource(R.string.private_dns_auto)
-                                "hostname" -> viewModel.privateDnsSpecifier
-                                    ?: stringResource(R.string.private_dns_provider)
-
-                                else -> privateDnsMode
-                            }
-
-                            PreferenceItem(
-                                title = stringResource(R.string.private_dns),
-                                summary = privateDnsSummary,
-                                icon = Icons.Default.VpnLock,
-                                onClick = {
-                                    context.startActivity(Intent(ACTION_WIRELESS_SETTINGS))
-                                }
-                            )
-
-                            if (privateDnsMode == "off" || privateDnsMode == "opportunistic") {
-                                Column(
-                                    modifier = Modifier
-                                        .clickable {
-                                            context.startActivity(Intent(ACTION_WIRELESS_SETTINGS))
-                                        }
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.private_dns_suggest_cloudflare),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = stringResource(R.string.private_dns_how_to_use),
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        OutlinedButton(
-                                            onClick = {
-                                                val clipboard =
-                                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                val clip = ClipData.newPlainText(
-                                                    "Cloudflare DNS",
-                                                    "1dot1dot1dot1.cloudflare-dns.com"
-                                                )
-                                                clipboard.setPrimaryClip(clip)
-                                                Toast.makeText(
-                                                    context,
-                                                    R.string.copied_to_clipboard,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Icon(Icons.Default.ContentCopy, contentDescription = null)
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(stringResource(R.string.copy_cloudflare_dns))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             item {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     SettingsCard(
@@ -357,7 +271,10 @@ fun SettingsScreen(
                             title = stringResource(R.string.lang_settings),
                             value = viewModel.language,
                             entries = languageMap,
-                            onValueChange = { viewModel.updateLanguage(it) },
+                            onValueChange = {
+                                viewModel.updateLanguage(it)
+                                (context as Activity).recreate()
+                            },
                             icon = Icons.Default.Language
                         )
 
@@ -377,7 +294,7 @@ fun SettingsScreen(
                         )
 
                         val colorSchemes = stringArrayResource(R.array.color_schemes)
-                        val colorSchemeValues = stringArrayResource(R.array.color_schemes_entries)
+                        val colorSchemeValues = stringArrayResource(R.array.color_schemes)
                         val colorSchemeMap = colorSchemeValues.zip(colorSchemes).toMap()
 
                         ListPreference(
@@ -426,14 +343,6 @@ fun SettingsScreen(
                                 onValueChange = { viewModel.updateProxyPort(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 icon = Icons.Default.Numbers
-                            )
-
-                            SwitchPreference(
-                                title = stringResource(R.string.byedpi_http_connect_setting),
-                                summary = stringResource(R.string.byedpi_http_connect_summary),
-                                checked = viewModel.httpConnect,
-                                onCheckedChange = { viewModel.updateHttpConnect(it) },
-                                icon = Icons.Default.Http
                             )
                         }
                     }

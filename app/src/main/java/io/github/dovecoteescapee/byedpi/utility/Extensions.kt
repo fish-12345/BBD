@@ -7,7 +7,6 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Environment
 import android.os.PowerManager
-import android.provider.Settings
 import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,21 +37,5 @@ fun Context.hasStorageAccess(): Boolean {
             this,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
-    }
-}
-
-fun Context.getPrivateDnsMode(): String? {
-    return try {
-        Settings.Global.getString(contentResolver, "private_dns_mode")
-    } catch (e: Exception) {
-        null
-    }
-}
-
-fun Context.getPrivateDnsSpecifier(): String? {
-    return try {
-        Settings.Global.getString(contentResolver, "private_dns_specifier")
-    } catch (e: Exception) {
-        null
     }
 }

@@ -7,6 +7,7 @@ import io.github.dovecoteescapee.byedpi.utility.getPreferences
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import androidx.core.content.edit
 
 class ThemeManager(context: Context) {
     private val prefs: SharedPreferences = context.getPreferences()
@@ -49,14 +50,14 @@ class ThemeManager(context: Context) {
     fun getSelectedColorScheme(): String = prefs.getString("color_scheme", "Default") ?: "Default"
 
     fun setDynamicColor(enabled: Boolean) {
-        prefs.edit().putBoolean("dynamic_colors", enabled).apply()
+        prefs.edit { putBoolean("dynamic_colors", enabled) }
     }
 
     fun setDarkTheme(theme: String) {
-        prefs.edit().putString("app_theme", theme).apply()
+        prefs.edit { putString("app_theme", theme) }
     }
 
     fun setColorScheme(scheme: String) {
-        prefs.edit().putString("color_scheme", scheme).apply()
+        prefs.edit { putString("color_scheme", scheme) }
     }
 }

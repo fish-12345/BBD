@@ -398,8 +398,7 @@ fun ActionGrid(
                 rowActions.forEach { action ->
                     ActionCard(
                         action = action,
-                        modifier = Modifier.weight(1f),
-                        isTv = isTv
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 if (rowActions.size < columns) {
@@ -415,8 +414,7 @@ fun ActionGrid(
 @Composable
 fun ActionCard(
     action: DashboardAction,
-    modifier: Modifier = Modifier,
-    isTv: Boolean
+    modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()

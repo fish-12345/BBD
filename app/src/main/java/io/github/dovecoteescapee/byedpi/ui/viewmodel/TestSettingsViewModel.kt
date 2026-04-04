@@ -119,11 +119,6 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
     }
 
 
-    fun updateDomainsList(newList: List<String>) {
-        domainsList = newList
-        testPrefs.domains = newList.joinToString("\n")
-    }
-
     fun updateStrategyLists(newValue: Set<String>) {
         testPrefs.strategyLists = newValue
         strategyLists = newValue
