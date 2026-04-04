@@ -26,16 +26,6 @@
         <item name="whitelist">Beyazliste</item>
     </array>
 
-    <array name="domain_lists_entries">
-        <item>YouTube</item>
-        <item>GoogleVideo</item>
-        <item>Discord</item>
-        <item>Cloudflare</item>
-        <item>Torrentler</item>
-        <item>Sosyal Medya</item>
-        <item>Özel liste</item>
-    </array>
-
     <array name="strategy_lists_entries">
         <item>Yerleşik</item>
         <item>Özel liste</item>

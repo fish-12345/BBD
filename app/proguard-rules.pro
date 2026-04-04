@@ -3,14 +3,14 @@
     native <methods>;
 }
 
--keep class io.github.dovecoteescapee.byedpi.core.ByeDpiProxy { *; }
--keep,allowoptimization class io.github.dovecoteescapee.byedpi.core.TProxyService { *; }
--keep,allowoptimization class io.github.dovecoteescapee.byedpi.activities.** { *; }
--keep,allowoptimization class io.github.dovecoteescapee.byedpi.services.** { *; }
--keep,allowoptimization class io.github.dovecoteescapee.byedpi.receiver.** { *; }
+-keep class io.github.romanvht.byedpi.core.ByeDpiProxy { *; }
+-keep,allowoptimization class io.github.romanvht.byedpi.core.TProxyService { *; }
+-keep,allowoptimization class io.github.romanvht.byedpi.activities.** { *; }
+-keep,allowoptimization class io.github.romanvht.byedpi.services.** { *; }
+-keep,allowoptimization class io.github.romanvht.byedpi.receiver.** { *; }
 
--keep class io.github.dovecoteescapee.byedpi.data.Command { *; }
--keep class io.github.dovecoteescapee.byedpi.data.AppSettings { *; }
+-keep class io.github.romanvht.byedpi.data.Command { *; }
+-keep class io.github.romanvht.byedpi.data.AppSettings { *; }
 
 -keepattributes Signature
 -keepattributes *Annotation*

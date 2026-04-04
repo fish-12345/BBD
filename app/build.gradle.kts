@@ -8,7 +8,7 @@ plugins {
 val abis = setOf("arm64-v8a")
 
 configure<ApplicationExtension> {
-    namespace = "io.github.dovecoteescapee.byedpi"
+    namespace = "io.github.romanvht.byedpi"
     compileSdk = 36
 
     defaultConfig {

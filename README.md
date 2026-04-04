@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-    <img src="https://github.com/dovecoteescapee/ByeDPIAndroid/raw/master/.github/images/app.svg" alt="Логотип ByeDPI" width="200" />
+    <img src="https://github.com/romanvht/ByeDPIAndroid/raw/master/.github/images/app.svg" alt="Логотип ByeDPI" width="200" />
   </p>
   <h1>ByeByeDPI Android</h1>
   <p>
@@ -9,10 +9,10 @@
     <a href="README-tr.md">Türkçe</a>
   </p>
   <p>
-    <a href="https://github.com/dovecoteescapee/ByeByeDPI/releases/latest"><img src="https://img.shields.io/github/v/release/dovecoteescapee/ByeByeDPI" alt="Latest Release" /></a>
-    <a href="https://github.com/dovecoteescapee/ByeByeDPI/releases"><img src="https://img.shields.io/github/downloads/dovecoteescapee/ByeByeDPI/total" alt="Downloads" /></a>
-    <a href="https://github.com/dovecoteescapee/ByeByeDPI/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dovecoteescapee/ByeByeDPI" alt="License" /></a>
-    <a href="https://github.com/dovecoteescapee/ByeByeDPI"><img src="https://img.shields.io/github/languages/code-size/dovecoteescapee/ByeByeDPI" alt="GitHub code size in bytes"/></a>
+    <a href="https://github.com/romanvht/ByeByeDPI/releases/latest"><img src="https://img.shields.io/github/v/release/romanvht/ByeByeDPI" alt="Latest Release" /></a>
+    <a href="https://github.com/romanvht/ByeByeDPI/releases"><img src="https://img.shields.io/github/downloads/romanvht/ByeByeDPI/total" alt="Downloads" /></a>
+    <a href="https://github.com/romanvht/ByeByeDPI/blob/master/LICENSE"><img src="https://img.shields.io/github/license/romanvht/ByeByeDPI" alt="License" /></a>
+    <a href="https://github.com/romanvht/ByeByeDPI"><img src="https://img.shields.io/github/languages/code-size/romanvht/ByeByeDPI" alt="GitHub code size in bytes"/></a>
   </p>
 </div>
 
@@ -22,7 +22,7 @@
 
 Приложение не является VPN. Оно использует VPN-режим на Android для перенаправления трафика, но не передает ничего на удаленный сервер. Оно не шифрует трафик и не скрывает ваш IP-адрес.
 
-Приложения является форком [ByeDPIAndroid](https://github.com/dovecoteescapee/ByeDPIAndroid)
+Приложения является форком [ByeDPIAndroid](https://github.com/romanvht/ByeDPIAndroid)
 
 ---
 

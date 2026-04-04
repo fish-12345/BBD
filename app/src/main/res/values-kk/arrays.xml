@@ -26,16 +26,6 @@
         <item name="whitelist">Ақ тізім</item>
     </array>
 
-    <array name="domain_lists_entries">
-        <item>YouTube</item>
-        <item>GoogleVideo</item>
-        <item>Discord</item>
-        <item>Cloudflare</item>
-        <item>Торренттер</item>
-        <item>Әлеуметтік желілер</item>
-        <item>Өз тізіміңіз</item>
-    </array>
-
     <array name="strategy_lists_entries">
         <item>Кірістірілген</item>
         <item>Өз тізіміңіз</item>
