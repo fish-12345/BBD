@@ -17,8 +17,8 @@ jobs:
       - name: Install NDK 28
         run: echo "y" | sdkmanager "ndk;28.0.12916984"
 
-      - name: Clone hev-socks5-tunnel
-        run: git clone https://github.com/heiher/hev-socks5-tunnel src/main/jni
+      - name: Clone hev-socks5-tunnel (with submodules)
+        run: git clone --recursive https://github.com/heiher/hev-socks5-tunnel src/main/jni
 
       - name: Build native library
         run: |
