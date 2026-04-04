@@ -1,0 +1,36 @@
+name: Build Native
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK 28
+        run: echo "y" | sdkmanager "ndk;28.0.12916984"
+
+      - name: Clone hev-socks5-tunnel
+        run: git clone https://github.com/heiher/hev-socks5-tunnel src/main/jni
+
+      - name: Build native library
+        run: |
+          $ANDROID_SDK_ROOT/ndk/28.0.12916984/ndk-build \
+            NDK_PROJECT_PATH=build/intermediates/ndkBuild \
+            NDK_LIBS_OUT=src/main/jniLibs \
+            APP_BUILD_SCRIPT=src/main/jni/Android.mk \
+            NDK_APPLICATION_MK=src/main/jni/Application.mk \
+            APP_CFLAGS="-O3 -DPKGNAME=io/github/romanvht/byedpi/core"
+
+      - name: Upload libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: jniLibs
+          path: src/main/jniLibs/
