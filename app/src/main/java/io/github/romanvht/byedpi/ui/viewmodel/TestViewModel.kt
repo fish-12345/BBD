@@ -20,6 +20,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.AppStatus
+import io.github.romanvht.byedpi.data.Command
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.services.ServiceManager
 import io.github.romanvht.byedpi.utility.DomainListUtils
@@ -55,7 +56,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     var testResults = mutableStateListOf<TestResult>()
         private set
     var showCommandSheet by mutableStateOf<String?>(null)
-    
+
     var showAll by mutableStateOf(false)
         private set
 
@@ -80,6 +81,9 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     val toastEvent = _toastEvent.asSharedFlow()
 
     private var testJob: Job? = null
+
+    // Сохраняем исходную стратегию
+    private var originalCommandData: Command? = null
 
     init {
         syncSettings()
@@ -114,10 +118,14 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
+        // Сохраняем текущую стратегию
+        val currentCmdText = prefs.getString("byedpi_cmd_args", "").orEmpty()
+        originalCommandData = HistoryUtils(context).findCommandByText(currentCmdText)
+            ?: Command(text = currentCmdText, pinned = false, name = "")
+
         testJob = viewModelScope.launch(Dispatchers.IO) {
             isTestingState = true
             prefs.edit { putBoolean("is_test_running", true) }
-            val savedCmd = prefs.getString("byedpi_cmd_args", "").orEmpty()
             clearLog()
 
             withContext(Dispatchers.Main) {
@@ -146,7 +154,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
             for ((index, cmd) in cmds.withIndex()) {
                 if (!isActive) break
-                
+
                 checkedSitesCount = 0
 
                 withContext(Dispatchers.Main) {
@@ -219,15 +227,58 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 currentStrategyProgress = 1f
             }
 
-            stopTesting(savedCmd)
+            // Нормальное завершение - восстанавливаем стратегию
+            restoreOriginalCommand()
+
+            // Сбрасываем состояние
+            isTestingState = false
+            context.getPreferences().edit { putBoolean("is_test_running", false) }
+            testJob = null
         }
     }
 
-    fun stopTesting(savedCmd: String? = null) {
+    private fun restoreOriginalCommand() {
+        originalCommandData?.let { command ->
+            val context = getApplication<Application>()
+
+            // Восстанавливаем команду в настройках
+            context.getPreferences().edit {
+                putString("byedpi_cmd_args", command.text)
+            }
+
+            val historyUtils = HistoryUtils(context)
+
+            // Добавляем в историю если нет
+            if (historyUtils.findCommandByText(command.text) == null) {
+                historyUtils.addCommand(command.text)
+            }
+
+            // Восстанавливаем pinned
+            if (command.pinned) {
+                historyUtils.pinCommand(command.text)
+            } else {
+                val current = historyUtils.findCommandByText(command.text)
+                if (current?.pinned == true) {
+                    historyUtils.unpinCommand(command.text)
+                }
+            }
+
+            // Восстанавливаем имя
+            if (command.name.isNotBlank()) {
+                historyUtils.renameCommand(command.text, command.name)
+            }
+
+            originalCommandData = null
+        }
+    }
+
+    fun stopTesting() {
         val context = getApplication<Application>()
         isTestingState = false
         context.getPreferences().edit { putBoolean("is_test_running", false) }
-        savedCmd?.let { updateCmdArgs(it) }
+
+        // Восстанавливаем исходную стратегию
+        restoreOriginalCommand()
 
         viewModelScope.launch(Dispatchers.IO) {
             testJob?.cancel()
@@ -303,17 +354,16 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadSites(): List<String> {
         val context = getApplication<Application>()
-        DomainListUtils.initializeDefaultLists(context)
+        DomainListUtils.syncLists(context)
         return DomainListUtils.getActiveDomains(context).filter { checkDomain(it) }
     }
-
 
     private fun loadCmds(): List<String> {
         val context = getApplication<Application>()
         val prefs = context.getPreferences()
         val selectedStrategyLists = prefs.getStringSet("byedpi_proxytest_strategy_lists", setOf("builtin")) ?: setOf("builtin")
         val sniValue = prefs.getStringNotNull("byedpi_proxytest_sni", "max.ru")
-        
+
         val allCmds = mutableListOf<String>()
         for (strategyList in selectedStrategyLists) {
             val cmds = when (strategyList) {
@@ -322,7 +372,23 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             }
             allCmds.addAll(cmds.map { it.trim() }.filter { it.isNotEmpty() })
         }
-        
+
         return allCmds.distinct().map { it.replace("{sni}", sniValue) }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        testJob?.cancel()
+
+        if (originalCommandData != null) {
+            restoreOriginalCommand()
+        }
+
+        if (appStatus.first == AppStatus.Running) {
+            viewModelScope.launch(Dispatchers.IO) {
+                ServiceManager.stop(getApplication())
+            }
+        }
     }
 }

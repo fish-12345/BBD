@@ -213,4 +213,6 @@
     <string name="test_process_domain">Прогресс доменов</string>
     <string name="traffic_monitoring_setting">Мониторинг трафика</string>
     <string name="domain_lists">Списки доменов</string>
+    <string name="test_cancelled">Test Cancelled</string>
+    <string name="test_error">Test Error</string>
 </resources>

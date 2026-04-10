@@ -6,5 +6,6 @@ data class DomainList(
     val domains: List<String>,
     val isActive: Boolean = true,
     val isBuiltIn: Boolean = false,
-    val lastModified: Long = System.currentTimeMillis()
+    val isModified: Boolean = false,
+    val isDeleted: Boolean = false
 )

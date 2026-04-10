@@ -101,7 +101,7 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
 
     fun updateDomainListsSummary() {
         viewModelScope.launch(Dispatchers.IO) {
-            DomainListUtils.initializeDefaultLists(getApplication())
+            DomainListUtils.syncLists(getApplication())
             val activeLists = DomainListUtils.getLists(getApplication()).filter { it.isActive }
 
             // Вычисляем строку в фоновом потоке

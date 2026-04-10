@@ -50,11 +50,11 @@ class DomainListsViewModel(application: Application) : AndroidViewModel(applicat
 
     fun loadDomainLists() {
         viewModelScope.launch(Dispatchers.IO) {
-            DomainListUtils.initializeDefaultLists(getApplication())
+            DomainListUtils.syncLists(getApplication())
             val lists = DomainListUtils.getLists(getApplication())
 
             val userLists = lists.filter { !it.isBuiltIn }
-                .sortedByDescending { it.lastModified }
+                .sortedByDescending { it.name }
             val builtInLists = lists.filter { it.isBuiltIn }
                 .sortedBy { it.name.lowercase() }
             val sortedLists = userLists + builtInLists

@@ -107,7 +107,7 @@ fun CmdSettingsScreen(
 
                         sortedHistory.forEach { command ->
                             val summary = buildString {
-                                if (command.name != null) append(command.name)
+                                append(command.name)
                                 if (command.pinned) {
                                     if (isNotEmpty()) append(" - ")
                                     append(stringResource(R.string.cmd_history_pinned))

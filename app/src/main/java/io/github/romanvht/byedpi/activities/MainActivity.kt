@@ -346,9 +346,9 @@ class MainActivity : ComponentActivity() {
                         SettingsScreen(
                             onBack = { navController.popBackStack() },
                             onReset = {
-                                getPreferences().edit { clear() }
-                                SettingsUtils.setTheme("system")
-                                recreate()
+                                SettingsUtils.resetSettings(this@MainActivity) {
+                                    recreate()
+                                }
                                 navController.navigate("home")
                             },
                             onExport = {

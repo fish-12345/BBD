@@ -62,6 +62,11 @@ class HistoryUtils(context: Context) {
         saveHistory(history)
     }
 
+    fun findCommandByText(text: String): Command? {
+        if (text.isBlank()) return null
+        return getHistory().find { it.text == text }
+    }
+
     fun getHistory(): List<Command> {
         val historyJson = sharedPreferences.getString(historyKey, null)
         return if (historyJson != null) {
