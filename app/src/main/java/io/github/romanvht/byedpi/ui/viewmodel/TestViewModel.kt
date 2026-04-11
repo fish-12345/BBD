@@ -82,11 +82,36 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private var testJob: Job? = null
 
-    // Сохраняем исходную стратегию
     private var originalCommandData: Command? = null
+
+    // ---- Хранение результатов только в памяти процесса (сбрасывается при перезапуске) ----
+    companion object {
+        private val inMemoryResults = mutableListOf<TestResult>()
+        private var inMemoryLog = AnnotatedString("")
+        private var hasEverRun = false
+    }
 
     init {
         syncSettings()
+        resetStuckTestingState()
+        // Загружаем только из памяти (companion object), не из SharedPreferences
+        loadFromMemory()
+    }
+
+    private fun loadFromMemory() {
+        testResults.clear()
+        testResults.addAll(inMemoryResults)
+        resultsLog = inMemoryLog
+        testHasEverRun = hasEverRun
+    }
+
+    private fun resetStuckTestingState() {
+        val context = getApplication<Application>()
+        val wasRunning = context.getPreferences().getBoolean("is_test_running", false)
+        if (wasRunning) {
+            context.getPreferences().edit { putBoolean("is_test_running", false) }
+            isTestingState = false
+        }
     }
 
     fun syncSettings() {
@@ -118,7 +143,15 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        // Сохраняем текущую стратегию
+        if (isTestingState) {
+            isTestingState = false
+        }
+
+        // Очищаем только in-memory, SharedPreferences не трогаем для результатов
+        inMemoryResults.clear()
+        inMemoryLog = AnnotatedString("")
+        hasEverRun = false
+
         val currentCmdText = prefs.getString("byedpi_cmd_args", "").orEmpty()
         originalCommandData = HistoryUtils(context).findCommandByText(currentCmdText)
             ?: Command(text = currentCmdText, pinned = false, name = "")
@@ -130,8 +163,11 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
             withContext(Dispatchers.Main) {
                 testHasEverRun = true
+                hasEverRun = true
                 resultsLog = AnnotatedString("")
+                inMemoryLog = AnnotatedString("")
                 testResults.clear()
+                inMemoryResults.clear()
                 syncSettings()
                 currentStrategyProgress = 0f
                 overallProgress = 0f
@@ -202,13 +238,20 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
                 val successfulCount = checkResults.sumOf { it.second }
                 val successPercentage = if (totalRequests > 0) (successfulCount * 100) / totalRequests else 0
-                val siteResults = checkResults.map { SiteResult(it.first, it.second, requestsCount) }
+                // ФИКС КРАША: копируем список результатов, чтобы он не был изменён в фоне
+                val siteResults = checkResults.map { SiteResult(it.first, it.second, requestsCount) }.toList()
 
                 withContext(Dispatchers.Main) {
                     if (showAll || successfulCount > 0) {
-                        testResults.add(TestResult(cmd, successfulCount, totalRequests, successPercentage, siteResults))
+                        val result = TestResult(cmd, successfulCount, totalRequests, successPercentage, siteResults)
+                        testResults.add(result)
+                        inMemoryResults.add(result)
                         if (autoSort) {
-                            testResults.sortByDescending { it.successCount }
+                            val sorted = testResults.sortedByDescending { it.successCount }
+                            testResults.clear()
+                            testResults.addAll(sorted)
+                            inMemoryResults.clear()
+                            inMemoryResults.addAll(sorted)
                         }
                     }
                     appendToResults("$successfulCount/$totalRequests ($successPercentage%)\n\n")
@@ -227,10 +270,8 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 currentStrategyProgress = 1f
             }
 
-            // Нормальное завершение - восстанавливаем стратегию
             restoreOriginalCommand()
 
-            // Сбрасываем состояние
             isTestingState = false
             context.getPreferences().edit { putBoolean("is_test_running", false) }
             testJob = null
@@ -241,19 +282,16 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
         originalCommandData?.let { command ->
             val context = getApplication<Application>()
 
-            // Восстанавливаем команду в настройках
             context.getPreferences().edit {
                 putString("byedpi_cmd_args", command.text)
             }
 
             val historyUtils = HistoryUtils(context)
 
-            // Добавляем в историю если нет
             if (historyUtils.findCommandByText(command.text) == null) {
                 historyUtils.addCommand(command.text)
             }
 
-            // Восстанавливаем pinned
             if (command.pinned) {
                 historyUtils.pinCommand(command.text)
             } else {
@@ -263,7 +301,6 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            // Восстанавливаем имя
             if (command.name.isNotBlank()) {
                 historyUtils.renameCommand(command.text, command.name)
             }
@@ -277,7 +314,6 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
         isTestingState = false
         context.getPreferences().edit { putBoolean("is_test_running", false) }
 
-        // Восстанавливаем исходную стратегию
         restoreOriginalCommand()
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -323,6 +359,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         resultsLog += newPart
+        inMemoryLog = resultsLog
         saveLog(if (isLink) "{$text}" else text)
     }
 
