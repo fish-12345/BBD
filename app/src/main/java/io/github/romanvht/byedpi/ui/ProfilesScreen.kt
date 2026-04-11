@@ -208,7 +208,7 @@ fun ProfilesScreen(
     showEditDialog?.let { profile ->
         ProfileDialog(
             title = stringResource(R.string.profiles_edit),
-            initialName = profile.name ?: "",
+            initialName = profile.name,
             initialCommand = profile.text,
             onDismiss = { showEditDialog = null },
             onConfirm = { name, command ->
@@ -222,7 +222,7 @@ fun ProfilesScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
             title = { Text(stringResource(R.string.profiles_delete_confirm)) },
-            text = { Text(stringResource(R.string.profiles_delete_message, profile.name ?: profile.text)) },
+            text = { Text(stringResource(R.string.profiles_delete_message, profile.name)) },
             confirmButton = {
                 Button(
                     onClick = {

@@ -10,11 +10,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -349,17 +347,22 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     private fun appendToResults(text: String, isLink: Boolean = false) {
         val newPart = buildAnnotatedString {
             if (isLink) {
-                pushStringAnnotation(tag = "COMMAND", annotation = text.trim())
-                withStyle(style = SpanStyle(color = Color.Blue)) {
-                    append(text)
-                }
+                val command = text.trim()
+                pushLink(
+                    LinkAnnotation.Clickable(
+                        tag = "COMMAND",
+                        linkInteractionListener = {
+                            showCommandSheet = command
+                        }
+                    )
+                )
+                append(text)
                 pop()
             } else {
                 append(text)
             }
         }
         resultsLog += newPart
-        inMemoryLog = resultsLog
         saveLog(if (isLink) "{$text}" else text)
     }
 

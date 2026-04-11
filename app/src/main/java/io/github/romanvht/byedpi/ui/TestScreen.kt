@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -46,7 +45,7 @@ import io.github.romanvht.byedpi.ui.viewmodel.TestViewModel
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestScreen(
     viewModel: TestViewModel = viewModel(),
@@ -419,18 +418,12 @@ fun TestLogsSection(
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        ClickableText(
+                        Text(
                             text = viewModel.resultsLog,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontFamily = FontFamily.Monospace
-                            ),
-                            onClick = { offset ->
-                                viewModel.resultsLog.getStringAnnotations(tag = "COMMAND", start = offset, end = offset)
-                                    .firstOrNull()?.let { annotation ->
-                                        viewModel.showCommandSheet = annotation.item
-                                    }
-                            }
+                            )
                         )
                     }
                 }
@@ -469,7 +462,6 @@ fun TestResultsList(
                 TestResultCard(
                     result = result,
                     onApply = { viewModel.applyCommand(result.command) },
-                    onCopy = { viewModel.copyCommand(result.command) },
                     onMore = { viewModel.showCommandSheet = result.command },
                     onSave = { viewModel.saveProfile(result.command, "") },
                     isTv = isTv
@@ -669,7 +661,6 @@ fun TvDialogButton(
 fun TestResultCard(
     result: TestResult,
     onApply: () -> Unit,
-    onCopy: () -> Unit,
     onMore: () -> Unit,
     onSave: () -> Unit,
     isTv: Boolean = false

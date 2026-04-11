@@ -1,23 +1,12 @@
 <resources>
-    <string name="cmd_documentation">Documentation</string>
     <string name="toggle_connect">On/Off</string>
-    <string name="vpn_connect">Connect</string>
-    <string name="vpn_disconnect">Disconnect</string>
-    <string name="vpn_connected">Connected (VPN)</string>
-    <string name="vpn_disconnected">Disconnected (VPN)</string>
-    <string name="proxy_up">Connected (Proxy)</string>
-    <string name="proxy_down">Disconnected (Proxy)</string>
-    <string name="proxy_start">Start</string>
-    <string name="proxy_stop">Stop</string>
     <string name="service_start_btn">Start</string>
     <string name="service_pause_btn">Pause</string>
     <string name="service_stop_btn">Stop</string>
     <string name="service_paused_text">Service paused</string>
-    <string name="open_editor">Open editor</string>
     <string name="settings">Settings</string>
     <string name="vpn_permission_denied">No permission to activate VPN</string>
     <string name="settings_unavailable">Disconnect first to access settings</string>
-    <string name="title_settings">Settings</string>
     <string name="save_logs">Save logs</string>
     <string name="close_app">Force close</string>
     <string name="reset_settings">Reset settings</string>
@@ -73,10 +62,8 @@
     <string name="byedpi_fake_offset_setting">Fake packet offset</string>
     <string name="byedpi_drop_sack_setting">Drop SACK</string>
     <string name="byedpi_protocols_category">Protocols</string>
-    <string name="byedpi_protocols_hint">Uncheck all to desync all traffic</string>
     <string name="automation">Automation</string>
     <string name="autostart_settings">Autostart service on device startup</string>
-    <string name="autohide_settings">Automatically hide application after autostart</string>
     <string name="autoconnect_settings">Automatically connect when the ByeByeDPI start</string>
     <string name="applist_setting">Apps filter</string>
     <string name="apps_select">Select apps</string>
@@ -95,8 +82,6 @@
     <string name="cmd_history_copy">Copy</string>
     <string name="cmd_history_rename">Rename</string>
     <string name="cmd_history_edit">Edit</string>
-    <string name="cmd_history_pin">Pin</string>
-    <string name="cmd_history_unpin">Unpin</string>
     <string name="cmd_history_pinned">Pinned</string>
     <string name="cmd_history_delete">Delete</string>
     <string name="telegram_link">Telegram group</string>
@@ -104,28 +89,13 @@
     <string name="summary_test">Testing of prepared command sets</string>
     <string name="test_start">Start testing</string>
     <string name="test_stop">Stop testing</string>
-    <string name="test_disclaimer">
-        This section allows you to test the application using a set of pre-prepared commands.
-        \nDuring testing, the system checks the availability of various websites via the proxy, and you can observe the process in real time.
-        \n
-        \nPlease note that this testing functionality is under development, and the command set is currently limited.
-        \nTest results may be helpful for a preliminary assessment of the proxy, but successful completion does not guarantee flawless performance in real-world conditions.
-    </string>
-    <string name="test_crash">
-        Did the application crash during testing?
-        \n\nGo to the test settings and increase the waiting time between commands in 2-second increments (2, 4, 6..).
-    </string>
     <string name="test_process">Checking</string>
-    <string name="test_proxy_error">Proxy error. Test stopped</string>
-    <string name="test_good_cmds">Commands with more than 50% success probability</string>
     <string name="test_complete">Test completed</string>
     <string name="test_complete_info">Tap on a command to copy or apply it</string>
     <string name="test_settings_sni">SNI fake packets</string>
     <string name="test_settings_fulllog">Host response output</string>
     <string name="test_settings_logclickable">All commands are clickable</string>
-    <string name="test_settings_domain_lists">Domain lists for testing</string>
     <string name="test_settings_domain_empty">No domains to test</string>
-    <string name="test_settings_domains">Your list of domains</string>
     <string name="test_settings_usercommands">Custom command lists</string>
     <string name="test_settings_commands">Command list</string>
     <string name="test_delay">Delay between commands</string>
@@ -138,8 +108,6 @@
     <string name="filter_selected">Selected</string>
     <string name="filter_system">System</string>
     <string name="action_cancel">Cancel</string>
-    <string name="action_ok">OK</string>
-    <string name="quick_actions">Quick Actions</string>
     <string name="vpn_mode">VPN Mode</string>
     <string name="proxy_mode">Proxy Mode</string>
     <string name="editor">Editor</string>
@@ -153,7 +121,6 @@
     <string name="battery_optimization_dialog_message">To ensure stable operation in the background, it is recommended to disable battery optimization. This will prevent the system from stopping the service when the screen is off and in the background.</string>
     <string name="battery_optimization_disable">Disable</string>
     <string name="test_details">Domain details</string>
-    <string name="test_connected">Connected</string>
     <string name="test_not_connected">Not connected</string>
     <string name="test_all_connected">All domains are available</string>
     <string name="add">Add</string>
@@ -175,20 +142,10 @@
     <string name="profiles_list">Profile list</string>
     <string name="profiles_empty">You don\'t have any profiles yet. You can add them manually or find a working strategy in the testing section.</string>
     <string name="restarting_service">Restarting service...</string>
-    <string name="private_dns">Private DNS</string>
-    <string name="private_dns_off">Off</string>
-    <string name="private_dns_auto">Automatic</string>
-    <string name="private_dns_provider">Private DNS provider hostname</string>
-    <string name="private_dns_suggest_cloudflare">It is recommended to use Cloudflare DNS for ByeByeDPI to work</string>
-    <string name="private_dns_how_to_use">How to enable: Tap this card -> Private DNS -> Private DNS provider hostname -> Enter 1dot1dot1dot1.cloudflare-dns.com</string>
-    <string name="copy_cloudflare_dns">Copy DNS</string>
-    <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="status_connected">Connected</string>
     <string name="status_disconnected">Disconnected</string>
     <string name="test_process_strategy">Strategy process</string>
     <string name="test_process_domain">Domain process</string>
     <string name="traffic_monitoring_setting">Traffic monitoring</string>
     <string name="domain_lists">Domain Lists</string>
-    <string name="test_cancelled">Test Cancelled</string>
-    <string name="test_error">Test Error</string>
 </resources>

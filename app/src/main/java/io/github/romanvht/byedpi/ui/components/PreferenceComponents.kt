@@ -317,7 +317,6 @@ fun EditTextPreference(
     placeholder: String = "",
     value: String,
     onValueChange: (String) -> Unit,
-    summary: String? = null,
     enabled: Boolean = true,
     icon: ImageVector? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default

@@ -344,7 +344,7 @@ fun CmdSettingsScreen(
     }
 
     showRenameDialog?.let { command ->
-        var newName by remember { mutableStateOf(command.name ?: "") }
+        var newName by remember { mutableStateOf(command.name) }
         if (isTv) {
             AlertDialog(
                 onDismissRequest = { showRenameDialog = null },
