@@ -131,6 +131,18 @@ fun MainScreen(
             val actions = remember(preferredMode, viewModel.isCmdEnabled, isRunning) {
                 listOf(
                     DashboardAction(
+                        icon = if (viewModel.isCmdEnabled) Icons.Default.Terminal else Icons.Default.EditNote,
+                        label = R.string.editor,
+                        onClick = { viewModel.performActionIfStopped(onOpenEditor) },
+                        enabled = !isRunning
+                    ),
+                    DashboardAction(
+                        icon = Icons.Default.Settings,
+                        label = R.string.settings,
+                        onClick = { viewModel.performActionIfStopped(onOpenSettings) },
+                        enabled = !isRunning
+                    ),
+                    DashboardAction(
                         icon = if (preferredMode == Mode.VPN) Icons.Default.VpnKey else Icons.Default.Router,
                         label = if (preferredMode == Mode.VPN) R.string.vpn_mode else R.string.proxy_mode,
                         onClick = {
@@ -143,18 +155,6 @@ fun MainScreen(
                         icon = Icons.AutoMirrored.Filled.List,
                         label = R.string.profiles_title,
                         onClick = { viewModel.performActionIfStopped(onOpenProfiles) },
-                        enabled = !isRunning
-                    ),
-                    DashboardAction(
-                        icon = if (viewModel.isCmdEnabled) Icons.Default.Terminal else Icons.Default.EditNote,
-                        label = R.string.editor,
-                        onClick = { viewModel.performActionIfStopped(onOpenEditor) },
-                        enabled = !isRunning
-                    ),
-                    DashboardAction(
-                        icon = Icons.Default.Settings,
-                        label = R.string.settings,
-                        onClick = { viewModel.performActionIfStopped(onOpenSettings) },
                         enabled = !isRunning
                     )
                 )
@@ -270,8 +270,7 @@ fun LargeScreenLayout(
         ) {
             ActionGrid(
                 actions = actions,
-                columns = 2,
-                isTv = isTv
+                columns = 2
             )
         }
     }
@@ -327,8 +326,7 @@ fun MobileLayout(
 
         ActionGrid(
             actions = actions,
-            columns = 2,
-            isTv = false
+            columns = 2
         )
     }
 }
@@ -384,8 +382,7 @@ fun ConnectionHero(
 @Composable
 fun ActionGrid(
     actions: List<DashboardAction>,
-    columns: Int,
-    isTv: Boolean
+    columns: Int
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)

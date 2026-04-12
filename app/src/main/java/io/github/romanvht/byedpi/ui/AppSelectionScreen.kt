@@ -3,7 +3,6 @@ package io.github.romanvht.byedpi.ui
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.AppInfo
 import io.github.romanvht.byedpi.ui.viewmodel.AppSelectionViewModel
@@ -76,7 +74,7 @@ fun AppSelectionScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSelectionScreenPhone(
     viewModel: AppSelectionViewModel,
@@ -201,7 +199,6 @@ fun AppSelectionScreenPhone(
     }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AppSelectionScreenTv(
     viewModel: AppSelectionViewModel,
@@ -417,7 +414,6 @@ fun AppItem(
     }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AppItemTv(
     app: AppInfo,
