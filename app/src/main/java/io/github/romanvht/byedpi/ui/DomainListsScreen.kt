@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.data.DomainList
 import io.github.romanvht.byedpi.ui.viewmodel.DomainListsViewModel
+import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +35,7 @@ fun DomainListsScreen(
     viewModel: DomainListsViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val isTv = remember { context.isTv() }
 
     LaunchedEffect(Unit) {
         viewModel.toastEvent.collectLatest { message ->
@@ -89,7 +91,6 @@ fun DomainListsScreen(
                         .map { it.trim() }
                         .filter { it.isNotEmpty() }
 
-                    // Теперь просто вызываем функцию, аргументы onSuccess/onError не нужны
                     viewModel.addList(name = name, domains = domainList)
                 }
             )
@@ -114,15 +115,97 @@ fun DomainListsScreen(
             )
         }
 
-        // Action Dialog
         if (viewModel.showActionDialog && viewModel.selectedList != null) {
             val list = viewModel.selectedList!!
 
-            AlertDialog(
-                onDismissRequest = { viewModel.hideActionDialog() },
-                title = { Text(list.name) },
-                text = {
-                    Column {
+            if (isTv) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.hideActionDialog() },
+                    title = { Text(list.name) },
+                    text = {
+                        Column {
+                            ListItem(
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                headlineContent = { Text("Редактировать") },
+                                leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.hideActionDialog()
+                                        viewModel.showEditDialogAction(list)
+                                    }
+                            )
+
+                            ListItem(
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                headlineContent = { Text("Копировать") },
+                                leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val clipboardManager =
+                                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        val clip = ClipData.newPlainText(
+                                            list.name,
+                                            viewModel.copyDomainsToClipboard(list)
+                                        )
+                                        clipboardManager.setPrimaryClip(clip)
+
+                                        viewModel.hideActionDialog()
+                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
+                                    }
+                            )
+
+                            if (!list.isBuiltIn) {
+                                HorizontalDivider(
+                                    Modifier,
+                                    DividerDefaults.Thickness,
+                                    DividerDefaults.color
+                                )
+
+                                ListItem(
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                    headlineContent = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
+                                    leadingContent = {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            viewModel.deleteList(list.id)
+                                            viewModel.hideActionDialog()
+                                            Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
+                                        }
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {},
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.hideActionDialog() }) {
+                            Text("Отмена")
+                        }
+                    }
+                )
+            } else {
+                ModalBottomSheet(
+                    onDismissRequest = { viewModel.hideActionDialog() },
+                    dragHandle = { BottomSheetDefaults.DragHandle() }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp)
+                    ) {
+                        Text(
+                            text = list.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
+                        )
 
                         ListItem(
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
@@ -134,6 +217,7 @@ fun DomainListsScreen(
                                     viewModel.hideActionDialog()
                                     viewModel.showEditDialogAction(list)
                                 }
+                                .padding(horizontal = 12.dp, vertical = 2.dp)
                         )
 
                         ListItem(
@@ -154,15 +238,10 @@ fun DomainListsScreen(
                                     viewModel.hideActionDialog()
                                     Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
                                 }
+                                .padding(horizontal = 12.dp, vertical = 2.dp)
                         )
 
                         if (!list.isBuiltIn) {
-                            HorizontalDivider(
-                                Modifier,
-                                DividerDefaults.Thickness,
-                                DividerDefaults.color
-                            )
-
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                                 headlineContent = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
@@ -180,17 +259,12 @@ fun DomainListsScreen(
                                         viewModel.hideActionDialog()
                                         Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
                                     }
+                                    .padding(horizontal = 12.dp, vertical = 2.dp)
                             )
                         }
                     }
-                },
-                confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { viewModel.hideActionDialog() }) {
-                        Text("Отмена")
-                    }
                 }
-            )
+            }
         }
     }
 }

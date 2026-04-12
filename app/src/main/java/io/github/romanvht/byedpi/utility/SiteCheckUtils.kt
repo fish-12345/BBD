@@ -66,16 +66,10 @@ class SiteCheckUtils(
                 connection = url.openConnection(proxy) as HttpURLConnection
                 connection.connectTimeout = (timeout * 1000).toInt()
                 connection.readTimeout = (timeout * 1000).toInt()
-                connection.instanceFollowRedirects = false
+                connection.instanceFollowRedirects = true
                 connection.setRequestProperty("Connection", "close")
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0")
 
                 val responseCode = connection.responseCode
-                val isHttpSuccess = responseCode in 200..399
-                if (!isHttpSuccess) {
-                    Log.w("SiteChecker", "Non-success code for $site: $responseCode")
-                    return@repeat
-                }
                 val declaredLength = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     connection.contentLengthLong
                 } else {
@@ -84,28 +78,34 @@ class SiteCheckUtils(
 
                 var actualLength = 0L
                 try {
-                    val inputStream = connection.inputStream
+                    val inputStream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
                     if (inputStream != null) {
-                        val buffer = ByteArray(4096)
-                        val bytesRead = inputStream.read(buffer, 0, buffer.size)
-                        if (bytesRead > 0) actualLength = bytesRead.toLong()
+                        val buffer = ByteArray(8192)
+                        var bytesRead: Int
+
+                        val limit = if (declaredLength > 0) declaredLength else 1024L * 1024
+
+                        while (actualLength < limit) {
+                            val remaining = limit - actualLength
+                            val toRead = if (remaining > buffer.size) buffer.size else remaining.toInt()
+                            bytesRead = inputStream.read(buffer, 0, toRead)
+                            if (bytesRead == -1) break
+                            actualLength += bytesRead
+                        }
                     }
                 } catch (_: IOException) {
-                    Log.w("SiteChecker", "Could not read body for $site")
-                    return@repeat
+                    // Stream reading failed
                 }
 
-                val bodyOk = declaredLength <= 0L || actualLength > 0
-
-                if (bodyOk) {
-                    Log.i("SiteChecker", "Success for $site: $responseCode, body: $actualLength bytes")
+                if (declaredLength <= 0L || actualLength >= declaredLength) {
+                    Log.i("SiteChecker", "Response for $site: $responseCode, Declared: $declaredLength, Actual: $actualLength")
                     responseCount++
                 } else {
-                    Log.w("SiteChecker", "Empty body for $site despite code $responseCode")
+                    Log.w("SiteChecker", "Block detected for $site, Declared: $declaredLength, Actual: $actualLength")
                 }
 
             } catch (e: Exception) {
-                Log.e("SiteChecker", "Connection failed for $site: ${e.message}")
+                Log.e("SiteChecker", "Error accessing $site: ${e.message}")
             } finally {
                 connection?.disconnect()
             }
