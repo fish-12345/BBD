@@ -261,7 +261,7 @@ fun ProfilesScreen(
                             ) {
                                 ListItem(
                                     headlineContent = { Text(stringResource(R.string.clear_selection)) },
-                                    leadingContent = { Icon(Icons.Default.Close, contentDescrizzption = null) },
+                                    leadingContent = { Icon(Icons.Default.Close, contentDescription = null) },
                                     colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
                                 )
                             }
