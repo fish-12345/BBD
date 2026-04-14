@@ -84,38 +84,23 @@ object ThemeColors {
     )
 }
 
-val A1_10 = Color(0xFFF8FFEB)
-val A1_50 = Color(0xFFCEFFAB)
 val A1_100 = Color(0xFFBBF294)
 val A1_200 = Color(0xFFA0D57B)
-val A1_300 = Color(0xFF85B962)
 val A1_400 = Color(0xFF6C9E4B)
-val A1_500 = Color(0xFF538333)
-val A1_600 = Color(0xFF3B6A1C)
 val A1_700 = Color(0xFF245103)
 val A1_800 = Color(0xFF163800)
 val A1_900 = Color(0xFF0A2100)
 
-val A2_10 = Color(0xFFF8FFEB) // Assuming matches A1 based on visual, or F8FFE8
-val A2_50 = Color(0xFFE8F5D8)
 val A2_100 = Color(0xFFD9E7CA)
 val A2_200 = Color(0xFFBDCBAF)
-val A2_300 = Color(0xFFA2B095)
-val A2_400 = Color(0xFF88957B)
 val A2_500 = Color(0xFF6E7B63)
-val A2_600 = Color(0xFF56624B)
 val A2_700 = Color(0xFF3E4A35)
 val A2_800 = Color(0xFF283420)
 val A2_900 = Color(0xFF141E0C)
 
-val A3_10 = Color(0xFFF1FFFE)
-val A3_50 = Color(0xFFC9FAF9)
 val A3_100 = Color(0xFFBBECEB)
 val A3_200 = Color(0xFFA0CFCE)
-val A3_300 = Color(0xFF85B4B3)
-val A3_400 = Color(0xFF6B9998)
 val A3_500 = Color(0xFF517F7E)
-val A3_600 = Color(0xFF386666)
 val A3_700 = Color(0xFF1E4E4E)
 val A3_800 = Color(0xFF003737)
 val A3_900 = Color(0xFF002020)
@@ -124,10 +109,8 @@ val N1_10 = Color(0xFFFCFCFC)
 val N1_50 = Color(0xFFF1F1F1)
 val N1_100 = Color(0xFFE2E2E2)
 val N1_200 = Color(0xFFC6C6C6)
-val N1_300 = Color(0xFFABABAB)
 val N1_400 = Color(0xFF919191)
 val N1_500 = Color(0xFF777777)
-val N1_600 = Color(0xFF4A4A4A)
 val N1_700 = Color(0xFF333333)
 val N1_800 = Color(0xFF1F1F1F)
 val N1_900 = Color(0xFF121212)
@@ -223,30 +206,3 @@ val OutlineVariantDark = N1_700  // 474747
 
 val ScrimLight = Color.Black.copy(alpha = 0.38f)
 val ScrimDark = Color.Black.copy(alpha = 0.38f)
-
-val PrimaryFixedLight = A1_100
-val PrimaryFixedDark = A1_100
-val PrimaryFixedDimLight = A1_200
-val PrimaryFixedDimDark = A1_200
-val OnPrimaryFixedLight = A1_900
-val OnPrimaryFixedDark = A1_900
-val OnPrimaryFixedVariantLight = A1_700
-val OnPrimaryFixedVariantDark = A1_700
-
-val SecondaryFixedLight = A2_100
-val SecondaryFixedDark = A2_100
-val SecondaryFixedDimLight = A2_200
-val SecondaryFixedDimDark = A2_200
-val OnSecondaryFixedLight = A2_900
-val OnSecondaryFixedDark = A2_900
-val OnSecondaryFixedVariantLight = A2_700
-val OnSecondaryFixedVariantDark = A2_700
-
-val TertiaryFixedLight = A3_100
-val TertiaryFixedDark = A3_100
-val TertiaryFixedDimLight = A3_200
-val TertiaryFixedDimDark = A3_200
-val OnTertiaryFixedLight = A3_900
-val OnTertiaryFixedDark = A3_900
-val OnTertiaryFixedVariantLight = A3_700
-val OnTertiaryFixedVariantDark = A3_700

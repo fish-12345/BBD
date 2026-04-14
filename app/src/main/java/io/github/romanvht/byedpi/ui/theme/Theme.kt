@@ -27,14 +27,8 @@ fun TrackerTheme(
     val managerDynamic by themeManager.isDynamicColor.collectAsState(initial = themeManager.getDynamicColor())
     val managerDark by themeManager.isDarkTheme.collectAsState(initial = themeManager.getDarkTheme())
     val selectedSchemeName by themeManager.selectedColorScheme.collectAsState(initial = themeManager.getSelectedColorScheme())
-
-    // Determine if dark theme should be used
     val isDark = managerDark == true || (managerDark == null && isSystemInDarkTheme())
-
-    // Check if dynamic color scheme should be used (Android 12+)
     val isSystemDynamic = managerDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-
-    // Get the appropriate color scheme
     val colorScheme = getColorScheme(isDark, isSystemDynamic, selectedSchemeName)
 
     // Update window settings if not in edit mode
