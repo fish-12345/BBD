@@ -317,7 +317,6 @@ fun AppSelectionScreenTv(
                     label = { Text(stringResource(R.string.filter_system)) }
                 )
             }
-
             Spacer(modifier = Modifier.weight(1f))
 
             // Clear Selection
