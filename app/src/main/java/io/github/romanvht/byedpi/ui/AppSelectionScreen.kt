@@ -113,7 +113,7 @@ fun AppSelectionScreenPhone(
                         expanded = false,
                         onExpandedChange = { },
                         placeholder = { Text(stringResource(R.string.search_apps)) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint=MaterialTheme.colorScheme.onSurfaceVariant)},
                         trailingIcon = {
                             if (viewModel.searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { viewModel.searchQuery = "" }) {
@@ -392,7 +392,7 @@ fun AppItem(
 
     Surface(
         onClick = { onCheckedChange(!app.isSelected) },
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.background,
         modifier = modifier
     ) {
         ListItem(

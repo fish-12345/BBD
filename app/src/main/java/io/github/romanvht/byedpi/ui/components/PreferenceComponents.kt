@@ -48,7 +48,7 @@ fun SettingsCard(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column(

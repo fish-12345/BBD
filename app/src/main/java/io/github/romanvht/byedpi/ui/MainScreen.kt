@@ -424,9 +424,9 @@ fun ActionCard(
     )
 
     val containerColor = if (isFocused)
-        MaterialTheme.colorScheme.primaryContainer
+        MaterialTheme.colorScheme.surface
     else
-        MaterialTheme.colorScheme.surfaceContainerHigh
+        MaterialTheme.colorScheme.surface
 
     val contentColor = if (isFocused)
         MaterialTheme.colorScheme.onPrimaryContainer
