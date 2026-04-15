@@ -396,6 +396,7 @@ fun AppItem(
         modifier = modifier
     ) {
         ListItem(
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
             headlineContent = { Text(app.appName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             supportingContent = { Text(app.packageName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             leadingContent = {
