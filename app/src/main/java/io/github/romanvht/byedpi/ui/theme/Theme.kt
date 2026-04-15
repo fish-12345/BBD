@@ -16,8 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import io.github.romanvht.byedpi.data.ThemeManager
-import io.github.romanvht.byedpi.ui.theme.ThemeColors.darkColor
-import io.github.romanvht.byedpi.ui.theme.ThemeColors.lightColor
 
 @Composable
 fun TrackerTheme(
@@ -31,7 +29,6 @@ fun TrackerTheme(
     val isSystemDynamic = managerDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colorScheme = getColorScheme(isDark, isSystemDynamic, selectedSchemeName)
 
-    // Update window settings if not in edit mode
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -39,7 +36,6 @@ fun TrackerTheme(
         }
     }
 
-    // Apply MaterialTheme
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
@@ -48,13 +44,14 @@ fun TrackerTheme(
 }
 
 val colorSchemes = mapOf(
-    "Default" to (lightColor to darkColor),
+    "Default" to (DefaultLightColors to DefaultDarkColors),
     "Blue" to (BlueLightColors to BlueDarkColors),
     "Red" to (RedLightColors to RedDarkColors),
     "Yellow" to (YellowLightColors to YellowDarkColors),
     "Orange" to (OrangeLightColors to OrangeDarkColors),
     "Purple" to (PurpleLightColors to PurpleDarkColors),
-    "Pink" to (PinkLightColors to PinkDarkColors)
+    "Pink" to (PinkLightColors to PinkDarkColors),
+    "Coffee" to (CoffeeLightColors to CoffeeDarkColors)
 )
 
 
@@ -63,20 +60,18 @@ private fun getColorScheme(
     isDark: Boolean,
     isSystemDynamic: Boolean,
     selectedSchemeName: String
+
 ): ColorScheme {
     val context = LocalContext.current
-
     if (isSystemDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     }
-
-    val selectedScheme = colorSchemes[selectedSchemeName] ?: (lightColor to darkColor)
+    val selectedScheme = colorSchemes[selectedSchemeName] ?: (DefaultLightColors to DefaultDarkColors)
     return if (isDark) selectedScheme.second else selectedScheme.first
 }
 
 private fun configureWindow(view: View, isDark: Boolean) {
     val window = (view.context as Activity).window
-
     val insetsController = WindowCompat.getInsetsController(window, view)
     insetsController.apply {
         isAppearanceLightStatusBars = !isDark

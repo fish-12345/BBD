@@ -157,7 +157,10 @@ fun AppSelectionScreenPhone(
 
             if (viewModel.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    LoadingIndicator(
+                        color = MaterialTheme.colorScheme.primary
+
+                    )
                 }
             } else {
                 if (isTablet) {
@@ -340,7 +343,10 @@ fun AppSelectionScreenTv(
                 .padding(24.dp)
         ) {
             if (viewModel.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                LoadingIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 200.dp),
