@@ -2,10 +2,10 @@ package io.github.romanvht.byedpi.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import io.github.romanvht.byedpi.data.ThemeManager
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrackerTheme(
     themeManager: ThemeManager,
@@ -25,56 +26,67 @@ fun TrackerTheme(
     val managerDynamic by themeManager.isDynamicColor.collectAsState(initial = themeManager.getDynamicColor())
     val managerDark by themeManager.isDarkTheme.collectAsState(initial = themeManager.getDarkTheme())
     val selectedSchemeName by themeManager.selectedColorScheme.collectAsState(initial = themeManager.getSelectedColorScheme())
-    val isDark = managerDark == true || (managerDark == null && isSystemInDarkTheme())
-    val isSystemDynamic = managerDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val colorScheme = getColorScheme(isDark, isSystemDynamic, selectedSchemeName)
+
+    val isDark = when (managerDark) {
+        true -> true
+        false -> false
+        null -> isSystemInDarkTheme()
+    }
+
+    val colorScheme = getColorScheme(
+        isDark = isDark,
+        isDynamic = managerDynamic,
+        schemeName = selectedSchemeName
+    )
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            configureWindow(view, isDark)
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !isDark
+                isAppearanceLightNavigationBars = !isDark
+            }
         }
     }
 
-    MaterialTheme(
+    MaterialExpressiveTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
 }
 
-val colorSchemes = mapOf(
-    "Default" to (DefaultLightColors to DefaultDarkColors),
-    "Blue" to (BlueLightColors to BlueDarkColors),
-    "Red" to (RedLightColors to RedDarkColors),
-    "Yellow" to (YellowLightColors to YellowDarkColors),
-    "Orange" to (OrangeLightColors to OrangeDarkColors),
-    "Purple" to (PurpleLightColors to PurpleDarkColors),
-    "Pink" to (PinkLightColors to PinkDarkColors),
-    "Coffee" to (CoffeeLightColors to CoffeeDarkColors)
-)
+private object ThemePresets {
+    val map = mapOf(
+        "Default" to (DefaultLightColors to DefaultDarkColors),
+        "Blue"    to (BlueLightColors to BlueDarkColors),
+        "Red"     to (RedLightColors to RedDarkColors),
+        "Yellow"  to (YellowLightColors to YellowDarkColors),
+        "Orange"  to (OrangeLightColors to OrangeDarkColors),
+        "Purple"  to (PurpleLightColors to PurpleDarkColors),
+        "Pink"    to (PinkLightColors to PinkDarkColors),
+        "Coffee"  to (CoffeeLightColors to CoffeeDarkColors)
+    )
 
+    val fallback = DefaultLightColors to DefaultDarkColors
+}
 
 @Composable
 private fun getColorScheme(
     isDark: Boolean,
-    isSystemDynamic: Boolean,
-    selectedSchemeName: String
-
+    isDynamic: Boolean,
+    schemeName: String
 ): ColorScheme {
     val context = LocalContext.current
-    if (isSystemDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        return if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    }
-    val selectedScheme = colorSchemes[selectedSchemeName] ?: (DefaultLightColors to DefaultDarkColors)
-    return if (isDark) selectedScheme.second else selectedScheme.first
-}
 
-private fun configureWindow(view: View, isDark: Boolean) {
-    val window = (view.context as Activity).window
-    val insetsController = WindowCompat.getInsetsController(window, view)
-    insetsController.apply {
-        isAppearanceLightStatusBars = !isDark
-        isAppearanceLightNavigationBars = !isDark
+    return when {
+        isDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        else -> {
+            val pair = ThemePresets.map[schemeName] ?: ThemePresets.fallback
+            if (isDark) pair.second else pair.first
+        }
     }
 }
