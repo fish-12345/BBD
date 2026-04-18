@@ -3,6 +3,7 @@ package io.github.romanvht.byedpi.ui
 import android.app.Activity
 import android.os.Build
 import androidx.compose.animation.*
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -281,6 +282,13 @@ fun SettingsScreen(
                         val themes = stringArrayResource(R.array.themes)
                         val themeValues = stringArrayResource(R.array.themes_entries)
                         val themeMap = themeValues.zip(themes).toMap()
+                        val isSystemInDarkMode = isSystemInDarkTheme()
+                        val themeIcon = when (viewModel.theme) {
+                            "light" -> Icons.Default.LightMode
+                            "dark" -> Icons.Default.Nightlight
+                            "system" -> if (isSystemInDarkMode) Icons.Default.Nightlight else Icons.Default.LightMode
+                            else -> Icons.Default.Nightlight
+                        }
 
                         ListPreference(
                             title = stringResource(R.string.theme_settings),
@@ -290,7 +298,7 @@ fun SettingsScreen(
                                 viewModel.updateTheme(it)
                                 onThemeChange()
                                             },
-                            icon = Icons.Default.Palette
+                            icon = themeIcon
                         )
 
                         val colorSchemes = stringArrayResource(R.array.color_schemes)
