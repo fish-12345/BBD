@@ -163,6 +163,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        window.setBackgroundDrawableResource(android.R.color.transparent)
 
         val intentFilter = IntentFilter().apply {
             addAction(STARTED_BROADCAST)
@@ -177,11 +178,19 @@ class MainActivity : ComponentActivity() {
             registerReceiver(receiver, intentFilter)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
         }
 
-        if (getPreferences().getBoolean("auto_connect", false) && appStatus.first != AppStatus.Running) {
+        if (getPreferences().getBoolean(
+                "auto_connect",
+                false
+            ) && appStatus.first != AppStatus.Running
+        ) {
             start()
         }
 
@@ -192,239 +201,259 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeManager = remember { ThemeManager(this) }
             TrackerTheme(themeManager = themeManager) {
-                val navController = rememberNavController()
-                val context = LocalContext.current
-                val isTv = remember { context.isTv() }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    val context = LocalContext.current
+                    val isTv = remember { context.isTv() }
 
-                var showBatteryOptimizationDialog by remember { mutableStateOf(false) }
-                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                    var showBatteryOptimizationDialog by remember { mutableStateOf(false) }
+                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-                LaunchedEffect(Unit) {
-                    if (!isTv && isBatteryOptimizationEnabled()) {
-                        showBatteryOptimizationDialog = true
+                    LaunchedEffect(Unit) {
+                        if (!isTv && isBatteryOptimizationEnabled()) {
+                            showBatteryOptimizationDialog = true
+                        }
                     }
-                }
 
-                if (showBatteryOptimizationDialog) {
-                    if (isTv) {
-                        AlertDialog(
-                            onDismissRequest = { showBatteryOptimizationDialog = false },
-                            title = { Text(stringResource(R.string.battery_optimization_dialog_title)) },
-                            text = { Text(stringResource(R.string.battery_optimization_dialog_message)) },
-                            confirmButton = {
-                                Button(onClick = {
-                                    showBatteryOptimizationDialog = false
-                                    requestDisableBatteryOptimization()
-                                }) {
-                                    Text(stringResource(R.string.battery_optimization_disable))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showBatteryOptimizationDialog = false }) {
-                                    Text(stringResource(R.string.action_cancel))
-                                }
-                            }
-                        )
-                    } else {
-                        ModalBottomSheet(
-                            onDismissRequest = { showBatteryOptimizationDialog = false },
-                            sheetState = sheetState,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                            tonalElevation = 0.dp,
-                            dragHandle = { BottomSheetDefaults.DragHandle() }
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 24.dp)
-                                    .padding(bottom = 24.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.battery_optimization_dialog_title),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.padding(bottom = 16.dp, top = 16.dp)
-                                )
-                                Text(
-                                    text = stringResource(R.string.battery_optimization_dialog_message),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    FilledTonalButton(
-                                        onClick = { showBatteryOptimizationDialog = false },
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(50.dp)
-                                    ) {
+                    if (showBatteryOptimizationDialog) {
+                        if (isTv) {
+                            AlertDialog(
+                                onDismissRequest = { showBatteryOptimizationDialog = false },
+                                title = { Text(stringResource(R.string.battery_optimization_dialog_title)) },
+                                text = { Text(stringResource(R.string.battery_optimization_dialog_message)) },
+                                confirmButton = {
+                                    Button(onClick = {
+                                        showBatteryOptimizationDialog = false
+                                        requestDisableBatteryOptimization()
+                                    }) {
+                                        Text(stringResource(R.string.battery_optimization_disable))
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = {
+                                        showBatteryOptimizationDialog = false
+                                    }) {
                                         Text(stringResource(R.string.action_cancel))
                                     }
-                                    Button(
-                                        onClick = {
-                                            showBatteryOptimizationDialog = false
-                                            requestDisableBatteryOptimization()
-                                        },
+                                }
+                            )
+                        } else {
+                            ModalBottomSheet(
+                                onDismissRequest = { showBatteryOptimizationDialog = false },
+                                sheetState = sheetState,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                tonalElevation = 0.dp,
+                                dragHandle = { BottomSheetDefaults.DragHandle() }
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp)
+                                        .padding(bottom = 24.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.battery_optimization_dialog_title),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        modifier = Modifier.padding(bottom = 16.dp, top = 16.dp)
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.battery_optimization_dialog_message),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Row(
                                         modifier = Modifier
-                                            .weight(1f)
-                                            .height(50.dp)
+                                            .fillMaxWidth()
+                                            .padding(top = 24.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                                     ) {
-                                        Text(stringResource(R.string.battery_optimization_disable))
+                                        FilledTonalButton(
+                                            onClick = { showBatteryOptimizationDialog = false },
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(50.dp)
+                                        ) {
+                                            Text(stringResource(R.string.action_cancel))
+                                        }
+                                        Button(
+                                            onClick = {
+                                                showBatteryOptimizationDialog = false
+                                                requestDisableBatteryOptimization()
+                                            },
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(50.dp)
+                                        ) {
+                                            Text(stringResource(R.string.battery_optimization_disable))
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                LaunchedEffect(intent?.getStringExtra("navigate_to")) {
-                    intent?.getStringExtra("navigate_to")?.let {
-                        navController.navigate(it)
-                        intent?.removeExtra("navigate_to")
+                    LaunchedEffect(intent?.getStringExtra("navigate_to")) {
+                        intent?.getStringExtra("navigate_to")?.let {
+                            navController.navigate(it)
+                            intent?.removeExtra("navigate_to")
+                        }
                     }
-                }
 
-                val offsetSpec = tween<IntOffset>(
-                    durationMillis = 400,
-                    easing = CubicBezierEasing(0.22f, 1f, 0.36f, 1f)
-                )
-                val springSpec = remember { spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.1f) }
-
-                NavHost(
-                    navController = navController, startDestination = "home",
-                    enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Start,
-                            animationSpec = offsetSpec
-                        ) + fadeIn(animationSpec = springSpec)
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Start,
-                        animationSpec = offsetSpec
-                    ) + fadeOut(animationSpec = springSpec)
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        animationSpec = offsetSpec
-                    ) + fadeIn(animationSpec = springSpec)  },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.End,
-                            animationSpec = offsetSpec
-                        ) + fadeOut(animationSpec = springSpec)
+                    val offsetSpec = tween<IntOffset>(
+                        durationMillis = 400,
+                        easing = CubicBezierEasing(0.22f, 1f, 0.36f, 1f)
+                    )
+                    val springSpec = remember {
+                        spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = 0.1f
+                        )
                     }
-                ) {
-                    composable("home",
-                        exitTransition = { fadeOut(animationSpec = springSpec) },
-                        popEnterTransition = { fadeIn(animationSpec = springSpec) }
+
+                    NavHost(
+                        navController = navController, startDestination = "home",
+                        enterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = offsetSpec
+                            ) + fadeIn(animationSpec = springSpec)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = offsetSpec
+                            ) + fadeOut(animationSpec = springSpec)
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = offsetSpec
+                            ) + fadeIn(animationSpec = springSpec)
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = offsetSpec
+                            ) + fadeOut(animationSpec = springSpec)
+                        }
                     ) {
-                        MainScreen(
-                            onPrepareVpn = { vpnRegister.launch(it) },
-                            onOpenSettings = {
-                                navController.navigate("settings")
-                            },
-                            onSaveLogs = { saveLogs() },
-                            onCloseApp = { closeApp() },
-                            onOpenEditor = {
-                                if (getPreferences().getBoolean("byedpi_enable_cmd_settings", false)) {
+                        composable(
+                            "home",
+                            exitTransition = { fadeOut(animationSpec = springSpec) },
+                            popEnterTransition = { fadeIn(animationSpec = springSpec) }
+                        ) {
+                            MainScreen(
+                                onPrepareVpn = { vpnRegister.launch(it) },
+                                onOpenSettings = {
+                                    navController.navigate("settings")
+                                },
+                                onSaveLogs = { saveLogs() },
+                                onCloseApp = { closeApp() },
+                                onOpenEditor = {
+                                    if (getPreferences().getBoolean(
+                                            "byedpi_enable_cmd_settings",
+                                            false
+                                        )
+                                    ) {
+                                        navController.navigate("settings/cmd")
+                                    } else {
+                                        navController.navigate("settings/ui")
+                                    }
+                                },
+                                onOpenProfiles = {
+                                    navController.navigate("profiles")
+                                }
+                            )
+                        }
+                        composable("settings") {
+                            SettingsScreen(
+                                onBack = { navController.popBackStack() },
+                                onReset = {
+                                    SettingsUtils.resetSettings(this@MainActivity) {
+                                        recreate()
+                                    }
+                                    navController.navigate("home")
+                                },
+                                onExport = {
+                                    val fileName = "bbd_${
+                                        System.currentTimeMillis().toReadableDateTime()
+                                    }.json"
+                                    exportSettingsLauncher.launch(fileName)
+                                },
+                                onImport = {
+                                    importSettingsLauncher.launch(arrayOf("application/json"))
+                                    navController.popBackStack()
+                                },
+                                onNavigateToTest = {
+                                    navController.navigate("test")
+                                },
+                                onNavigateToAppSelection = {
+                                    navController.navigate("settings/apps")
+                                },
+                                onNavigateToCmdSettings = {
                                     navController.navigate("settings/cmd")
-                                } else {
+                                },
+                                onNavigateToUISettings = {
                                     navController.navigate("settings/ui")
+                                },
+                                onOpenTelegram = {
+                                    openUrl("https://t.me/ByeByeDPI_group")
+                                },
+                                onOpenSourceCode = {
+                                    openUrl("https://github.com/romanvht/ByeByeDPI")
+                                },
+                                onRequestStorageAccess = {
+                                    requestStoragePermission()
+                                },
+                                onRequestDisableBatteryOptimization = {
+                                    requestDisableBatteryOptimization()
+                                },
+                                onThemeChange = {
+                                    if (isTv) recreate()
                                 }
-                            },
-                            onOpenProfiles = {
-                                navController.navigate("profiles")
-                            }
-                        )
-                    }
-                    composable("settings") {
-                        SettingsScreen(
-                            onBack = { navController.popBackStack() },
-                            onReset = {
-                                SettingsUtils.resetSettings(this@MainActivity) {
-                                    recreate()
+                            )
+                        }
+                        composable("settings/cmd") {
+                            CmdSettingsScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("settings/ui") {
+                            UISettingsScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("settings/apps") {
+                            AppSelectionScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("test") {
+                            TestScreen(
+                                onBack = {
+                                    navController.popBackStack()
+                                },
+                                onOpenSettings = {
+                                    navController.navigate("settings/test")
                                 }
-                                navController.navigate("home")
-                            },
-                            onExport = {
-                                val fileName = "bbd_${System.currentTimeMillis().toReadableDateTime()}.json"
-                                exportSettingsLauncher.launch(fileName)
-                            },
-                            onImport = {
-                                importSettingsLauncher.launch(arrayOf("application/json"))
-                                navController.popBackStack()
-                            },
-                            onNavigateToTest = {
-                                navController.navigate("test")
-                            },
-                            onNavigateToAppSelection = {
-                                navController.navigate("settings/apps")
-                            },
-                            onNavigateToCmdSettings = {
-                                navController.navigate("settings/cmd")
-                            },
-                            onNavigateToUISettings = {
-                                navController.navigate("settings/ui")
-                            },
-                            onOpenTelegram = {
-                                openUrl("https://t.me/ByeByeDPI_group")
-                            },
-                            onOpenSourceCode = {
-                                openUrl("https://github.com/romanvht/ByeByeDPI")
-                            },
-                            onRequestStorageAccess = {
-                                requestStoragePermission()
-                            },
-                            onRequestDisableBatteryOptimization = {
-                                requestDisableBatteryOptimization()
-                            },
-                            onThemeChange = {
-                                if (isTv) recreate()
-                            }
-                        )
-                    }
-                    composable("settings/cmd") {
-                        CmdSettingsScreen(onBack = { navController.popBackStack() })
-                    }
-                    composable("settings/ui") {
-                        UISettingsScreen(onBack = { navController.popBackStack() })
-                    }
-                    composable("settings/apps") {
-                        AppSelectionScreen(onBack = { navController.popBackStack() })
-                    }
-                    composable("test") {
-                        TestScreen(
-                            onBack = {
-                                navController.popBackStack()
-                            },
-                            onOpenSettings = {
-                                navController.navigate("settings/test")
-                            }
-                        )
-                    }
-                    composable("settings/test") {
-                        TestSettingsScreen(
-                            onBack = { navController.popBackStack() },
-                            onNavigateToDomainLists = {
-                                navController.navigate("settings/domain-lists")
-                            }
-                        )
-                    }
-                    composable("settings/domain-lists") {
-                        DomainListsScreen(
-                            onBack = { navController.popBackStack() }
-                        )
-                    }
-                    composable("profiles") {
-                        ProfilesScreen(
-                            onBack = { navController.popBackStack() },
-                            onNavigateToTest = { navController.navigate("test") }
-                        )
+                            )
+                        }
+                        composable("settings/test") {
+                            TestSettingsScreen(
+                                onBack = { navController.popBackStack() },
+                                onNavigateToDomainLists = {
+                                    navController.navigate("settings/domain-lists")
+                                }
+                            )
+                        }
+                        composable("settings/domain-lists") {
+                            DomainListsScreen(
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("profiles") {
+                            ProfilesScreen(
+                                onBack = { navController.popBackStack() },
+                                onNavigateToTest = { navController.navigate("test") }
+                            )
+                        }
                     }
                 }
             }
