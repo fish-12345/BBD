@@ -15,9 +15,11 @@ import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.utility.AppPreferences
 import io.github.romanvht.byedpi.utility.createConnectionNotification
 import io.github.romanvht.byedpi.utility.getPreferences
+import java.util.concurrent.ConcurrentHashMap
 
 object NetworkChangeReceiver {
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private val networkCapabilitiesMap = ConcurrentHashMap<Network, NetworkCapabilities>()
 
     fun register(context: Context) {
         if (networkCallback != null) return
@@ -25,16 +27,23 @@ object NetworkChangeReceiver {
         val appContext = context.applicationContext
         val connectivityManager = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+        networkCapabilitiesMap.clear()
+
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                connectivityManager.getNetworkCapabilities(network)?.let {
+                    networkCapabilitiesMap[network] = it
+                }
                 handleNetworkChange(appContext)
             }
 
             override fun onLost(network: Network) {
+                networkCapabilitiesMap.remove(network)
                 handleNetworkChange(appContext)
             }
 
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                networkCapabilitiesMap[network] = networkCapabilities
                 handleNetworkChange(appContext)
             }
         }
@@ -58,6 +67,7 @@ object NetworkChangeReceiver {
                 // Ignore
             }
             networkCallback = null
+            networkCapabilitiesMap.clear()
         }
     }
 
@@ -68,18 +78,10 @@ object NetworkChangeReceiver {
 
         if (wifiProfile.isEmpty() && mobileProfile.isEmpty()) return
 
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        
         var isWifi = false
         var isCellular = false
 
-        val networks = connectivityManager.allNetworks
-        for (network in networks) {
-            val caps = connectivityManager.getNetworkCapabilities(network) ?: continue
-            
-            if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)) continue
-            if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) continue
-
+        for (caps in networkCapabilitiesMap.values) {
             if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                 isWifi = true
                 break 
