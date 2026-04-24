@@ -485,9 +485,8 @@ fun StatusButton(
     var isFocused by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-
     val infiniteTransition = rememberInfiniteTransition(label = "animations")
-    
+
     val pulseProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,

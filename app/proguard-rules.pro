@@ -12,8 +12,6 @@
 -keep class io.github.romanvht.byedpi.data.Command { *; }
 -keep class io.github.romanvht.byedpi.data.AppSettings { *; }
 
--keepattributes Signature
--keepattributes *Annotation*
 
 -repackageclasses 'ru.gdlbo'
 -renamesourcefileattribute ''
