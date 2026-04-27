@@ -78,7 +78,6 @@ fun DomainListsScreen(
             }
         }
 
-        // Add Dialog
         if (viewModel.showAddDialog) {
             DomainListEditDialog(
                 title = "Добавить список",
