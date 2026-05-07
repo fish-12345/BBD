@@ -9,7 +9,7 @@ val abis = setOf("arm64-v8a")
 
 configure<ApplicationExtension> {
     namespace = "io.github.romanvht.byedpi"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "io.github.romanvht.byedpi"
