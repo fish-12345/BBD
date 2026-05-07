@@ -1,6 +1,7 @@
+-l:"\xC2\x00\x00\x00\x01\x14\x2E\xE3\xE3\x5F\x6B\xBB\x23\xA8\xE6\x5D\xA9\x78\x21\xCF\xC2\x72\x4C\x8F\xC4\x5E\x14\x00\x00\x00\x00\xC5\x00\x00\x00\x00\x4C\x00\xA7\x00\x00\x00\x00\x00\x00\x44\x00\x00\x80\x00\x00\x00\x0D\xFC\xFA\x1D\xCD\x73\xBA\x2A\x90\x93\xB3\xEE\xF7\x43\xC5\x85\xDA\xFF\x45\x3C\x00\x00\x00\x00\x00\x00\x7C\x00\x9B\x00\xF6\x00\x00\xDD\x00\x00\x00\x00\x00\x00\x00\x00\x00\x59\xA8\xE4\x00\x00\x00\x00\x00\x00\x00\x00\x7B\x00\x0F\x00\x00\x00\x48\x4E\x00\x00\x00\x06\xF3\x00\x00\x00\x00\xD9\x5A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" -a3 -t12 -d1 -s0+h -d3+s -s6+s -d5+s -s8+s -d7+s -s10+s -d3 -At,s -r3
 -Ku -a1 -An -d1 -s0+s -d3+s -s6+s -d9+s -s12+s -d15+s -s20+s -d25+s -s30+s -d35+s -At,r,s -s1 -q1 -At,r,s -s5 -o25000+s -At,r,s -o1 -d1 -r1+s -t10 -b1500 -s0+s -d3+s -At,r,s -f-1 -r1+s -At,r,s -s1 -o1+s -s-1
 -d1 -d3+s -s6+s -d9+s -s12+s -d15+s -s20+s -d25+s -s30+s -d35+s -r1+s -S -a1 -As -d1 -d3+s -s6+s -d9+s -s12+s -d15+s -s20+s -d25+s -s30+s -d35+s -S -a1
--Ku -a3 -l:"\xe3\x00\x06\xec\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" -An -f64+se -t5 -n {sni}
+-Ku -l:"\xe3\x00\x06\xec\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" -a3 -An -f64+se -n {sni} -t5
 -o1 -d1 -a1 -At,r,s -s1 -d1 -s5+s -s10+s -s15+s -s20+s -r1+s -S -a1 -As -s1 -d1 -s5+s -s10+s -s15+s -s20+s -S -a1
 -n {sni} -Qr -f-204 -s1:5+sm -a1 -As -d1 -s3+s -s5+s -q7 -a1 -As -o2 -f-43 -a1 -As -r5 -Mh -s1:5+s -s3:7+sm -a1
 -d1+s -s50+s -a1 -As -f20 -r2+s -a1 -At -d2 -s1+s -s5+s -s10+s -s15+s -s25+s -s35+s -s50+s -s60+s -a1
@@ -18,6 +19,7 @@
 -o1 -a1 -At,r,s -f-1 -a1 -Ar,s -o1 -a1 -At -r1+s -f-1 -t6 -a1
 -d1 -s1+s -s3+s -s6+s -s9+s -s12+s -s15+s -s20+s -s30+s -a1
 -n {sni} -d2:5:2+h -f-3 -r2+sm -o2 -o50+s -r2+s -f-4 -a1
+-o2 -O4 -s1 -q1 -a2 -Ar -s5 -o1+s -f1+s -r20+s -a2
 -o1 -r-5+se -a1 -At,r,s -d1 -n {sni} -Qr -f-1 -a1
 -s1 -d1 -r1+s -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1
 -s1 -q1 -r1+s -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1
@@ -32,6 +34,7 @@
 -s1 -o1 -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1
 -d1 -o1 -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1
 -d1 -s4 -d8 -s1+s -d5+s -s10+s -d20+s -a1
+-f-1 -n {sni} -Qr -s2+s -r3 -o20 -t4 -a7
 -n {sni} -Qr -d5+sm -f3+sm -o2 -t4 -a1
 -o1 -a1 -Ar -q1 -a1 -At -f-1 -r1+s -a1
 -q1 -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1
@@ -44,6 +47,7 @@
 -s1 -d1 -a1 -At,r,s -f-1 -r1+s -a1
 -o1 -d1 -r1+s -S -s1+s -d3+s -a1
 -d3+s -d1+s -d53+s -a1 -a5 -An -Ku -O1
+-n {sni} -Qr -m2 -f-1 -d7 -a1
 -d3+s -a1
 -s1+s -d3+s -d1+s -d53+s -a1 -a5 -An -Ku -O1
 -s0+s -d3+s -d1+s -d53+s -a1 -a5 -An -Ku -O1
@@ -82,11 +86,11 @@
 -n {sni} -Qr -d1:3 -f-1 -a1
 -s1 -d3+s -a1 -At -r1+s -a1
 -o1 -a1 -At,r,s -d1 -a1
--q1 -a1 -At,r,s -d1 -a1
 -n {sni} -Qr -d1 -f-1
 -d1+s -o2 -s5 -r5 -a1
 -r8 -o2 -s7 -q4+s -a1
 -d6+s -q4+hm -o2 -a1
+-f-1+sm -t7 -a5 -m2
 -s1+s -d3+s -a1
 -s1 -f-1 -S -a1
 -o1+s -d3+s -a1
