@@ -74,7 +74,7 @@ fun AppSelectionScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppSelectionScreenPhone(
     viewModel: AppSelectionViewModel,
@@ -202,6 +202,7 @@ fun AppSelectionScreenPhone(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppSelectionScreenTv(
     viewModel: AppSelectionViewModel,
