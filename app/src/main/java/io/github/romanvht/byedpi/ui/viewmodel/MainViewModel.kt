@@ -60,7 +60,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         when (key) {
             "byedpi_mode" -> preferredMode = appPrefs.mode
             "byedpi_enable_cmd_settings" -> isCmdEnabled = appPrefs.cmdEnable
-            "byedpi_cmd_args" -> currentProfileName = appPrefs.getProfileName(appPrefs.cmdArgs)
+            "byedpi_cmd_args", "byedpi_command_history" -> currentProfileName = appPrefs.getProfileName(appPrefs.cmdArgs)
             "traffic_monitoring" -> isTrafficMonitoringEnabled = appPrefs.trafficMonitoring
         }
     }
