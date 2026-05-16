@@ -21,11 +21,12 @@ class ByeDpiProxyService : LifecycleService() {
     private var proxy = ByeDpiProxy()
     private var proxyJob: Job? = null
     private val mutex = Mutex()
+    private lateinit var dataStore: DataStoreManager
 
     companion object {
         private val TAG: String = ByeDpiProxyService::class.java.simpleName
         private const val FOREGROUND_SERVICE_ID: Int = 2
-        private const val PAUSE_NOTIFICATION_ID: Int = 3
+        private const val PAUSE_NOTIFICATION_ID: Int = 2
         private const val NOTIFICATION_CHANNEL_ID: String = "ByeDPI Proxy"
 
         private var status: ServiceStatus = ServiceStatus.Disconnected
@@ -33,6 +34,7 @@ class ByeDpiProxyService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        dataStore = getDataStore()
         registerNotificationChannel(
             this,
             NOTIFICATION_CHANNEL_ID,
@@ -97,7 +99,7 @@ class ByeDpiProxyService : LifecycleService() {
                 startProxy()
                 updateStatus(ServiceStatus.Connected)
 
-                val prefs = AppPreferences(getPreferences())
+                val prefs = AppPreferences(dataStore)
                 if (prefs.trafficMonitoring) {
                     TrafficMonitor.setOnUpdateListener { dl, ul, totalDl, totalUl ->
                         updateNotification(dl, ul, totalDl, totalUl)
@@ -132,11 +134,6 @@ class ByeDpiProxyService : LifecycleService() {
 
     private suspend fun stop() {
         Log.i(TAG, "Stopping")
-        if (status != ServiceStatus.Connected) {
-            Log.w(TAG, "Proxy not connected")
-            updateStatus(ServiceStatus.Disconnected)
-            return
-        }
         mutex.withLock {
             withContext(Dispatchers.IO) {
                 stopProxy()
@@ -145,6 +142,14 @@ class ByeDpiProxyService : LifecycleService() {
             TrafficMonitor.stop()
         }
         updateStatus(ServiceStatus.Disconnected)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+
         stopSelf()
     }
 
@@ -167,7 +172,10 @@ class ByeDpiProxyService : LifecycleService() {
             if (code != 0) {
                 Log.e(TAG, "Proxy stopped with code $code")
                 updateStatus(ServiceStatus.Failed)
-                stopSelf()
+            }
+
+            withContext(Dispatchers.Main) {
+                stop()
             }
         }
 
@@ -205,7 +213,7 @@ class ByeDpiProxyService : LifecycleService() {
     }
 
     private fun getByeDpiPreferences(): ByeDpiProxyPreferences =
-        ByeDpiProxyPreferences.fromSharedPreferences(getPreferences(), this)
+        ByeDpiProxyPreferences.fromDataStore(dataStore, this)
 
     private fun updateStatus(newStatus: ServiceStatus) {
         Log.d(TAG, "Proxy status changed from $status to $newStatus")
@@ -245,7 +253,7 @@ class ByeDpiProxyService : LifecycleService() {
         totalDownload: String? = null,
         totalUpload: String? = null
     ): Notification {
-        val prefs = AppPreferences(getPreferences())
+        val prefs = AppPreferences(dataStore)
         val profileName = prefs.getProfileName(prefs.cmdArgs)
         val showStats = prefs.trafficMonitoring
 

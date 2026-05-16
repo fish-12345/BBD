@@ -14,7 +14,7 @@ import io.github.romanvht.byedpi.services.ServiceManager
 import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.utility.AppPreferences
 import io.github.romanvht.byedpi.utility.createConnectionNotification
-import io.github.romanvht.byedpi.utility.getPreferences
+import io.github.romanvht.byedpi.utility.getDataStore
 import java.util.concurrent.ConcurrentHashMap
 
 object NetworkChangeReceiver {
@@ -72,7 +72,7 @@ object NetworkChangeReceiver {
     }
 
     private fun handleNetworkChange(context: Context) {
-        val prefs = AppPreferences(context.getPreferences())
+        val prefs = AppPreferences(context.getDataStore())
         val wifiProfile = prefs.wifiProfile
         val mobileProfile = prefs.mobileProfile
 

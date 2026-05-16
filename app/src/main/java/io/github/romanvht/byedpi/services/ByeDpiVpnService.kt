@@ -31,11 +31,12 @@ class ByeDpiVpnService : LifecycleVpnService() {
     private var proxyJob: Job? = null
     private var tunFd: ParcelFileDescriptor? = null
     private val mutex = Mutex()
+    private lateinit var dataStore: DataStoreManager
 
     companion object {
         private val TAG: String = ByeDpiVpnService::class.java.simpleName
         private const val FOREGROUND_SERVICE_ID: Int = 1
-        private const val PAUSE_NOTIFICATION_ID: Int = 3
+        private const val PAUSE_NOTIFICATION_ID: Int = 1
         private const val NOTIFICATION_CHANNEL_ID: String = "ByeDPIVpn"
 
         private var status: ServiceStatus = ServiceStatus.Disconnected
@@ -43,6 +44,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
 
     override fun onCreate() {
         super.onCreate()
+        dataStore = getDataStore()
         registerNotificationChannel(
             this,
             NOTIFICATION_CHANNEL_ID,
@@ -120,7 +122,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
                 startTun2Socks()
                 updateStatus(ServiceStatus.Connected)
 
-                val prefs = AppPreferences(getPreferences())
+                val prefs = AppPreferences(dataStore)
                 if (prefs.trafficMonitoring) {
                     TrafficMonitor.setOnUpdateListener { dl, ul, totalDl, totalUl ->
                         updateNotification(dl, ul, totalDl, totalUl)
@@ -155,11 +157,6 @@ class ByeDpiVpnService : LifecycleVpnService() {
 
     private suspend fun stop() {
         Log.i(TAG, "Stopping")
-        if (status != ServiceStatus.Connected) {
-            Log.w(TAG, "VPN not connected")
-            updateStatus(ServiceStatus.Disconnected)
-            return
-        }
         mutex.withLock {
             try {
                 withContext(Dispatchers.IO) {
@@ -173,6 +170,14 @@ class ByeDpiVpnService : LifecycleVpnService() {
             TrafficMonitor.stop()
         }
         updateStatus(ServiceStatus.Disconnected)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+
         stopSelf()
     }
 
@@ -194,8 +199,10 @@ class ByeDpiVpnService : LifecycleVpnService() {
                 Log.e(TAG, "Proxy stopped with code $code")
                 updateStatus(ServiceStatus.Failed)
             }
-                stopTun2Socks()
-                stopSelf()
+
+            withContext(Dispatchers.Main) {
+                stop()
+            }
         }
 
         Log.i(TAG, "Proxy started")
@@ -239,11 +246,10 @@ class ByeDpiVpnService : LifecycleVpnService() {
             throw IllegalStateException("VPN field not null")
         }
 
-        val sharedPreferences = getPreferences()
-        val (ip, port) = sharedPreferences.getProxyIpAndPort()
+        val (ip, port) = dataStore.getProxyIpAndPort()
 
-        val dns = sharedPreferences.getStringNotNull("dns_ip", "8.8.8.8")
-        val ipv6 = sharedPreferences.getBoolean("ipv6_enable", false)
+        val dns = dataStore.get("dns_ip", "8.8.8.8")
+        val ipv6 = dataStore.get("ipv6_enable", false)
 
         val tun2socksConfig = buildString {
             appendLine("tunnel:")
@@ -309,7 +315,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
     }
 
     private fun getByeDpiPreferences(): ByeDpiProxyPreferences =
-        ByeDpiProxyPreferences.fromSharedPreferences(getPreferences(), this)
+        ByeDpiProxyPreferences.fromDataStore(dataStore, this)
 
     private fun updateStatus(newStatus: ServiceStatus) {
         Log.d(TAG, "VPN status changed from $status to $newStatus")
@@ -350,7 +356,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
         totalDownload: String? = null,
         totalUpload: String? = null
     ): Notification {
-        val prefs = AppPreferences(getPreferences())
+        val prefs = AppPreferences(dataStore)
         val profileName = prefs.getProfileName(prefs.cmdArgs)
         val showStats = prefs.trafficMonitoring
 
@@ -410,9 +416,8 @@ class ByeDpiVpnService : LifecycleVpnService() {
             builder.setMetered(false)
         }
 
-        val preferences = getPreferences()
-        val listType = preferences.getStringNotNull("applist_type", "disable")
-        val listedApps = preferences.getSelectedApps()
+        val listType = dataStore.get("applist_type", "disable")
+        val listedApps = dataStore.get("selected_apps", emptySet<String>())
 
         when (listType) {
             "blacklist" -> {

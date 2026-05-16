@@ -1,32 +1,31 @@
 package io.github.romanvht.byedpi.core
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import io.github.romanvht.byedpi.data.UISettings
+import io.github.romanvht.byedpi.utility.DataStoreManager
 import io.github.romanvht.byedpi.utility.DomainListUtils
-import io.github.romanvht.byedpi.utility.checkIpAndPortInCmd
-import io.github.romanvht.byedpi.utility.getStringNotNull
+import io.github.romanvht.byedpi.utility.getProxyIpAndPort
 import io.github.romanvht.byedpi.utility.shellSplit
 
 sealed interface ByeDpiProxyPreferences {
     companion object {
-        fun fromSharedPreferences(preferences: SharedPreferences, context: Context): ByeDpiProxyPreferences =
-            when (preferences.getBoolean("byedpi_enable_cmd_settings", false)) {
-                true -> ByeDpiProxyCmdPreferences(preferences, context)
-                false -> ByeDpiProxyUIPreferences(preferences)
+        fun fromDataStore(dataStore: DataStoreManager, context: Context): ByeDpiProxyPreferences =
+            when (dataStore.get("byedpi_enable_cmd_settings", false)) {
+                true -> ByeDpiProxyCmdPreferences(dataStore, context)
+                false -> ByeDpiProxyUIPreferences(dataStore)
             }
     }
 }
 
 class ByeDpiProxyCmdPreferences(val args: Array<String>) : ByeDpiProxyPreferences {
-    constructor(preferences: SharedPreferences, context: Context) : this(
-        parseCmdToArguments(preferences, context)
+    constructor(dataStore: DataStoreManager, context: Context) : this(
+        parseCmdToArguments(dataStore, context)
     )
 
     companion object {
-        private fun parseCmdToArguments(preferences: SharedPreferences, context: Context): Array<String> {
-            val cmd = preferences.getStringNotNull("byedpi_cmd_args", "-Ku -a1 -An -o1 -At,r,s -d1")
+        private fun parseCmdToArguments(dataStore: DataStoreManager, context: Context): Array<String> {
+            val cmd = dataStore.get("byedpi_cmd_args", "-Ku -a1 -An -o1 -At,r,s -d1")
             val preparedCmd = getLists(cmd, context)
 
             val firstArgIndex = preparedCmd.indexOf("-")
@@ -34,13 +33,12 @@ class ByeDpiProxyCmdPreferences(val args: Array<String>) : ByeDpiProxyPreference
 
             Log.d("ProxyPref", "CMD: $args")
 
-            val (cmdIp, cmdPort) = preferences.checkIpAndPortInCmd()
-            val ip = preferences.getStringNotNull("byedpi_proxy_ip", "127.0.0.1")
-            val port = preferences.getStringNotNull("byedpi_proxy_port", "1080")
+            val (ip, port) = dataStore.getProxyIpAndPort()
 
             val prefix = buildString {
-                if (cmdIp == null) append("--ip $ip ")
-                if (cmdPort == null) append("--port $port ")
+                val cmdArgsList = shellSplit(args)
+                if (cmdArgsList.none { it == "-i" || it.startsWith("--ip") }) append("--ip $ip ")
+                if (cmdArgsList.none { it == "-p" || it.startsWith("--port") }) append("--port $port ")
             }
 
             Log.d("ProxyPref", "Added from settings: $prefix")
@@ -70,8 +68,8 @@ class ByeDpiProxyCmdPreferences(val args: Array<String>) : ByeDpiProxyPreference
 
 class ByeDpiProxyUIPreferences(val settings: UISettings = UISettings()) : ByeDpiProxyPreferences {
 
-    constructor(preferences: SharedPreferences) : this(
-        UISettings.fromSharedPreferences(preferences)
+    constructor(dataStore: DataStoreManager) : this(
+        UISettings.fromDataStore(dataStore)
     )
 
     val uiargs: Array<String>

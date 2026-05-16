@@ -13,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.R
@@ -44,6 +43,8 @@ data class TestResult(
 )
 
 class TestViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dataStore = application.getDataStore()
 
     var isTestingState by mutableStateOf(false)
         private set
@@ -90,10 +91,11 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        syncSettings()
         resetStuckTestingState()
-        // Загружаем только из памяти (companion object), не из SharedPreferences
         loadFromMemory()
+        dataStore.observe(viewModelScope, "byedpi_proxytest_showall", false) {
+            showAll = it
+        }
     }
 
     private fun loadFromMemory() {
@@ -104,16 +106,11 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun resetStuckTestingState() {
-        val context = getApplication<Application>()
-        val wasRunning = context.getPreferences().getBoolean("is_test_running", false)
+        val wasRunning = dataStore.get("is_test_running", false)
         if (wasRunning) {
-            context.getPreferences().edit { putBoolean("is_test_running", false) }
+            dataStore.setAsync("is_test_running", false)
             isTestingState = false
         }
-    }
-
-    fun syncSettings() {
-        showAll = getApplication<Application>().getPreferences().getBoolean("byedpi_proxytest_showall", false)
     }
 
     private fun showToast(messageResId: Int) {
@@ -134,7 +131,6 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
         val context = getApplication<Application>()
         val sites = loadSites()
         val cmds = loadCmds()
-        val prefs = context.getPreferences()
 
         if (sites.isEmpty()) {
             resultsLog = AnnotatedString("${context.getString(R.string.test_settings_domain_empty)}\n")
@@ -145,18 +141,18 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             isTestingState = false
         }
 
-        // Очищаем только in-memory, SharedPreferences не трогаем для результатов
+        // Очищаем только in-memory
         inMemoryResults.clear()
         inMemoryLog = AnnotatedString("")
         hasEverRun = false
 
-        val currentCmdText = prefs.getString("byedpi_cmd_args", "").orEmpty()
+        val currentCmdText = dataStore.get("byedpi_cmd_args", "")
         originalCommandData = HistoryUtils(context).findCommandByText(currentCmdText)
             ?: Command(text = currentCmdText, pinned = false, name = "")
 
         testJob = viewModelScope.launch(Dispatchers.IO) {
             isTestingState = true
-            prefs.edit { putBoolean("is_test_running", true) }
+            dataStore.set("is_test_running", true)
             clearLog()
 
             withContext(Dispatchers.Main) {
@@ -166,21 +162,20 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 inMemoryLog = AnnotatedString("")
                 testResults.clear()
                 inMemoryResults.clear()
-                syncSettings()
                 currentStrategyProgress = 0f
                 overallProgress = 0f
             }
 
-            val fullLog = prefs.getBoolean("byedpi_proxytest_fulllog", false)
-            val logClickable = prefs.getBoolean("byedpi_proxytest_logclickable", false)
-            val autoSort = prefs.getBoolean("byedpi_proxytest_autosort", true)
-            val delaySec = prefs.getIntStringNotNull("byedpi_proxytest_delay", 6)
-            val requestsCount = prefs.getIntStringNotNull("byedpi_proxytest_requests", 1)
-            val requestTimeout = prefs.getLongStringNotNull("byedpi_proxytest_timeout", 5)
-            val concurrentRequests = prefs.getIntStringNotNull("byedpi_proxytest_concurrent_requests", 20)
+            val fullLog = dataStore.get("byedpi_proxytest_fulllog", false)
+            val logClickable = dataStore.get("byedpi_proxytest_logclickable", false)
+            val autoSort = dataStore.get("byedpi_proxytest_autosort", true)
+            val delaySec = dataStore.get("byedpi_proxytest_delay", "6").toIntOrNull() ?: 6
+            val requestsCount = dataStore.get("byedpi_proxytest_requests", "1").toIntOrNull() ?: 1
+            val requestTimeout = dataStore.get("byedpi_proxytest_timeout", "5").toLongOrNull() ?: 5L
+            val concurrentRequests = dataStore.get("byedpi_proxytest_concurrent_requests", "20").toIntOrNull() ?: 20
 
-            val ip = prefs.getStringNotNull("byedpi_proxy_ip", "127.0.0.1")
-            val port = prefs.getIntStringNotNull("byedpi_proxy_port", 1080)
+            val ip = dataStore.get("byedpi_proxy_ip", "127.0.0.1")
+            val port = dataStore.get("byedpi_proxy_port", "1080").toIntOrNull() ?: 1080
             val siteChecker = SiteCheckUtils(ip, port)
 
             totalCmdCount = cmds.size
@@ -236,7 +231,6 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
                 val successfulCount = checkResults.sumOf { it.second }
                 val successPercentage = if (totalRequests > 0) (successfulCount * 100) / totalRequests else 0
-                // ФИКС КРАША: копируем список результатов, чтобы он не был изменён в фоне
                 val siteResults = checkResults.map { SiteResult(it.first, it.second, requestsCount) }.toList()
 
                 withContext(Dispatchers.Main) {
@@ -271,7 +265,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
             restoreOriginalCommand()
 
             isTestingState = false
-            context.getPreferences().edit { putBoolean("is_test_running", false) }
+            dataStore.set("is_test_running", false)
             testJob = null
         }
     }
@@ -279,10 +273,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     private fun restoreOriginalCommand() {
         originalCommandData?.let { command ->
             val context = getApplication<Application>()
-
-            context.getPreferences().edit {
-                putString("byedpi_cmd_args", command.text)
-            }
+            dataStore.setAsync("byedpi_cmd_args", command.text)
 
             val historyUtils = HistoryUtils(context)
 
@@ -310,7 +301,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     fun stopTesting() {
         val context = getApplication<Application>()
         isTestingState = false
-        context.getPreferences().edit { putBoolean("is_test_running", false) }
+        dataStore.setAsync("is_test_running", false)
 
         restoreOriginalCommand()
 
@@ -379,7 +370,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateCmdArgs(cmd: String) {
-        getApplication<Application>().getPreferences().edit { putString("byedpi_cmd_args", cmd) }
+        dataStore.setAsync("byedpi_cmd_args", cmd)
     }
 
     private fun saveLog(text: String) {
@@ -400,14 +391,13 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadCmds(): List<String> {
         val context = getApplication<Application>()
-        val prefs = context.getPreferences()
-        val selectedStrategyLists = prefs.getStringSet("byedpi_proxytest_strategy_lists", setOf("builtin")) ?: setOf("builtin")
-        val sniValue = prefs.getStringNotNull("byedpi_proxytest_sni", "max.ru")
+        val selectedStrategyLists = dataStore.get("byedpi_proxytest_strategy_lists", setOf("builtin"))
+        val sniValue = dataStore.get("byedpi_proxytest_sni", "max.ru")
 
         val allCmds = mutableListOf<String>()
         for (strategyList in selectedStrategyLists) {
             val cmds = when (strategyList) {
-                "custom" -> prefs.getStringNotNull("byedpi_proxytest_commands", "").lines()
+                "custom" -> dataStore.get("byedpi_proxytest_commands", "").lines()
                 else -> context.assets.open("proxytest_strategies.list").bufferedReader().readText().lines()
             }
             allCmds.addAll(cmds.map { it.trim() }.filter { it.isNotEmpty() })

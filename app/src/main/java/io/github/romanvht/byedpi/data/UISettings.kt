@@ -1,6 +1,6 @@
 package io.github.romanvht.byedpi.data
 
-import android.content.SharedPreferences
+import io.github.romanvht.byedpi.utility.DataStoreManager
 
 data class UISettings(
     val ip: String = "127.0.0.1",
@@ -61,41 +61,41 @@ data class UISettings(
     }
 
     companion object {
-        fun fromSharedPreferences(preferences: SharedPreferences): UISettings {
-            val hostsMode = preferences.getString("byedpi_hosts_mode", null) ?.let { HostsMode.fromName(it) } ?: HostsMode.Disable
+        fun fromDataStore(dataStore: DataStoreManager): UISettings {
+            val hostsMode = dataStore.get("byedpi_hosts_mode", "disable").let { HostsMode.fromName(it) }
 
             val hosts = when (hostsMode) {
-                HostsMode.Blacklist -> preferences.getString("byedpi_hosts_blacklist", null)
-                HostsMode.Whitelist -> preferences.getString("byedpi_hosts_whitelist", null)
+                HostsMode.Blacklist -> dataStore.get("byedpi_hosts_blacklist", "")
+                HostsMode.Whitelist -> dataStore.get("byedpi_hosts_whitelist", "")
                 else -> null
             }
 
             return UISettings(
-                ip = preferences.getString("byedpi_proxy_ip", null) ?: "127.0.0.1",
-                port = preferences.getString("byedpi_proxy_port", null)?.toIntOrNull() ?: 1080,
-                maxConnections = preferences.getString("byedpi_max_connections", null)?.toIntOrNull() ?: 512,
-                bufferSize = preferences.getString("byedpi_buffer_size", null)?.toIntOrNull() ?: 16384,
-                defaultTtl = preferences.getString("byedpi_default_ttl", null)?.toIntOrNull() ?: 0,
-                noDomain = preferences.getBoolean("byedpi_no_domain", false),
-                desyncHttp = preferences.getBoolean("byedpi_desync_http", true),
-                desyncHttps = preferences.getBoolean("byedpi_desync_https", true),
-                desyncUdp = preferences.getBoolean("byedpi_desync_udp", true),
-                desyncMethod = preferences.getString("byedpi_desync_method", null) ?.let { DesyncMethod.fromName(it) } ?: DesyncMethod.OOB,
-                splitPosition = preferences.getString("byedpi_split_position", null)?.toIntOrNull() ?: 1,
-                splitAtHost = preferences.getBoolean("byedpi_split_at_host", false),
-                fakeTtl = preferences.getString("byedpi_fake_ttl", null)?.toIntOrNull() ?: 8,
-                fakeSni = preferences.getString("byedpi_fake_sni", null) ?: "www.iana.org",
-                oobChar = preferences.getString("byedpi_oob_data", null) ?: "a",
-                hostMixedCase = preferences.getBoolean("byedpi_host_mixed_case", false),
-                domainMixedCase = preferences.getBoolean("byedpi_domain_mixed_case", false),
-                hostRemoveSpaces = preferences.getBoolean("byedpi_host_remove_spaces", false),
-                tlsRecordSplit = preferences.getBoolean("byedpi_tlsrec_enabled", false),
-                tlsRecordSplitPosition = preferences.getString("byedpi_tlsrec_position", null)?.toIntOrNull() ?: 0,
-                tlsRecordSplitAtSni = preferences.getBoolean("byedpi_tlsrec_at_sni", false),
-                tcpFastOpen = preferences.getBoolean("byedpi_tcp_fast_open", false),
-                udpFakeCount = preferences.getString("byedpi_udp_fake_count", null)?.toIntOrNull() ?: 1,
-                dropSack = preferences.getBoolean("byedpi_drop_sack", false),
-                fakeOffset = preferences.getString("byedpi_fake_offset", null)?.toIntOrNull() ?: 0,
+                ip = dataStore.get("byedpi_proxy_ip", "127.0.0.1"),
+                port = dataStore.get("byedpi_proxy_port", "1080").toIntOrNull() ?: 1080,
+                maxConnections = dataStore.get("byedpi_max_connections", "512").toIntOrNull() ?: 512,
+                bufferSize = dataStore.get("byedpi_buffer_size", "16384").toIntOrNull() ?: 16384,
+                defaultTtl = dataStore.get("byedpi_default_ttl", "0").toIntOrNull() ?: 0,
+                noDomain = dataStore.get("byedpi_no_domain", false),
+                desyncHttp = dataStore.get("byedpi_desync_http", true),
+                desyncHttps = dataStore.get("byedpi_desync_https", true),
+                desyncUdp = dataStore.get("byedpi_desync_udp", true),
+                desyncMethod = dataStore.get("byedpi_desync_method", "oob").let { DesyncMethod.fromName(it) },
+                splitPosition = dataStore.get("byedpi_split_position", "1").toIntOrNull() ?: 1,
+                splitAtHost = dataStore.get("byedpi_split_at_host", false),
+                fakeTtl = dataStore.get("byedpi_fake_ttl", "8").toIntOrNull() ?: 8,
+                fakeSni = dataStore.get("byedpi_fake_sni", "www.iana.org"),
+                oobChar = dataStore.get("byedpi_oob_data", "a"),
+                hostMixedCase = dataStore.get("byedpi_host_mixed_case", false),
+                domainMixedCase = dataStore.get("byedpi_domain_mixed_case", false),
+                hostRemoveSpaces = dataStore.get("byedpi_host_remove_spaces", false),
+                tlsRecordSplit = dataStore.get("byedpi_tlsrec_enabled", false),
+                tlsRecordSplitPosition = dataStore.get("byedpi_tlsrec_position", "0").toIntOrNull() ?: 0,
+                tlsRecordSplitAtSni = dataStore.get("byedpi_tlsrec_at_sni", false),
+                tcpFastOpen = dataStore.get("byedpi_tcp_fast_open", false),
+                udpFakeCount = dataStore.get("byedpi_udp_fake_count", "1").toIntOrNull() ?: 1,
+                dropSack = dataStore.get("byedpi_drop_sack", false),
+                fakeOffset = dataStore.get("byedpi_fake_offset", "0").toIntOrNull() ?: 0,
                 hostsMode = hostsMode,
                 hosts = hosts,
             )

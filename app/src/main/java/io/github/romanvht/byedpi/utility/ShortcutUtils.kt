@@ -16,6 +16,7 @@ object ShortcutUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             val shortcuts = mutableListOf<ShortcutInfo>()
+            val dataStore = context.getDataStore()
 
             val toggleIntent = Intent(context, ToggleActivity::class.java).apply {
                 action = ACTION_TOGGLE
@@ -31,7 +32,7 @@ object ShortcutUtils {
 
             shortcuts.add(toggleShortcut)
 
-            if (context.getPreferences().getBoolean("byedpi_enable_cmd_settings", false)) {
+            if (dataStore.get("byedpi_enable_cmd_settings", false)) {
                 val history = HistoryUtils(context)
                 val pinned = history.getHistory().filter { it.pinned }.take(3)
 

@@ -5,13 +5,11 @@ import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.edit
 import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.services.ServiceManager
 import io.github.romanvht.byedpi.services.appStatus
-import io.github.romanvht.byedpi.utility.getPreferences
-import io.github.romanvht.byedpi.utility.mode
+import io.github.romanvht.byedpi.utility.getDataStore
 
 class ToggleActivity : ComponentActivity() {
     private val vpnRegister =
@@ -35,19 +33,22 @@ class ToggleActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent?) {
         val strategy = intent?.getStringExtra("strategy")
         val modeStr = intent?.getStringExtra("mode")
-        val prefs = getPreferences()
+        val dataStore = getDataStore()
         var updated = false
 
-        if (strategy != null && strategy != prefs.getString("byedpi_cmd_args", null)) {
-            prefs.edit(commit = true) { putString("byedpi_cmd_args", strategy) }
+        if (strategy != null && strategy != dataStore.get("byedpi_cmd_args", "")) {
+            dataStore.setAsync("byedpi_cmd_args", strategy)
             updated = true
         }
 
         if (modeStr != null) {
-            val newMode = try { Mode.valueOf(modeStr) } catch (e: Exception) { null }
-            if (newMode != null && newMode != prefs.mode()) {
-                prefs.edit(commit = true) { putString("mode", newMode.name) }
-                updated = true
+            val newMode = try { Mode.fromString(modeStr) } catch (e: Exception) { null }
+            if (newMode != null) {
+                val currentModeStr = dataStore.get("byedpi_mode", "vpn")
+                if (newMode != Mode.fromString(currentModeStr)) {
+                    dataStore.setAsync("byedpi_mode", newMode.toString().lowercase())
+                    updated = true
+                }
             }
         }
 
@@ -66,7 +67,8 @@ class ToggleActivity : ComponentActivity() {
                     start()
                 } else {
                     if (updated) {
-                        ServiceManager.restart(this, prefs.mode())
+                        val currentModeStr = dataStore.get("byedpi_mode", "vpn")
+                        ServiceManager.restart(this, Mode.fromString(currentModeStr))
                     } else {
                         stop()
                     }
@@ -75,7 +77,8 @@ class ToggleActivity : ComponentActivity() {
         }
 
         if (intent?.getBooleanExtra("finish_after", true) != false) {
-            val mode = prefs.mode()
+            val currentModeStr = dataStore.get("byedpi_mode", "vpn")
+            val mode = Mode.fromString(currentModeStr)
             if (status == AppStatus.Halted && !onlyStop && !onlyUpdate && mode == Mode.VPN && VpnService.prepare(this) != null) {
                 return
             }
@@ -84,7 +87,8 @@ class ToggleActivity : ComponentActivity() {
     }
 
     private fun start() {
-        val mode = getPreferences().mode()
+        val currentModeStr = getDataStore().get("byedpi_mode", "vpn")
+        val mode = Mode.fromString(currentModeStr)
         if (mode == Mode.VPN) {
             val intentPrepare = VpnService.prepare(this)
             if (intentPrepare != null) {

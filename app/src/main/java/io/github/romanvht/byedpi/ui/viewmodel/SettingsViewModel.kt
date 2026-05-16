@@ -5,13 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.data.ThemeManager
 import io.github.romanvht.byedpi.utility.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
-    private val prefs = application.getPreferences()
-    private val appPrefs = AppPreferences(prefs)
+    private val dataStore = application.getDataStore()
+    private val appPrefs = AppPreferences(dataStore)
     private val themeManager = ThemeManager(application)
 
     var language by mutableStateOf(appPrefs.language)
@@ -51,47 +54,79 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val isProxyVisible: Boolean
         get() {
-            val (cmdIp, cmdPort) = prefs.checkIpAndPortInCmd()
-            return !cmdEnable || (cmdIp == null && cmdPort == null)
+            val cmdEnableSync = dataStore.get("byedpi_enable_cmd_settings", false)
+            val cmdArgsStr = dataStore.get("byedpi_cmd_args", "")
+            
+            if (!cmdEnableSync) return true
+            
+            val cmdArgs = shellSplit(cmdArgsStr)
+            fun hasArg(argsList: List<String>, keys: List<String>): Boolean {
+                for (arg in argsList) {
+                    for (key in keys) {
+                        if (arg == key || arg.startsWith("$key=")) return true
+                    }
+                }
+                return false
+            }
+            
+            val hasIp = hasArg(cmdArgs, listOf("--ip", "-i"))
+            val hasPort = hasArg(cmdArgs, listOf("--port", "-p"))
+            
+            return !hasIp && !hasPort
         }
+
+    init {
+        dataStore.run {
+            observe(viewModelScope, "language", "system") { language = it }
+            observe(viewModelScope, "app_theme", "system") { theme = it }
+            observe(viewModelScope, "color_scheme", "Default") { colorScheme = it }
+            observe(viewModelScope, "dns_ip", "1.1.1.1") { dnsIp = it }
+            observe(viewModelScope, "dns_solution", "1.1.1.1") { dnsSolution = it }
+            observe(viewModelScope, "ipv6_enable", false) { ipv6Enable = it }
+            observe(viewModelScope, "applist_type", "disable") { applistType = it }
+            observe(viewModelScope, "autostart", false) { autostart = it }
+            observe(viewModelScope, "auto_connect", false) { autoConnect = it }
+            observe(viewModelScope, "byedpi_proxy_ip", "127.0.0.1") { proxyIp = it }
+            observe(viewModelScope, "byedpi_proxy_port", "1080") { proxyPort = it }
+        }
+        viewModelScope.launch {
+            launch { appPrefs.modeFlow.collectLatest { mode = it } }
+            launch { appPrefs.cmdEnableFlow.collectLatest { cmdEnable = it } }
+            launch { appPrefs.trafficMonitoringFlow.collectLatest { trafficMonitoring = it } }
+            launch { themeManager.isDynamicColor.collectLatest { dynamicColors = it } }
+        }
+    }
 
     fun updateLanguage(newValue: String) {
         appPrefs.language = newValue
-        language = newValue
         SettingsUtils.setLang(newValue)
     }
 
     fun updateTheme(newValue: String) {
         appPrefs.theme = newValue
-        theme = newValue
         themeManager.setDarkTheme(newValue)
     }
 
     fun updateColorScheme(newValue: String) {
         appPrefs.colorScheme = newValue
-        colorScheme = newValue
         themeManager.setColorScheme(newValue)
     }
 
     fun updateDynamicColors(newValue: Boolean) {
-        dynamicColors = newValue
         themeManager.setDynamicColor(newValue)
     }
 
     fun updateMode(newValue: String) {
         val newMode = Mode.fromString(newValue)
         appPrefs.mode = newMode
-        mode = newMode
     }
 
     fun updateDns(newValue: String) {
         appPrefs.dnsIp = newValue
-        dnsIp = newValue
     }
 
     fun updateDnsSolution(newValue: String) {
         appPrefs.dnsSolution = newValue
-        dnsSolution = newValue
         if (newValue != "custom") {
             updateDns(newValue)
         }
@@ -99,42 +134,34 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun updateIpv6(newValue: Boolean) {
         appPrefs.ipv6Enable = newValue
-        ipv6Enable = newValue
     }
 
     fun updateApplistType(newValue: String) {
         appPrefs.applistType = newValue
-        applistType = newValue
     }
 
     fun updateAutostart(newValue: Boolean) {
         appPrefs.autostart = newValue
-        autostart = newValue
     }
 
     fun updateAutoConnect(newValue: Boolean) {
         appPrefs.autoConnect = newValue
-        autoConnect = newValue
     }
 
     fun updateCmdEnable(newValue: Boolean) {
         appPrefs.cmdEnable = newValue
-        cmdEnable = newValue
     }
 
     fun updateProxyIp(newValue: String) {
         appPrefs.proxyIp = newValue
-        proxyIp = newValue
     }
 
     fun updateProxyPort(newValue: String) {
         appPrefs.proxyPort = newValue
-        proxyPort = newValue
     }
 
     fun updateTrafficMonitoring(newValue: Boolean) {
         appPrefs.trafficMonitoring = newValue
-        trafficMonitoring = newValue
     }
 
     fun refreshBatteryOptimizationStatus() {

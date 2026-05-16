@@ -7,8 +7,7 @@ import android.service.quicksettings.TileService
 import android.util.Log
 import androidx.annotation.RequiresApi
 import io.github.romanvht.byedpi.data.*
-import io.github.romanvht.byedpi.utility.getPreferences
-import io.github.romanvht.byedpi.utility.mode
+import io.github.romanvht.byedpi.utility.getDataStore
 
 @RequiresApi(Build.VERSION_CODES.N)
 class QuickTileService : TileService() {
@@ -47,7 +46,8 @@ class QuickTileService : TileService() {
 
     private fun handleClick() {
         val (status) = appStatus
-        val mode = getPreferences().mode()
+        val modeStr = getDataStore().get("byedpi_mode", "vpn")
+        val mode = Mode.fromString(modeStr)
 
         when (status) {
             AppStatus.Halted -> startService(mode)

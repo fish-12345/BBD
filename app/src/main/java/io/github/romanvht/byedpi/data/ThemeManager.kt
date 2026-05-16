@@ -1,63 +1,46 @@
 package io.github.romanvht.byedpi.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
-import io.github.romanvht.byedpi.utility.getPreferences
-import kotlinx.coroutines.channels.awaitClose
+import io.github.romanvht.byedpi.utility.getDataStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import androidx.core.content.edit
+import kotlinx.coroutines.flow.map
 
 class ThemeManager(context: Context) {
-    private val prefs: SharedPreferences = context.getPreferences()
+    private val dataStore = context.getDataStore()
+    private val dynamicColorsKey = "dynamic_colors"
 
-    val isDynamicColor: Flow<Boolean> = callbackFlow {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "dynamic_colors") trySend(getDynamicColor())
+    val isDynamicColor: Flow<Boolean> = dataStore.getFlow(dynamicColorsKey, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+
+    val isDarkTheme: Flow<Boolean?> = dataStore.getFlow("app_theme", "system").map {
+        when (it) {
+            "dark" -> true
+            "light" -> false
+            else -> null
         }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        trySend(getDynamicColor())
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    val isDarkTheme: Flow<Boolean?> = callbackFlow {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "app_theme") trySend(getDarkTheme())
-        }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        trySend(getDarkTheme())
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
+    val selectedColorScheme: Flow<String> = dataStore.getFlow("color_scheme", "Default")
 
-    val selectedColorScheme: Flow<String> = callbackFlow {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "color_scheme") trySend(getSelectedColorScheme())
-        }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        trySend(getSelectedColorScheme())
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
+    fun getDynamicColor(): Boolean = dataStore.get(dynamicColorsKey, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 
-    fun getDynamicColor(): Boolean = prefs.getBoolean("dynamic_colors", Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-
-    fun getDarkTheme(): Boolean? = when (prefs.getString("app_theme", "system")) {
+    fun getDarkTheme(): Boolean? = when (dataStore.get("app_theme", "system")) {
         "dark" -> true
         "light" -> false
         else -> null
     }
 
-    fun getSelectedColorScheme(): String = prefs.getString("color_scheme", "Default") ?: "Default"
+    fun getSelectedColorScheme(): String = dataStore.get("color_scheme", "Default")
 
     fun setDynamicColor(enabled: Boolean) {
-        prefs.edit { putBoolean("dynamic_colors", enabled) }
+        dataStore.setAsync(dynamicColorsKey, enabled)
     }
 
     fun setDarkTheme(theme: String) {
-        prefs.edit { putString("app_theme", theme) }
+        dataStore.setAsync("app_theme", theme)
     }
 
     fun setColorScheme(scheme: String) {
-        prefs.edit { putString("color_scheme", scheme) }
+        dataStore.setAsync("color_scheme", scheme)
     }
 }

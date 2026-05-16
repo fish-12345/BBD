@@ -5,12 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.utility.AppPreferences
 import io.github.romanvht.byedpi.utility.HistoryUtils
-import io.github.romanvht.byedpi.utility.getPreferences
+import io.github.romanvht.byedpi.utility.getDataStore
 
 class CmdSettingsViewModel(application: Application) : AndroidViewModel(application) {
-    private val appPrefs = AppPreferences(application.getPreferences())
+    private val dataStore = application.getDataStore()
+    private val appPrefs = AppPreferences(dataStore)
     private val historyUtils = HistoryUtils(application)
 
     var cmdArgs by mutableStateOf(appPrefs.cmdArgs)
@@ -18,13 +20,20 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
     var history by mutableStateOf(historyUtils.getHistory())
         private set
 
+    init {
+        dataStore.run {
+            observe(viewModelScope, "byedpi_cmd_args", "") { cmdArgs = it }
+            observe(viewModelScope, "byedpi_command_history", "") { refreshHistory() }
+        }
+    }
+
     fun updateCmdArgs(newValue: String) {
-        cmdArgs = newValue
-        appPrefs.cmdArgs = newValue
         if (newValue.isNotBlank()) {
             historyUtils.addCommand(newValue)
             refreshHistory()
         }
+        cmdArgs = newValue
+        appPrefs.cmdArgs = newValue
     }
 
     fun clearCmdArgs() {

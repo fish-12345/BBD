@@ -1,7 +1,6 @@
 package io.github.romanvht.byedpi.ui.viewmodel
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.net.VpnService
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,7 @@ import io.github.romanvht.byedpi.services.ServiceManager
 import io.github.romanvht.byedpi.services.TrafficMonitor
 import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.utility.AppPreferences
-import io.github.romanvht.byedpi.utility.getPreferences
+import io.github.romanvht.byedpi.utility.getDataStore
 import io.github.romanvht.byedpi.utility.getProxyIpAndPort
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,8 +22,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    private val prefs = application.getPreferences()
-    private val appPrefs = AppPreferences(prefs)
+    private val dataStore = application.getDataStore()
+    private val appPrefs = AppPreferences(dataStore)
 
     var isClickable by mutableStateOf(true)
         private set
@@ -45,7 +44,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         private set
 
     val proxyAddress: Pair<String, String>
-        get() = prefs.getProxyIpAndPort()
+        get() = dataStore.getProxyIpAndPort()
 
     val uploadSpeed = TrafficMonitor.uploadSpeed
     val downloadSpeed = TrafficMonitor.downloadSpeed
@@ -56,22 +55,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _toastEvent = MutableSharedFlow<Int>()
     val toastEvent = _toastEvent.asSharedFlow()
 
-    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        when (key) {
-            "byedpi_mode" -> preferredMode = appPrefs.mode
-            "byedpi_enable_cmd_settings" -> isCmdEnabled = appPrefs.cmdEnable
-            "byedpi_cmd_args", "byedpi_command_history" -> currentProfileName = appPrefs.getProfileName(appPrefs.cmdArgs)
-            "traffic_monitoring" -> isTrafficMonitoringEnabled = appPrefs.trafficMonitoring
-        }
-    }
-
     init {
-        prefs.registerOnSharedPreferenceChangeListener(preferenceListener)
-    }
-
-    override fun onCleared() {
-        prefs.unregisterOnSharedPreferenceChangeListener(preferenceListener)
-        super.onCleared()
+        dataStore.run {
+            observe(viewModelScope, "byedpi_mode", "vpn") { preferredMode = Mode.fromString(it) }
+            observe(viewModelScope, "byedpi_enable_cmd_settings", false) { isCmdEnabled = it }
+            observe(viewModelScope, "byedpi_cmd_args", "") { currentProfileName = appPrefs.getProfileName(it) }
+            observe(viewModelScope, "byedpi_command_history", "") { currentProfileName = appPrefs.getProfileName(appPrefs.cmdArgs) }
+            observe(viewModelScope, "traffic_monitoring", true) { isTrafficMonitoringEnabled = it }
+        }
     }
 
     private fun showToast(messageResId: Int) {

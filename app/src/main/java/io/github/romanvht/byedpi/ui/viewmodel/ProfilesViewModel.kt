@@ -6,17 +6,19 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.Command
 import io.github.romanvht.byedpi.services.ServiceManager
 import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.utility.AppPreferences
 import io.github.romanvht.byedpi.utility.HistoryUtils
-import io.github.romanvht.byedpi.utility.getPreferences
+import io.github.romanvht.byedpi.utility.getDataStore
 
 class ProfilesViewModel(application: Application) : AndroidViewModel(application) {
+    private val dataStore = application.getDataStore()
     private val historyUtils = HistoryUtils(application)
-    private val appPrefs = AppPreferences(application.getPreferences())
+    private val appPrefs = AppPreferences(dataStore)
 
     var profiles = mutableStateListOf<Command>()
         private set
@@ -29,6 +31,11 @@ class ProfilesViewModel(application: Application) : AndroidViewModel(application
 
     init {
         loadProfiles()
+        dataStore.run {
+            observe(viewModelScope, "byedpi_command_history", "") { loadProfiles() }
+            observe(viewModelScope, "byedpi_wifi_profile", "") { wifiProfile = it }
+            observe(viewModelScope, "byedpi_mobile_profile", "") { mobileProfile = it }
+        }
     }
 
     private fun loadProfiles() {
@@ -71,11 +78,9 @@ class ProfilesViewModel(application: Application) : AndroidViewModel(application
     
     fun updateWifiProfile(command: String) {
         appPrefs.wifiProfile = command
-        wifiProfile = command
     }
     
     fun updateMobileProfile(command: String) {
         appPrefs.mobileProfile = command
-        mobileProfile = command
     }
 }

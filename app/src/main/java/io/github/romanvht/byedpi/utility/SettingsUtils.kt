@@ -7,12 +7,12 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import com.google.gson.Gson
 import io.github.romanvht.byedpi.BuildConfig
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.AppSettings
+import kotlinx.coroutines.runBlocking
 
 object SettingsUtils {
     private const val TAG = "SettingsUtils"
@@ -57,13 +57,34 @@ object SettingsUtils {
 
     fun exportSettings(context: Context, uri: Uri) {
         try {
-            val prefs = context.getPreferences()
+            val dataStore = context.getDataStore()
             val history = HistoryUtils(context).getHistory()
-            val apps = prefs.getSelectedApps()
+            val apps = dataStore.get("selected_apps", emptySet<String>()).toList()
             val domainLists = DomainListUtils.getAllLists(context)
 
-            val settings = prefs.all.filterKeys { key ->
-                key !in setOf("byedpi_command_history", "selected_apps", "domain_initial_loaded")
+            val importantKeys = listOf(
+                "language", "app_theme", "color_scheme", "byedpi_mode",
+                "dns_ip", "dns_solution", "ipv6_enable", "applist_type",
+                "autostart", "auto_connect", "byedpi_enable_cmd_settings", "byedpi_proxy_ip",
+                "byedpi_proxy_port", "byedpi_cmd_args", "byedpi_wifi_profile", "byedpi_mobile_profile",
+                "traffic_monitoring", "byedpi_proxytest_delay", "byedpi_proxytest_requests",
+                "byedpi_proxytest_timeout", "byedpi_proxytest_sni", "byedpi_proxytest_fulllog",
+                "byedpi_proxytest_logclickable", "byedpi_proxytest_autosort", "byedpi_proxytest_showall",
+                "byedpi_max_connections", "byedpi_buffer_size", "byedpi_no_domain",
+                "byedpi_tcp_fast_open", "byedpi_desync_method", "byedpi_hosts_mode",
+                "byedpi_default_ttl", "byedpi_split_position", "byedpi_split_at_host",
+                "byedpi_drop_sack", "byedpi_fake_ttl", "byedpi_fake_offset", "byedpi_fake_sni",
+                "byedpi_oob_data", "byedpi_desync_http", "byedpi_desync_https", "byedpi_desync_udp",
+                "byedpi_host_mixed_case", "byedpi_domain_mixed_case", "byedpi_host_remove_spaces",
+                "byedpi_tlsrec_enabled", "byedpi_tlsrec_position", "byedpi_tlsrec_at_sni",
+                "byedpi_udp_fake_count"
+            )
+
+            val settingsMap = mutableMapOf<String, Any>()
+            importantKeys.forEach { keyName ->
+                dataStore.getNullable(keyName)?.let { value ->
+                    settingsMap[keyName] = value
+                }
             }
 
             val export = AppSettings(
@@ -72,7 +93,7 @@ object SettingsUtils {
                 history = history,
                 apps = apps,
                 domainLists = domainLists,
-                settings = settings
+                settings = settingsMap
             )
 
             val json = Gson().toJson(export)
@@ -105,41 +126,18 @@ object SettingsUtils {
                     return@use
                 }
 
-                val prefs = context.getPreferences()
-                prefs.edit(commit = true) {
-                    clear()
+                val dataStore = context.getDataStore()
+                runBlocking {
+                    dataStore.clear()
                     import.settings.forEach { (key, value) ->
-                        when (value) {
-                            is Int -> putInt(key, value)
-                            is Boolean -> putBoolean(key, value)
-                            is String -> putString(key, value)
-                            is Float -> putFloat(key, value)
-                            is Long -> putLong(key, value)
-                            is Double -> {
-                                when (value) {
-                                    value.toInt().toDouble() -> {
-                                        putInt(key, value.toInt())
-                                    }
-                                    value.toLong().toDouble() -> {
-                                        putLong(key, value.toLong())
-                                    }
-                                    else -> {
-                                        putFloat(key, value.toFloat())
-                                    }
-                                }
-                            }
-                            is Collection<*> -> {
-                                if (value.all { it is String }) {
-                                    @Suppress("UNCHECKED_CAST")
-                                    putStringSet(key, (value as Collection<String>).toSet())
-                                }
-                            }
+                        if (value != null) {
+                            dataStore.set(key, value)
                         }
                     }
-                }
-
-                if (import.apps != null) {
-                    prefs.edit(commit = true) { putStringSet("selected_apps", import.apps.toSet()) }
+                    
+                    if (import.apps != null) {
+                        dataStore.set("selected_apps", import.apps.toSet())
+                    }
                 }
 
                 if (import.history != null) {
@@ -164,8 +162,8 @@ object SettingsUtils {
                     DomainListUtils.saveLists(context, normalized)
                 }
 
-                val newLang = prefs.getString("language", "system") ?: "system"
-                val newTheme = prefs.getString("app_theme", "system") ?: "system"
+                val newLang = dataStore.get("language", "system")
+                val newTheme = dataStore.get("app_theme", "system")
                 setLang(newLang)
                 setTheme(newTheme)
 
@@ -183,10 +181,10 @@ object SettingsUtils {
 
     fun resetSettings(context: Context, onRestart: () -> Unit) {
         try {
-            val prefs = context.getPreferences()
+            val dataStore = context.getDataStore()
 
-            prefs.edit(commit = true) {
-                clear()
+            runBlocking {
+                dataStore.clear()
             }
 
             HistoryUtils(context).saveHistory(emptyList())

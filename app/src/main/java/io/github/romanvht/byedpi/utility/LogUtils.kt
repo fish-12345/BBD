@@ -14,8 +14,9 @@ object LogUtils {
 
     fun collectLogs(): String? =
         try {
+            val pid = android.os.Process.myPid()
             Runtime.getRuntime()
-                .exec("logcat *:D -d")
+                .exec("logcat -d -t 2000 --pid=$pid *:D")
                 .inputStream.bufferedReader()
                 .use { it.readText() }
         } catch (e: Exception) {

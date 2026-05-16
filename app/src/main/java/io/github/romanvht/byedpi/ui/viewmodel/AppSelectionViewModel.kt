@@ -8,17 +8,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.data.AppInfo
-import io.github.romanvht.byedpi.utility.getPreferences
+import io.github.romanvht.byedpi.utility.getDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.content.edit
 
 class AppSelectionViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
-    private val prefs = context.getPreferences()
+    private val dataStore = context.getDataStore()
     private val pm = context.packageManager
 
     var apps by mutableStateOf<List<AppInfo>>(emptyList())
@@ -38,7 +37,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
             isLoading = true
             apps = withContext(Dispatchers.IO) {
                 val installedApps = pm.getInstalledApplications(0)
-                val selectedApps = prefs.getStringSet("selected_apps", setOf()) ?: setOf()
+                val selectedApps = dataStore.get("selected_apps", setOf<String>())
 
                 installedApps
                     .filter { it.packageName != context.packageName }
@@ -66,19 +65,21 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun toggleAppSelection(app: AppInfo, isChecked: Boolean) {
-        val newSelected = prefs.getStringSet("selected_apps", setOf())?.toMutableSet() ?: mutableSetOf()
-        if (isChecked) newSelected.add(app.packageName)
-        else newSelected.remove(app.packageName)
-        prefs.edit { putStringSet("selected_apps", newSelected) }
+        viewModelScope.launch {
+            val currentSelected = dataStore.get("selected_apps", setOf<String>()).toMutableSet()
+            if (isChecked) currentSelected.add(app.packageName)
+            else currentSelected.remove(app.packageName)
+            dataStore.set("selected_apps", currentSelected)
 
-        apps = apps.map {
-            if (it.packageName == app.packageName) it.copy(isSelected = isChecked)
-            else it
+            apps = apps.map {
+                if (it.packageName == app.packageName) it.copy(isSelected = isChecked)
+                else it
+            }
         }
     }
 
     fun clearSelection() {
-        prefs.edit {remove("selected_apps")}
+        dataStore.removeAsync("selected_apps", setOf<String>())
         apps = apps.map { it.copy(isSelected = false) }
     }
 

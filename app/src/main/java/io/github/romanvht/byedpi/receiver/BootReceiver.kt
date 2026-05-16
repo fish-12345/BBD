@@ -7,8 +7,7 @@ import android.net.VpnService
 import android.os.SystemClock
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.services.ServiceManager
-import io.github.romanvht.byedpi.utility.getPreferences
-import io.github.romanvht.byedpi.utility.mode
+import io.github.romanvht.byedpi.utility.getDataStore
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -21,11 +20,14 @@ class BootReceiver : BroadcastReceiver() {
                 return
             }
 
-            val preferences = context.getPreferences()
-            val autorunEnabled = preferences.getBoolean("autostart", false)
+            val dataStore = context.getDataStore()
+            val autorunEnabled = dataStore.get("autostart", false)
 
-            if(autorunEnabled) {
-                when (preferences.mode()) {
+            if (autorunEnabled) {
+                val modeStr = dataStore.get("byedpi_mode", "vpn")
+                val mode = Mode.fromString(modeStr)
+                
+                when (mode) {
                     Mode.VPN -> {
                         if (VpnService.prepare(context) == null) {
                             ServiceManager.start(context, Mode.VPN)

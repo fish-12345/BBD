@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -58,7 +57,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        val lang = newBase.getPreferences().getString("language", "system") ?: "system"
+        val dataStore = newBase.getDataStore()
+        val lang = dataStore.get("language", "system")
         if (lang == "system") {
             super.attachBaseContext(newBase)
             return
@@ -155,10 +155,10 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        val prefs = getPreferences()
-        val lang = prefs.getStringNotNull("language", "system")
+        val dataStore = getDataStore()
+        val lang = dataStore.get("language", "system")
         SettingsUtils.setLang(lang)
-        val theme = prefs.getStringNotNull("app_theme", "system")
+        val theme = dataStore.get("app_theme", "system")
         SettingsUtils.setTheme(theme)
 
         super.onCreate(savedInstanceState)
@@ -186,11 +186,7 @@ class MainActivity : ComponentActivity() {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
         }
 
-        if (getPreferences().getBoolean(
-                "auto_connect",
-                false
-            ) && appStatus.first != AppStatus.Running
-        ) {
+        if (dataStore.get("auto_connect", false) && appStatus.first != AppStatus.Running) {
             start()
         }
 
@@ -353,11 +349,7 @@ class MainActivity : ComponentActivity() {
                                 onSaveLogs = { saveLogs() },
                                 onCloseApp = { closeApp() },
                                 onOpenEditor = {
-                                    if (getPreferences().getBoolean(
-                                            "byedpi_enable_cmd_settings",
-                                            false
-                                        )
-                                    ) {
+                                    if (dataStore.get("byedpi_enable_cmd_settings", false)) {
                                         navController.navigate("settings/cmd")
                                     } else {
                                         navController.navigate("settings/ui")
@@ -468,10 +460,10 @@ class MainActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent?) {
         if (intent?.action == ACTION_TOGGLE) {
             val strategy = intent.getStringExtra("strategy")
-            val prefs = getPreferences()
+            val dataStore = getDataStore()
             var updated = false
-            if (strategy != null && strategy != prefs.getString("byedpi_cmd_args", null)) {
-                prefs.edit(commit = true) { putString("byedpi_cmd_args", strategy) }
+            if (strategy != null && strategy != dataStore.get("byedpi_cmd_args", "")) {
+                dataStore.setAsync("byedpi_cmd_args", strategy)
                 updated = true
             }
 
@@ -488,7 +480,8 @@ class MainActivity : ComponentActivity() {
                         start()
                     } else {
                         if (updated) {
-                            ServiceManager.restart(this, prefs.mode())
+                            val modeStr = dataStore.get("byedpi_mode", "vpn")
+                            ServiceManager.restart(this, Mode.fromString(modeStr))
                         } else {
                             stop()
                         }
@@ -512,7 +505,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun start() {
-        when (getPreferences().mode()) {
+        val modeStr = getDataStore().get("byedpi_mode", "vpn")
+        when (Mode.fromString(modeStr)) {
             Mode.VPN -> {
                 val intentPrepare = android.net.VpnService.prepare(this)
                 if (intentPrepare != null) {
