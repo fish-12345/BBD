@@ -100,11 +100,9 @@ fun TestSettingsScreen(
                     )
                 }
             }
-
             // КАТЕГОРИЯ 2: Данные (Исправленный визуал)
             item {
                 SettingsCard(title = stringResource(R.string.test_settings_commands)) {
-                    // Оборачиваем всё в Column, чтобы фон карточки обволакивал все элементы
                     Column(modifier = Modifier.fillMaxWidth()) {
                         NavigationPreference(
                             title = stringResource(R.string.domain_lists),

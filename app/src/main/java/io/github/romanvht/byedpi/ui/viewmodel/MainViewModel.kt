@@ -30,10 +30,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentStatus get() = appStatus.first
     val currentMode get() = appStatus.second
-    
+
     var preferredMode by mutableStateOf(appPrefs.mode)
         private set
-        
+
     var isCmdEnabled by mutableStateOf(appPrefs.cmdEnable)
         private set
 
@@ -89,7 +89,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleService(onPrepareVpn: (Intent) -> Unit) {
         if (!isClickable) return
-        
+
         isClickable = false
         viewModelScope.launch {
             if (currentStatus == AppStatus.Halted) {
@@ -113,6 +113,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     ServiceManager.start(context, Mode.VPN)
                 }
             }
+
             Mode.Proxy -> ServiceManager.start(context, Mode.Proxy)
         }
     }

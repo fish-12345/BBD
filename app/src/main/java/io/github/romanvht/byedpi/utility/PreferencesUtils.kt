@@ -65,11 +65,11 @@ class AppPreferences(private val dataStore: DataStoreManager) {
     var cmdArgs: String
         get() = dataStore.get("byedpi_cmd_args", "")
         set(value) = dataStore.setAsync("byedpi_cmd_args", value)
-        
+
     var wifiProfile: String
         get() = dataStore.get("byedpi_wifi_profile", "")
         set(value) = dataStore.setAsync("byedpi_wifi_profile", value)
-        
+
     var mobileProfile: String
         get() = dataStore.get("byedpi_mobile_profile", "")
         set(value) = dataStore.setAsync("byedpi_mobile_profile", value)
@@ -252,13 +252,13 @@ class UIPreferences(private val dataStore: DataStoreManager) {
 fun DataStoreManager.getProxyIpAndPort(): Pair<String, String> {
     val cmdEnable = get("byedpi_enable_cmd_settings", false)
     val cmdArgsStr = get("byedpi_cmd_args", "")
-    
+
     var cmdIp: String? = null
     var cmdPort: String? = null
-    
+
     if (cmdEnable && cmdArgsStr.isNotBlank()) {
         val cmdArgs = shellSplit(cmdArgsStr)
-        
+
         fun getArgValue(argsList: List<String>, keys: List<String>): String? {
             for (i in argsList.indices) {
                 val arg = argsList[i]
@@ -274,7 +274,7 @@ fun DataStoreManager.getProxyIpAndPort(): Pair<String, String> {
             }
             return null
         }
-        
+
         cmdIp = getArgValue(cmdArgs, listOf("--ip", "-i"))
         cmdPort = getArgValue(cmdArgs, listOf("--port", "-p"))
     }

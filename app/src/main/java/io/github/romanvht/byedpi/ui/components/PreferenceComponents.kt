@@ -274,7 +274,12 @@ fun ListPreference(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
+                        modifier = Modifier.padding(
+                            start = 24.dp,
+                            top = 16.dp,
+                            end = 24.dp,
+                            bottom = 16.dp
+                        )
                     )
                     entries.forEach { (entryValue, entryLabel) ->
                         Row(
@@ -333,9 +338,9 @@ fun EditTextPreference(
         summary = value.ifBlank { null },
         enabled = enabled,
         icon = icon,
-        onClick = { 
+        onClick = {
             tempValue = value
-            showDialog = true 
+            showDialog = true
         }
     )
 
@@ -452,9 +457,9 @@ fun MultiSelectListPreference(
         summary = summary ?: values.joinToString(", ") { entries[it] ?: it },
         enabled = enabled,
         icon = icon,
-        onClick = { 
+        onClick = {
             tempValues = values
-            showDialog = true 
+            showDialog = true
         }
     )
 
@@ -529,7 +534,12 @@ fun MultiSelectListPreference(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
+                        modifier = Modifier.padding(
+                            start = 24.dp,
+                            top = 16.dp,
+                            end = 24.dp,
+                            bottom = 16.dp
+                        )
                     )
                     Column(Modifier.selectableGroup()) {
                         entries.forEach { (entryValue, entryLabel) ->
@@ -657,7 +667,7 @@ fun ListEditPreference(
                                 onValueChange = { newItemValue = it },
                                 modifier = Modifier.weight(1f),
                                 label = { Text(stringResource(R.string.add)) },
-                                placeholder = { Text(placeholder)},
+                                placeholder = { Text(placeholder) },
                                 singleLine = !splitByLinesOnly,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                 keyboardActions = KeyboardActions(onDone = { onAdd() })
@@ -727,7 +737,7 @@ fun ListEditPreference(
                             onValueChange = { newItemValue = it },
                             modifier = Modifier.weight(1f),
                             label = { Text(stringResource(R.string.add)) },
-                            placeholder = { Text(placeholder)},
+                            placeholder = { Text(placeholder) },
                             singleLine = !splitByLinesOnly,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = { onAdd() })

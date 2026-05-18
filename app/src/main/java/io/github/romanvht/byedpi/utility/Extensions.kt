@@ -9,7 +9,7 @@ import android.os.Environment
 import android.os.PowerManager
 import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 fun Long.toReadableDateTime(): String {
     val format = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())

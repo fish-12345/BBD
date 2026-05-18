@@ -32,7 +32,7 @@ fun CmdSettingsScreen(
 ) {
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
-    
+
     var showActionDialog by remember { mutableStateOf<Command?>(null) }
     var showRenameDialog by remember { mutableStateOf<Command?>(null) }
     var showEditDialog by remember { mutableStateOf<Command?>(null) }
@@ -232,7 +232,7 @@ fun CmdSettingsScreen(
                                 viewModel.updateCmdArgs(command.text)
                             }
                         )
-                        
+
                         if (!command.pinned) {
                             actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
                                 viewModel.pinCommand(command.text)

@@ -78,7 +78,7 @@ class SiteCheckUtils(
 
                 var actualLength = 0L
                 try {
-                    val inputStream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+                    val inputStream = if (responseCode in 200..399) connection.inputStream else connection.errorStream
                     if (inputStream != null) {
                         val buffer = ByteArray(8192)
                         var bytesRead: Int

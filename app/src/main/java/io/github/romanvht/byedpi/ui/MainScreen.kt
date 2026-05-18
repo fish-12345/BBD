@@ -2,8 +2,23 @@ package io.github.romanvht.byedpi.ui
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -99,7 +114,12 @@ fun MainScreen(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.save_logs)) },
-                            leadingIcon = { Icon(Icons.Outlined.BugReport, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.BugReport,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 onSaveLogs()
@@ -107,7 +127,12 @@ fun MainScreen(
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.close_app)) },
-                            leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.ExitToApp,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 onCloseApp()
@@ -419,7 +444,10 @@ fun ActionCard(
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else if (isFocused) 1.05f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
         label = "scale"
     )
 
@@ -503,7 +531,10 @@ fun StatusButton(
     ) {
         val buttonScale by animateFloatAsState(
             targetValue = if (isPressed) 0.9f else if (isFocused) 1.1f else if (isRunning) 1.05f else 1f,
-            animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
             label = "scale"
         )
 
@@ -551,7 +582,10 @@ fun StatusButton(
             shape = CircleShape,
             color = buttonColor,
             interactionSource = interactionSource,
-            border = if (isFocused && isTv) BorderStroke(4.dp, MaterialTheme.colorScheme.primary) else null,
+            border = if (isFocused && isTv) BorderStroke(
+                4.dp,
+                MaterialTheme.colorScheme.primary
+            ) else null,
             shadowElevation = if (isRunning || isFocused) 12.dp else 4.dp,
             tonalElevation = if (isRunning) 8.dp else 2.dp
         ) {

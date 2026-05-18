@@ -28,7 +28,11 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -94,7 +98,10 @@ fun AppSelectionScreenPhone(
                 },
                 actions = {
                     IconButton(onClick = { viewModel.clearSelection() }) {
-                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.clear_selection))
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.clear_selection)
+                        )
                     }
                 }
             )
@@ -113,7 +120,13 @@ fun AppSelectionScreenPhone(
                         expanded = false,
                         onExpandedChange = { },
                         placeholder = { Text(stringResource(R.string.search_apps)) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint=MaterialTheme.colorScheme.onSurfaceVariant)},
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
                         trailingIcon = {
                             if (viewModel.searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { viewModel.searchQuery = "" }) {
@@ -255,14 +268,17 @@ fun AppSelectionScreenTv(
                                     focusManager.moveFocus(FocusDirection.Right)
                                     true
                                 }
+
                                 Key.Enter, Key.NumPadEnter -> {
                                     focusManager.moveFocus(FocusDirection.Right)
                                     true
                                 }
+
                                 Key.DirectionDown -> {
                                     focusManager.moveFocus(FocusDirection.Down)
                                     true
                                 }
+
                                 else -> false
                             }
                         } else {
@@ -289,7 +305,11 @@ fun AppSelectionScreenTv(
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.cmd_args_clear))
                 }
@@ -301,7 +321,13 @@ fun AppSelectionScreenTv(
                     selected = viewModel.showSelectedOnly,
                     onClick = { viewModel.showSelectedOnly = !viewModel.showSelectedOnly },
                     leadingIcon = if (viewModel.showSelectedOnly) {
-                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                        {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     } else null,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.filter_selected)) }
@@ -312,7 +338,13 @@ fun AppSelectionScreenTv(
                     selected = viewModel.showSystemApps,
                     onClick = { viewModel.showSystemApps = !viewModel.showSystemApps },
                     leadingIcon = if (viewModel.showSystemApps) {
-                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                        {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     } else null,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.filter_system)) }
@@ -329,7 +361,11 @@ fun AppSelectionScreenTv(
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
             ) {
-                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.clear_selection))
             }
@@ -399,7 +435,13 @@ fun AppItem(
         ListItem(
             colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
             headlineContent = { Text(app.appName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            supportingContent = { Text(app.packageName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            supportingContent = {
+                Text(
+                    app.packageName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
             leadingContent = {
                 if (icon != null) {
                     Image(

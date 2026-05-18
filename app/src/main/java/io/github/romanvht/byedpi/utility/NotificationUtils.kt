@@ -55,7 +55,7 @@ fun createConnectionNotification(
     } else {
         context.getString(content)
     }
-    
+
     builder.setContentText(contentText)
 
     if (downloadSpeed != null) {

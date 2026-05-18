@@ -65,7 +65,7 @@ fun UISettingsScreen(
                 SettingsCard(title = stringResource(R.string.byedpi_readme_link)) {
                     PreferenceItem(
                         title = stringResource(R.string.byedpi_readme_link),
-                        onClick = { uriHandler.openUri("https://github.com/hufrea/byedpi/blob/v0.13/README.md") },
+                        onClick = { uriHandler.openUri("https://github.com/hufrea/byedpi/blob/main/README.md") },
                         icon = Icons.Default.Description
                     )
                 }

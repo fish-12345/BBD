@@ -36,7 +36,7 @@ fun ProfilesScreen(
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
     val isTablet = remember { context.isTablet() }
-    
+
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf<Command?>(null) }
     var showDeleteDialog by remember { mutableStateOf<Command?>(null) }
@@ -53,7 +53,10 @@ fun ProfilesScreen(
                 },
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.profiles_add))
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.profiles_add)
+                        )
                     }
                 }
             )
@@ -241,7 +244,7 @@ fun ProfilesScreen(
             }
         )
     }
-    
+
     showProfileSelectionDialog?.let { (title, onSelect) ->
         if (isTv || isTablet) {
             AlertDialog(
@@ -261,7 +264,12 @@ fun ProfilesScreen(
                             ) {
                                 ListItem(
                                     headlineContent = { Text(stringResource(R.string.clear_selection)) },
-                                    leadingContent = { Icon(Icons.Default.Close, contentDescription = null) },
+                                    leadingContent = {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = null
+                                        )
+                                    },
                                     colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
                                 )
                             }
@@ -436,7 +444,10 @@ fun ProfileItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 FilledTonalIconButton(onClick = onApply) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.apply))
+                    Icon(
+                        Icons.Default.PlayArrow,
+                        contentDescription = stringResource(R.string.apply)
+                    )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = onEdit) {

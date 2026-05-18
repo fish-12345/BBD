@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import io.github.romanvht.byedpi.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.DomainList
 import io.github.romanvht.byedpi.ui.viewmodel.DomainListsViewModel
 import io.github.romanvht.byedpi.utility.isTv
@@ -126,7 +126,12 @@ fun DomainListsScreen(
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                                 headlineContent = { Text("Редактировать") },
-                                leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                leadingContent = {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = null
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -138,7 +143,12 @@ fun DomainListsScreen(
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                                 headlineContent = { Text("Копировать") },
-                                leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+                                leadingContent = {
+                                    Icon(
+                                        Icons.Default.ContentCopy,
+                                        contentDescription = null
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -151,7 +161,8 @@ fun DomainListsScreen(
                                         clipboardManager.setPrimaryClip(clip)
 
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT)
+                                            .show()
                                     }
                             )
 
@@ -164,7 +175,12 @@ fun DomainListsScreen(
 
                                 ListItem(
                                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                    headlineContent = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
+                                    headlineContent = {
+                                        Text(
+                                            "Удалить",
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    },
                                     leadingContent = {
                                         Icon(
                                             Icons.Default.Delete,
@@ -177,7 +193,11 @@ fun DomainListsScreen(
                                         .clickable {
                                             viewModel.deleteList(list.id)
                                             viewModel.hideActionDialog()
-                                            Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "Список удален",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                 )
                             }
@@ -209,7 +229,12 @@ fun DomainListsScreen(
                         ListItem(
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                             headlineContent = { Text("Редактировать") },
-                            leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = null
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
@@ -222,7 +247,12 @@ fun DomainListsScreen(
                         ListItem(
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                             headlineContent = { Text("Копировать") },
-                            leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = null
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
@@ -235,7 +265,8 @@ fun DomainListsScreen(
                                     clipboardManager.setPrimaryClip(clip)
 
                                     viewModel.hideActionDialog()
-                                    Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT)
+                                        .show()
                                 }
                                 .padding(horizontal = 12.dp, vertical = 2.dp)
                         )
@@ -243,7 +274,12 @@ fun DomainListsScreen(
                         if (!list.isBuiltIn) {
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                headlineContent = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
+                                headlineContent = {
+                                    Text(
+                                        "Удалить",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                },
                                 leadingContent = {
                                     Icon(
                                         Icons.Default.Delete,
@@ -256,7 +292,8 @@ fun DomainListsScreen(
                                     .clickable {
                                         viewModel.deleteList(list.id)
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT)
+                                            .show()
                                     }
                                     .padding(horizontal = 12.dp, vertical = 2.dp)
                             )

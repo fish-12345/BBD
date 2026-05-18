@@ -2,7 +2,11 @@ package io.github.romanvht.byedpi.ui
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -75,7 +79,12 @@ fun SettingsScreen(
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.reset_settings)) },
-                            leadingIcon = { Icon(Icons.Default.RestartAlt, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.RestartAlt,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 onReset()
@@ -83,7 +92,12 @@ fun SettingsScreen(
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.export_settings)) },
-                            leadingIcon = { Icon(Icons.Default.FileUpload, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.FileUpload,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 onExport()
@@ -91,7 +105,12 @@ fun SettingsScreen(
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.import_settings)) },
-                            leadingIcon = { Icon(Icons.Default.FileDownload, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.FileDownload,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 onImport()
@@ -297,7 +316,7 @@ fun SettingsScreen(
                             onValueChange = {
                                 viewModel.updateTheme(it)
                                 onThemeChange()
-                                            },
+                            },
                             icon = themeIcon
                         )
 

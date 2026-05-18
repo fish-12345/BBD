@@ -143,7 +143,10 @@ fun TestScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(horizontal = if (isTv) 48.dp else 24.dp, vertical = if (isTv) 24.dp else 16.dp),
+                    .padding(
+                        horizontal = if (isTv) 48.dp else 24.dp,
+                        vertical = if (isTv) 24.dp else 16.dp
+                    ),
                 horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Column(
@@ -247,7 +250,10 @@ fun TestScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                TestResultsList(viewModel = viewModel, contentPadding = PaddingValues(bottom = 88.dp))
+                TestResultsList(
+                    viewModel = viewModel,
+                    contentPadding = PaddingValues(bottom = 88.dp)
+                )
             }
         }
     }
@@ -589,7 +595,12 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                     ) {
                         ListItem(
                             headlineContent = { Text(stringResource(R.string.cmd_history_apply)) },
-                            leadingContent = { Icon(Icons.Default.Terminal, contentDescription = null) }
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.Terminal,
+                                    contentDescription = null
+                                )
+                            }
                         )
                     }
                     Surface(
@@ -603,7 +614,12 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                     ) {
                         ListItem(
                             headlineContent = { Text(stringResource(R.string.cmd_history_copy)) },
-                            leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) }
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = null
+                                )
+                            }
                         )
                     }
                     Surface(
@@ -633,7 +649,7 @@ fun TvDialogButton(
     onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    
+
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -745,7 +761,7 @@ fun TestResultCard(
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        
+
                         Text(
                             text = stringResource(R.string.test_details),
                             style = MaterialTheme.typography.labelLarge,
@@ -788,7 +804,10 @@ fun TestResultCard(
                                             text = stringResource(R.string.test_not_connected),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                            modifier = Modifier.padding(
+                                                horizontal = 6.dp,
+                                                vertical = 2.dp
+                                            )
                                         )
                                     }
                                 }
