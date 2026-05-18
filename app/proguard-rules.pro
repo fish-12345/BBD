@@ -12,7 +12,6 @@
 -keep,allowoptimization class io.github.romanvht.byedpi.services.** { *; }
 -keep,allowoptimization class io.github.romanvht.byedpi.receiver.** { *; }
 
--repackageclasses 'ru.gdlbo'
 -renamesourcefileattribute ''
 -keepattributes SourceFile,InnerClasses,EnclosingMethod,Signature,RuntimeVisibleAnnotations,*Annotation*,*Parcelable*
 -allowaccessmodification

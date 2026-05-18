@@ -91,11 +91,9 @@ class AppPreferences(private val dataStore: DataStoreManager) {
     }
 
     // Flows for Reactive UI
-    val cmdArgsFlow: Flow<String> = dataStore.getFlow("byedpi_cmd_args", "")
     val modeFlow: Flow<Mode> = dataStore.getFlow("byedpi_mode", "vpn").map { Mode.fromString(it) }
     val cmdEnableFlow: Flow<Boolean> = dataStore.getFlow("byedpi_enable_cmd_settings", false)
     val trafficMonitoringFlow: Flow<Boolean> = dataStore.getFlow("traffic_monitoring", true)
-    val commandHistoryFlow: Flow<String> = dataStore.getFlow("byedpi_command_history", "")
 }
 
 class TestPreferences(private val dataStore: DataStoreManager) {
@@ -130,10 +128,6 @@ class TestPreferences(private val dataStore: DataStoreManager) {
     var showAll: Boolean
         get() = dataStore.get("byedpi_proxytest_showall", false)
         set(value) = dataStore.setAsync("byedpi_proxytest_showall", value)
-
-    var domains: String
-        get() = dataStore.get("byedpi_proxytest_domains", "")
-        set(value) = dataStore.setAsync("byedpi_proxytest_domains", value)
 
     var strategyLists: Set<String>
         get() = dataStore.get("byedpi_proxytest_strategy_lists", setOf("builtin"))

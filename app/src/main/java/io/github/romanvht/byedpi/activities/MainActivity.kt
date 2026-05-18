@@ -138,7 +138,8 @@ class MainActivity : ComponentActivity() {
 
             when (val action = intent.action) {
                 STARTED_BROADCAST,
-                STOPPED_BROADCAST -> { /* appStatus is updated via mutableStateOf in ByeDpiStatus */ }
+                STOPPED_BROADCAST -> { /* appStatus is updated via mutableStateOf in ByeDpiStatus */
+                }
 
                 FAILED_BROADCAST -> {
                     Toast.makeText(
@@ -488,7 +489,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            
+
             if (intent.getBooleanExtra("finish_after", true)) {
                 finish()
             }
