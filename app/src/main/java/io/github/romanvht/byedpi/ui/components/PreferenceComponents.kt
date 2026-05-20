@@ -203,7 +203,10 @@ fun ListPreference(
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
     var showDialog by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Expanded, SheetValue.Hidden)
+    )
 
     PreferenceItem(
         modifier = modifier,
@@ -330,7 +333,10 @@ fun EditTextPreference(
     val isTv = remember { context.isTv() }
     var showDialog by remember { mutableStateOf(false) }
     var tempValue by remember(value) { mutableStateOf(value) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Expanded, SheetValue.Hidden)
+    )
 
     PreferenceItem(
         modifier = modifier,
@@ -449,7 +455,10 @@ fun MultiSelectListPreference(
     val isTv = remember { context.isTv() }
     var showDialog by remember { mutableStateOf(false) }
     var tempValues by remember(values) { mutableStateOf(values) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Expanded, SheetValue.Hidden)
+    )
 
     PreferenceItem(
         modifier = modifier,
@@ -625,7 +634,10 @@ fun ListEditPreference(
     var showDialog by remember { mutableStateOf(false) }
     var tempValues by remember(values) { mutableStateOf(values) }
     var newItemValue by remember { mutableStateOf("") }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Expanded, SheetValue.Hidden)
+    )
 
     val onAdd = {
         if (newItemValue.isNotBlank()) {

@@ -42,7 +42,7 @@ class ToggleActivity : ComponentActivity() {
         }
 
         if (modeStr != null) {
-            val newMode = try { Mode.fromString(modeStr) } catch (e: Exception) { null }
+            val newMode = try { Mode.fromString(modeStr) } catch (_: Exception) { null }
             if (newMode != null) {
                 val currentModeStr = dataStore.get("byedpi_mode", "vpn")
                 if (newMode != Mode.fromString(currentModeStr)) {

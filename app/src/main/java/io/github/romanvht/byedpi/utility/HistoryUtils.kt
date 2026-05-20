@@ -68,7 +68,7 @@ class HistoryUtils(private val context: Context) {
         return if (historyJson.isNotBlank()) {
             try {
                 Gson().fromJson(historyJson, Array<Command>::class.java).toList()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 emptyList()
             }
         } else {

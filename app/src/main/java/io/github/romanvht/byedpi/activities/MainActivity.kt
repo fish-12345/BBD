@@ -207,7 +207,10 @@ class MainActivity : ComponentActivity() {
                     val isTv = remember { context.isTv() }
 
                     var showBatteryOptimizationDialog by remember { mutableStateOf(false) }
-                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                    val sheetState = rememberBottomSheetState(
+                        initialValue = SheetValue.Hidden,
+                        enabledValues = setOf(SheetValue.Expanded, SheetValue.Hidden)
+                    )
 
                     LaunchedEffect(Unit) {
                         if (!isTv && isBatteryOptimizationEnabled()) {
@@ -500,7 +503,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         try {
             unregisterReceiver(receiver)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Receiver might not be registered
         }
     }
@@ -558,7 +561,7 @@ class MainActivity : ComponentActivity() {
                 intent.addCategory("android.intent.category.DEFAULT")
                 intent.data = "package:${packageName}".toUri()
                 startActivity(intent)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
                 startActivity(intent)

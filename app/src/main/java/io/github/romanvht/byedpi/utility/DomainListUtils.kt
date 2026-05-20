@@ -89,7 +89,7 @@ object DomainListUtils {
             val type = object : TypeToken<List<DomainList>>() {}.type
             val lists: List<DomainList> = gson.fromJson(json, type) ?: emptyList()
             lists.toMutableList()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             mutableListOf()
         }
     }

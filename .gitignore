@@ -9,3 +9,8 @@
 local.properties
 /.idea
 /app/.idea
+/app/debug
+/app/build
+/app/release
+*.aar
+*.jar
