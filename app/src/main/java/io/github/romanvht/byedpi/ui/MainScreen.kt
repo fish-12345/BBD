@@ -30,7 +30,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -51,6 +50,7 @@ import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.ui.viewmodel.MainViewModel
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.utility.isTablet
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
@@ -114,7 +114,7 @@ fun MainScreen(
                             text = { Text(stringResource(R.string.save_logs)) },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Outlined.BugReport,
+                                    IconsData.BugReport,
                                     contentDescription = null
                                 )
                             },
@@ -154,7 +154,7 @@ fun MainScreen(
             val actions = remember(preferredMode, viewModel.isCmdEnabled, isRunning) {
                 listOf(
                     DashboardAction(
-                        icon = if (viewModel.isCmdEnabled) Icons.Default.Terminal else Icons.Default.EditNote,
+                        icon = if (viewModel.isCmdEnabled) IconsData.Terminal else IconsData.EditNote,
                         label = R.string.editor,
                         onClick = { viewModel.performActionIfStopped(onOpenEditor) },
                         enabled = !isRunning
@@ -166,7 +166,7 @@ fun MainScreen(
                         enabled = !isRunning
                     ),
                     DashboardAction(
-                        icon = if (preferredMode == Mode.VPN) Icons.Default.VpnKey else Icons.Default.Router,
+                        icon = if (preferredMode == Mode.VPN) IconsData.VpnKey else IconsData.Router,
                         label = if (preferredMode == Mode.VPN) R.string.vpn_mode else R.string.proxy_mode,
                         onClick = {
                             val newMode = if (preferredMode == Mode.VPN) Mode.Proxy else Mode.VPN
@@ -588,7 +588,7 @@ fun StatusButton(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Default.PowerSettingsNew,
+                    imageVector = IconsData.PowerSettingsNew,
                     contentDescription = stringResource(if (isRunning) R.string.status_connected else R.string.status_disconnected),
                     modifier = Modifier.size(80.dp),
                     tint = iconColor
@@ -675,7 +675,7 @@ fun StatusText(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowDownward,
+                                    imageVector = IconsData.ArrowDownward,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.primary
@@ -697,7 +697,7 @@ fun StatusText(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowUpward,
+                                    imageVector = IconsData.ArrowUpward,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.secondary

@@ -9,11 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.CallSplit
-import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.automirrored.filled.FormatIndentIncrease
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.UISettings.DesyncMethod.*
 import io.github.romanvht.byedpi.data.UISettings.HostsMode.*
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.components.*
 import io.github.romanvht.byedpi.ui.viewmodel.UISettingsViewModel
 import io.github.romanvht.byedpi.utility.isTv
@@ -66,7 +63,7 @@ fun UISettingsScreen(
                     PreferenceItem(
                         title = stringResource(R.string.byedpi_readme_link),
                         onClick = { uriHandler.openUri("https://github.com/hufrea/byedpi/blob/main/README.md") },
-                        icon = Icons.Default.Description
+                        icon = IconsData.Description
                     )
                 }
             }
@@ -78,7 +75,7 @@ fun UISettingsScreen(
                         value = viewModel.maxConnections,
                         onValueChange = { viewModel.updateMaxConnections(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Numbers
+                        icon = IconsData.Numbers
                     )
 
                     EditTextPreference(
@@ -86,21 +83,21 @@ fun UISettingsScreen(
                         value = viewModel.bufferSize,
                         onValueChange = { viewModel.updateBufferSize(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Storage
+                        icon = IconsData.Storage
                     )
 
                     SwitchPreference(
                         title = stringResource(R.string.byedpi_no_domain_setting),
                         checked = viewModel.noDomain,
                         onCheckedChange = { viewModel.updateNoDomain(it) },
-                        icon = Icons.Default.DomainDisabled
+                        icon = IconsData.DomainDisabled
                     )
 
                     SwitchPreference(
                         title = stringResource(R.string.byedpi_tcp_fast_open_setting),
                         checked = viewModel.tcpFastOpen,
                         onCheckedChange = { viewModel.updateTcpFastOpen(it) },
-                        icon = Icons.Default.Speed
+                        icon = IconsData.Speed
                     )
                 }
             }
@@ -116,7 +113,7 @@ fun UISettingsScreen(
                         value = viewModel.hostsMode.toString().lowercase(),
                         entries = hostsModeMap,
                         onValueChange = { viewModel.updateHostsMode(it) },
-                        icon = Icons.Default.Security
+                        icon = IconsData.Security
                     )
 
                     AnimatedVisibility(
@@ -129,7 +126,7 @@ fun UISettingsScreen(
                             placeholder = stringResource(R.string.some_domain),
                             values = viewModel.hostsBlacklist,
                             onValuesChange = { viewModel.updateHostsBlacklist(it) },
-                            icon = Icons.Default.Block
+                            icon = IconsData.Block
                         )
                     }
 
@@ -143,7 +140,7 @@ fun UISettingsScreen(
                             placeholder = stringResource(R.string.some_domain),
                             values = viewModel.hostsWhitelist,
                             onValuesChange = { viewModel.updateHostsWhitelist(it) },
-                            icon = Icons.Default.Checklist
+                            icon = IconsData.Checklist
                         )
                     }
 
@@ -152,7 +149,7 @@ fun UISettingsScreen(
                         value = viewModel.defaultTtl,
                         onValueChange = { viewModel.updateDefaultTtl(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Timer
+                        icon = IconsData.Timer
                     )
 
                     val desyncMethods = stringArrayResource(R.array.byedpi_desync_methods)
@@ -164,7 +161,7 @@ fun UISettingsScreen(
                         value = viewModel.desyncMethod.toString().lowercase(),
                         entries = desyncMethodMap,
                         onValueChange = { viewModel.updateDesyncMethod(it) },
-                        icon = Icons.Default.SyncAlt
+                        icon = IconsData.SyncAlt
                     )
 
                     val desyncEnabled = viewModel.desyncMethod != None
@@ -179,14 +176,14 @@ fun UISettingsScreen(
                                 value = viewModel.splitPosition,
                                 onValueChange = { viewModel.updateSplitPosition(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                icon = Icons.AutoMirrored.Filled.CallSplit
+                                icon = IconsData.CallSplit
                             )
 
                             SwitchPreference(
                                 title = stringResource(R.string.byedpi_split_at_host_setting),
                                 checked = viewModel.splitAtHost,
                                 onCheckedChange = { viewModel.updateSplitAtHost(it) },
-                                icon = Icons.AutoMirrored.Filled.AltRoute
+                                icon = IconsData.AltRoute
                             )
                         }
                     }
@@ -195,7 +192,7 @@ fun UISettingsScreen(
                         title = stringResource(R.string.byedpi_drop_sack_setting),
                         checked = viewModel.dropSack,
                         onCheckedChange = { viewModel.updateDropSack(it) },
-                        icon = Icons.Default.DeleteSweep
+                        icon = IconsData.DeleteSweep
                     )
 
                     val isFake = viewModel.desyncMethod == Fake
@@ -210,7 +207,7 @@ fun UISettingsScreen(
                                 value = viewModel.fakeTtl,
                                 onValueChange = { viewModel.updateFakeTtl(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                icon = Icons.Default.Timer
+                                icon = IconsData.Timer
                             )
 
                             EditTextPreference(
@@ -218,14 +215,14 @@ fun UISettingsScreen(
                                 value = viewModel.fakeOffset,
                                 onValueChange = { viewModel.updateFakeOffset(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                icon = Icons.AutoMirrored.Filled.FormatIndentIncrease
+                                icon = IconsData.FormatIndentIncrease
                             )
 
                             EditTextPreference(
                                 title = stringResource(R.string.sni_of_fake_packet),
                                 value = viewModel.fakeSni,
                                 onValueChange = { viewModel.updateFakeSni(it) },
-                                icon = Icons.Default.Dns
+                                icon = IconsData.Dns
                             )
                         }
                     }
@@ -240,7 +237,7 @@ fun UISettingsScreen(
                             title = stringResource(R.string.oob_data),
                             value = viewModel.oobData,
                             onValueChange = { viewModel.updateOobData(it) },
-                            icon = Icons.Default.DataArray
+                            icon = IconsData.DataArray
                         )
                     }
                 }
@@ -252,21 +249,21 @@ fun UISettingsScreen(
                         title = stringResource(R.string.desync_http),
                         checked = viewModel.desyncHttp,
                         onCheckedChange = { viewModel.updateDesyncHttp(it) },
-                        icon = Icons.Default.Http
+                        icon = IconsData.Http
                     )
 
                     SwitchPreference(
                         title = stringResource(R.string.desync_https),
                         checked = viewModel.desyncHttps,
                         onCheckedChange = { viewModel.updateDesyncHttps(it) },
-                        icon = Icons.Default.Https
+                        icon = IconsData.Https
                     )
 
                     SwitchPreference(
                         title = stringResource(R.string.desync_udp),
                         checked = viewModel.desyncUdp,
                         onCheckedChange = { viewModel.updateDesyncUdp(it) },
-                        icon = Icons.AutoMirrored.Filled.DirectionsRun
+                        icon = IconsData.DirectionsRun
                     )
                 }
             }
@@ -282,7 +279,7 @@ fun UISettingsScreen(
                         checked = viewModel.hostMixedCase,
                         onCheckedChange = { viewModel.updateHostMixedCase(it) },
                         enabled = httpEnabled,
-                        icon = Icons.Default.TextFields
+                        icon = IconsData.TextFields
                     )
 
                     SwitchPreference(
@@ -290,7 +287,7 @@ fun UISettingsScreen(
                         checked = viewModel.domainMixedCase,
                         onCheckedChange = { viewModel.updateDomainMixedCase(it) },
                         enabled = httpEnabled,
-                        icon = Icons.Default.Abc
+                        icon = IconsData.Abc
                     )
 
                     SwitchPreference(
@@ -298,7 +295,7 @@ fun UISettingsScreen(
                         checked = viewModel.hostRemoveSpaces,
                         onCheckedChange = { viewModel.updateHostRemoveSpaces(it) },
                         enabled = httpEnabled,
-                        icon = Icons.Default.SpaceBar
+                        icon = IconsData.SpaceBar
                     )
                 }
             }
@@ -350,7 +347,7 @@ fun UISettingsScreen(
                         onValueChange = { viewModel.updateUdpFakeCount(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         enabled = udpEnabled,
-                        icon = Icons.Default.Repeat
+                        icon = IconsData.Repeat
                     )
                 }
             }

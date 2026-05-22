@@ -11,9 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.filled.Notes
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.components.*
 import io.github.romanvht.byedpi.ui.viewmodel.TestSettingsViewModel
 import io.github.romanvht.byedpi.utility.isTv
@@ -69,34 +67,34 @@ fun TestSettingsScreen(
                         value = viewModel.delay,
                         onValueChange = { viewModel.updateDelay(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Timer
+                        icon = IconsData.Timer
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_requests),
                         value = viewModel.requests,
                         onValueChange = { viewModel.updateRequests(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Repeat
+                        icon = IconsData.Repeat
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_timeout),
                         value = viewModel.timeout,
                         onValueChange = { viewModel.updateTimeout(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.HourglassEmpty
+                        icon = IconsData.HourglassEmpty
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_concurrent_requests),
                         value = viewModel.concurrentRequests,
                         onValueChange = { viewModel.updateConcurrentRequests(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = Icons.Default.Speed
+                        icon = IconsData.Speed
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_settings_sni),
                         value = viewModel.sni,
                         onValueChange = { viewModel.updateSni(it) },
-                        icon = Icons.Default.Dns
+                        icon = IconsData.Dns
                     )
                 }
             }
@@ -125,7 +123,7 @@ fun TestSettingsScreen(
                             values = viewModel.strategyLists,
                             entries = entryMap,
                             onValuesChange = { viewModel.updateStrategyLists(it) },
-                            icon = Icons.Default.Terminal
+                            icon = IconsData.Terminal
                         )
 
                         // Анимация теперь внутри Column карточки
@@ -145,7 +143,7 @@ fun TestSettingsScreen(
                                     placeholder = stringResource(R.string.some_strategy),
                                     values = viewModel.commandsList,
                                     onValuesChange = { viewModel.updateCommandsList(it) },
-                                    icon = Icons.Default.Code,
+                                    icon = IconsData.Code,
                                     splitByLinesOnly = true
                                 )
                             }
@@ -161,25 +159,25 @@ fun TestSettingsScreen(
                         title = stringResource(R.string.test_settings_fulllog),
                         checked = viewModel.fullLog,
                         onCheckedChange = { viewModel.updateFullLog(it) },
-                        icon = Icons.AutoMirrored.Filled.Notes
+                        icon = IconsData.Notes
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_logclickable),
                         checked = viewModel.logClickable,
                         onCheckedChange = { viewModel.updateLogClickable(it) },
-                        icon = Icons.Default.TouchApp
+                        icon = IconsData.TouchApp
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_autosort),
                         checked = viewModel.autoSort,
                         onCheckedChange = { viewModel.updateAutoSort(it) },
-                        icon = Icons.AutoMirrored.Filled.Sort
+                        icon = IconsData.Sort
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_showall),
                         checked = viewModel.showAll,
                         onCheckedChange = { viewModel.updateShowAll(it) },
-                        icon = Icons.Default.Visibility
+                        icon = IconsData.Visibility
                     )
                 }
             }

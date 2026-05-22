@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.DomainList
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.viewmodel.DomainListsViewModel
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
@@ -145,7 +146,7 @@ fun DomainListsScreen(
                                 headlineContent = { Text("Копировать") },
                                 leadingContent = {
                                     Icon(
-                                        Icons.Default.ContentCopy,
+                                        IconsData.ContentCopy,
                                         contentDescription = null
                                     )
                                 },
@@ -249,7 +250,7 @@ fun DomainListsScreen(
                             headlineContent = { Text("Копировать") },
                             leadingContent = {
                                 Icon(
-                                    Icons.Default.ContentCopy,
+                                    IconsData.ContentCopy,
                                     contentDescription = null
                                 )
                             },

@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.BuildConfig
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.Mode
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.components.*
 import io.github.romanvht.byedpi.ui.viewmodel.SettingsViewModel
 import io.github.romanvht.byedpi.utility.isTablet
@@ -81,7 +82,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.reset_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.RestartAlt,
+                                    IconsData.RestartAlt,
                                     contentDescription = null
                                 )
                             },
@@ -94,7 +95,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.export_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.FileUpload,
+                                    IconsData.FileUpload,
                                     contentDescription = null
                                 )
                             },
@@ -107,7 +108,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.import_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.FileDownload,
+                                    IconsData.FileDownload,
                                     contentDescription = null
                                 )
                             },
@@ -141,21 +142,21 @@ fun SettingsScreen(
                             title = stringResource(R.string.use_command_line_settings),
                             checked = viewModel.cmdEnable,
                             onCheckedChange = { viewModel.updateCmdEnable(it) },
-                            icon = Icons.Default.Code
+                            icon = IconsData.Code
                         )
 
                         PreferenceItem(
                             title = stringResource(R.string.ui_editor),
                             enabled = !viewModel.cmdEnable,
                             onClick = onNavigateToUISettings,
-                            icon = Icons.Default.EditNote
+                            icon = IconsData.EditNote
                         )
 
                         PreferenceItem(
                             title = stringResource(R.string.command_line_editor),
                             enabled = viewModel.cmdEnable,
                             onClick = onNavigateToCmdSettings,
-                            icon = Icons.Default.Terminal
+                            icon = IconsData.Terminal
                         )
 
                         PreferenceItem(
@@ -163,7 +164,7 @@ fun SettingsScreen(
                             summary = stringResource(R.string.summary_test),
                             enabled = viewModel.cmdEnable,
                             onClick = onNavigateToTest,
-                            icon = Icons.Default.BugReport
+                            icon = IconsData.BugReport
                         )
 
                         if ((!isTv && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R))
@@ -177,7 +178,7 @@ fun SettingsScreen(
                                     title = stringResource(R.string.storage_access),
                                     summary = stringResource(R.string.storage_access_summary),
                                     onClick = onRequestStorageAccess,
-                                    icon = Icons.Default.Storage
+                                    icon = IconsData.Storage
                                 )
                             }
                         }
@@ -200,7 +201,7 @@ fun SettingsScreen(
                             value = viewModel.mode.toString().lowercase(),
                             entries = modeMap,
                             onValueChange = { viewModel.updateMode(it) },
-                            icon = Icons.Default.SettingsInputComponent
+                            icon = IconsData.SettingsInputComponent
                         )
 
                         AnimatedVisibility(
@@ -218,7 +219,7 @@ fun SettingsScreen(
                                     value = viewModel.dnsSolution,
                                     entries = dnsSolutionMap,
                                     onValueChange = { viewModel.updateDnsSolution(it) },
-                                    icon = Icons.Default.Dns
+                                    icon = IconsData.Dns
                                 )
 
                                 AnimatedVisibility(
@@ -230,7 +231,7 @@ fun SettingsScreen(
                                         title = stringResource(R.string.dbs_ip_setting),
                                         value = viewModel.dnsIp,
                                         onValueChange = { viewModel.updateDns(it) },
-                                        icon = Icons.Default.Dns
+                                        icon = IconsData.Dns
                                     )
                                 }
 
@@ -238,14 +239,14 @@ fun SettingsScreen(
                                     title = stringResource(R.string.ipv6_setting),
                                     checked = viewModel.ipv6Enable,
                                     onCheckedChange = { viewModel.updateIpv6(it) },
-                                    icon = Icons.Default.NetworkCheck
+                                    icon = IconsData.NetworkCheck
                                 )
 
                                 SwitchPreference(
                                     title = stringResource(R.string.traffic_monitoring_setting),
                                     checked = viewModel.trafficMonitoring,
                                     onCheckedChange = { viewModel.updateTrafficMonitoring(it) },
-                                    icon = Icons.Default.Speed
+                                    icon = IconsData.Speed
                                 )
 
                                 val applistTypes = stringArrayResource(R.array.applist_types)
@@ -257,7 +258,7 @@ fun SettingsScreen(
                                     value = viewModel.applistType,
                                     entries = applistMap,
                                     onValueChange = { viewModel.updateApplistType(it) },
-                                    icon = Icons.Default.FilterList
+                                    icon = IconsData.FilterList
                                 )
 
                                 AnimatedVisibility(
@@ -268,7 +269,7 @@ fun SettingsScreen(
                                     PreferenceItem(
                                         title = stringResource(R.string.apps_select),
                                         onClick = onNavigateToAppSelection,
-                                        icon = Icons.Default.AppRegistration
+                                        icon = IconsData.AppRegistration
                                     )
                                 }
                             }
@@ -295,7 +296,7 @@ fun SettingsScreen(
                                 viewModel.updateLanguage(it)
                                 (context as Activity).recreate()
                             },
-                            icon = Icons.Default.Language
+                            icon = IconsData.Language
                         )
 
                         val themes = stringArrayResource(R.array.themes)
@@ -303,10 +304,10 @@ fun SettingsScreen(
                         val themeMap = themeValues.zip(themes).toMap()
                         val isSystemInDarkMode = isSystemInDarkTheme()
                         val themeIcon = when (viewModel.theme) {
-                            "light" -> Icons.Default.LightMode
-                            "dark" -> Icons.Default.Nightlight
-                            "system" -> if (isSystemInDarkMode) Icons.Default.Nightlight else Icons.Default.LightMode
-                            else -> Icons.Default.Nightlight
+                            "light" -> IconsData.LightMode
+                            "dark" -> IconsData.Nightlight
+                            "system" -> if (isSystemInDarkMode) IconsData.Nightlight else IconsData.LightMode
+                            else -> IconsData.Nightlight
                         }
 
                         ListPreference(
@@ -329,7 +330,7 @@ fun SettingsScreen(
                             value = viewModel.colorScheme,
                             entries = colorSchemeMap,
                             onValueChange = { viewModel.updateColorScheme(it) },
-                            icon = Icons.Default.ColorLens,
+                            icon = IconsData.ColorLens,
                             enabled = !viewModel.dynamicColors
                         )
 
@@ -338,7 +339,7 @@ fun SettingsScreen(
                                 title = stringResource(R.string.dynamic_colors_settings),
                                 checked = viewModel.dynamicColors,
                                 onCheckedChange = { viewModel.updateDynamicColors(it) },
-                                icon = Icons.Default.AutoFixHigh
+                                icon = IconsData.AutoFixHigh
                             )
                         }
                     }
@@ -360,7 +361,7 @@ fun SettingsScreen(
                                 title = stringResource(R.string.bye_dpi_proxy_ip_setting),
                                 value = viewModel.proxyIp,
                                 onValueChange = { viewModel.updateProxyIp(it) },
-                                icon = Icons.Default.Router
+                                icon = IconsData.Router
                             )
 
                             EditTextPreference(
@@ -369,7 +370,7 @@ fun SettingsScreen(
                                 value = viewModel.proxyPort,
                                 onValueChange = { viewModel.updateProxyPort(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                icon = Icons.Default.Numbers
+                                icon = IconsData.Numbers
                             )
                         }
                     }
@@ -386,14 +387,14 @@ fun SettingsScreen(
                             title = stringResource(R.string.autostart_settings),
                             checked = viewModel.autostart,
                             onCheckedChange = { viewModel.updateAutostart(it) },
-                            icon = Icons.Default.PowerSettingsNew
+                            icon = IconsData.PowerSettingsNew
                         )
 
                         SwitchPreference(
                             title = stringResource(R.string.autoconnect_settings),
                             checked = viewModel.autoConnect,
                             onCheckedChange = { viewModel.updateAutoConnect(it) },
-                            icon = Icons.Default.AutoMode
+                            icon = IconsData.AutoMode
                         )
 
                         if (!isTv) {
@@ -406,7 +407,7 @@ fun SettingsScreen(
                                     title = stringResource(R.string.battery_optimization),
                                     summary = stringResource(R.string.battery_optimization_summary),
                                     onClick = onRequestDisableBatteryOptimization,
-                                    icon = Icons.Default.BatteryAlert
+                                    icon = IconsData.BatteryAlert
                                 )
                             }
                         }
@@ -429,7 +430,7 @@ fun SettingsScreen(
                         PreferenceItem(
                             title = stringResource(R.string.source_code_link),
                             onClick = onOpenSourceCode,
-                            icon = Icons.Default.Source
+                            icon = IconsData.Source
                         )
 
                         PreferenceItem(
@@ -441,7 +442,7 @@ fun SettingsScreen(
                         PreferenceItem(
                             title = stringResource(R.string.byedpi_version),
                             summary = "0.17.3",
-                            icon = Icons.Default.HistoryEdu
+                            icon = IconsData.HistoryEdu
                         )
                     }
                 }

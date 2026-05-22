@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.Command
+import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.viewmodel.ProfilesViewModel
 import io.github.romanvht.byedpi.utility.isTablet
 import io.github.romanvht.byedpi.utility.isTv
@@ -41,6 +43,8 @@ fun ProfilesScreen(
     var showEditDialog by remember { mutableStateOf<Command?>(null) }
     var showDeleteDialog by remember { mutableStateOf<Command?>(null) }
     var showProfileSelectionDialog by remember { mutableStateOf<Pair<String, (String) -> Unit>?>(null) }
+    val wifiTitle = stringResource(R.string.profiles_wifi)
+    val mobileTitle = stringResource(R.string.profiles_mobile)
 
     Scaffold(
         topBar = {
@@ -103,17 +107,16 @@ fun ProfilesScreen(
                         )
                     
                     AutoSwitchCard(
-                        title = stringResource(R.string.profiles_wifi),
+                        title = wifiTitle,
                         profileName = wifiProfileName,
-                        icon = Icons.Default.Wifi,
+                        icon = IconsData.Wifi,
+                        isTv = isTv,
+                        showChevron = viewModel.profiles.isNotEmpty(),
                         onClick = {
                             if (viewModel.profiles.isNotEmpty()) {
-                                showProfileSelectionDialog =
-                                    context.getString(R.string.profiles_wifi) to {
-                                        viewModel.updateWifiProfile(
-                                            it
-                                        )
-                                    }
+                                showProfileSelectionDialog = wifiTitle to {
+                                    viewModel.updateWifiProfile(it)
+                                }
                             }
                         },
                         onClear = if (viewModel.wifiProfile.isNotEmpty()) {
@@ -129,17 +132,16 @@ fun ProfilesScreen(
                         )
 
                     AutoSwitchCard(
-                        title = stringResource(R.string.profiles_mobile),
+                        title = mobileTitle,
                         profileName = mobileProfileName,
-                        icon = Icons.Default.SignalCellularAlt,
+                        icon = IconsData.SignalCellularAlt,
+                        isTv = isTv,
+                        showChevron = viewModel.profiles.isNotEmpty(),
                         onClick = {
                             if (viewModel.profiles.isNotEmpty()) {
-                                showProfileSelectionDialog =
-                                    context.getString(R.string.profiles_mobile) to {
-                                        viewModel.updateMobileProfile(
-                                            it
-                                        )
-                                    }
+                                showProfileSelectionDialog = mobileTitle to {
+                                    viewModel.updateMobileProfile(it)
+                                }
                             }
                         },
                         onClear = if (viewModel.mobileProfile.isNotEmpty()) {
@@ -176,7 +178,7 @@ fun ProfilesScreen(
                                     onClick = onNavigateToTest,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(Icons.Default.BugReport, contentDescription = null)
+                                    Icon(IconsData.BugReport, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(stringResource(R.string.title_test))
                                 }
@@ -184,7 +186,7 @@ fun ProfilesScreen(
                         }
                     }
                 } else {
-                    items(viewModel.profiles) { profile ->
+                    items(viewModel.profiles, key = { it.text }) { profile ->
                         ProfileItem(
                             profile = profile,
                             onApply = { viewModel.applyProfile(profile) },
@@ -270,11 +272,11 @@ fun ProfilesScreen(
                                             contentDescription = null
                                         )
                                     },
-                                    colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                                 )
                             }
                         }
-                        items(viewModel.profiles) { profile ->
+                        items(viewModel.profiles, key = { it.text }) { profile ->
                             Surface(
                                 onClick = {
                                     onSelect(profile.text)
@@ -287,7 +289,7 @@ fun ProfilesScreen(
                                 ListItem(
                                     headlineContent = { Text(profile.name) },
                                     supportingContent = { Text(profile.text, maxLines = 1) },
-                                    colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                                 )
                             }
                         }
@@ -314,7 +316,29 @@ fun ProfilesScreen(
                         modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
                     )
                     LazyColumn {
-                        items(viewModel.profiles) { profile ->
+                        item {
+                            Surface(
+                                onClick = {
+                                    onSelect("")
+                                    showProfileSelectionDialog = null
+                                },
+                                shape = MaterialTheme.shapes.medium,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.errorContainer
+                            ) {
+                                ListItem(
+                                    headlineContent = { Text(stringResource(R.string.clear_selection)) },
+                                    leadingContent = {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                                )
+                            }
+                        }
+                        items(viewModel.profiles, key = { it.text }) { profile ->
                             Surface(
                                 onClick = {
                                     onSelect(profile.text)
@@ -339,16 +363,14 @@ fun ProfilesScreen(
 
 @Composable
 fun AutoSwitchCard(
-    viewModel: ProfilesViewModel = viewModel(),
     title: String,
     profileName: String,
     icon: ImageVector,
+    isTv: Boolean,
+    showChevron: Boolean,
     onClick: () -> Unit,
     onClear: (() -> Unit)? = null
 ) {
-    val context = LocalContext.current
-    val isTv = remember { context.isTv() }
-
     ElevatedCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -390,7 +412,7 @@ fun AutoSwitchCard(
                     )
                 }
             }
-            if (isTv && viewModel.profiles.isNotEmpty()) {
+            if (isTv && showChevron) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = null
@@ -477,7 +499,7 @@ fun ProfileDialog(
         title = { Text(title) },
         text = {
             Column(
-                modifier = Modifier.widthIn(min = 400.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
