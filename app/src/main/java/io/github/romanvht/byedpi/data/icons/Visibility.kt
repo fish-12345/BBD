@@ -3,67 +3,83 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _visibility: ImageVector? = null
-
-val IconsData.Visibility: ImageVector
-    get() {
-        if (_visibility != null) return _visibility!!
-        _visibility = ImageVector.Builder(
-            name = "Visibility",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(12.0f, 18.0f)
-                quadToRelative(-4.275f, 0.0f, -7.637f, -2.312f)
-                reflectiveQuadTo(0.0f, 10.0f)
-                quadToRelative(1.5f, -3.875f, 4.863f, -6.188f)
-                reflectiveQuadTo(12.0f, 1.5f)
-                quadToRelative(4.275f, 0.0f, 7.638f, 2.312f)
-                reflectiveQuadTo(24.0f, 10.0f)
-                quadToRelative(-1.5f, 3.875f, -4.862f, 6.188f)
-                reflectiveQuadTo(12.0f, 18.0f)
-                close()
-                moveToRelative(0.0f, -2.0f)
-                quadToRelative(3.35f, 0.0f, 6.013f, -1.738f)
-                reflectiveQuadTo(21.8f, 10.0f)
-                quadToRelative(-1.125f, -2.612f, -3.787f, -4.306f)
-                reflectiveQuadTo(12.0f, 4.0f)
-                reflectiveQuadTo(5.987f, 5.694f)
-                reflectiveQuadTo(2.2f, 10.0f)
-                quadToRelative(1.125f, 2.612f, 3.787f, 4.306f)
-                reflectiveQuadTo(12.0f, 16.0f)
-                close()
-                moveToRelative(0.0f, -2.0f)
-                quadToRelative(-1.675f, 0.0f, -2.837f, -1.163f)
-                reflectiveQuadTo(8.0f, 10.0f)
-                reflectiveQuadToRelative(1.163f, -2.837f)
-                reflectiveQuadTo(12.0f, 6.0f)
-                reflectiveQuadToRelative(2.838f, 1.163f)
-                reflectiveQuadTo(16.0f, 10.0f)
-                reflectiveQuadToRelative(-1.162f, 2.838f)
-                reflectiveQuadTo(12.0f, 14.0f)
-                close()
-                moveToRelative(0.0f, -2.0f)
-                quadToRelative(0.825f, 0.0f, 1.413f, -0.587f)
-                reflectiveQuadTo(14.0f, 10.0f)
-                reflectiveQuadToRelative(-0.587f, -1.413f)
-                reflectiveQuadTo(12.0f, 8.0f)
-                reflectiveQuadToRelative(-1.412f, 0.587f)
-                reflectiveQuadTo(10.0f, 10.0f)
-                reflectiveQuadToRelative(0.588f, 1.413f)
-                reflectiveQuadTo(12.0f, 12.0f)
-                close()
-            }
-        }.build()
-        return _visibility!!
+val Ico.Visibility: ImageVector
+  get() {
+    if (_Visibility != null) {
+      return _Visibility!!
     }
+    _Visibility =
+      ImageVector.Builder(
+          name = "Visibility",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(15.19f, 14.69f)
+            quadTo(16.5f, 13.38f, 16.5f, 11.5f)
+            reflectiveQuadTo(15.19f, 8.31f)
+            reflectiveQuadTo(12f, 7f)
+            reflectiveQuadTo(8.81f, 8.31f)
+            reflectiveQuadTo(7.5f, 11.5f)
+            reflectiveQuadToRelative(1.31f, 3.19f)
+            reflectiveQuadTo(12f, 16f)
+            reflectiveQuadToRelative(3.19f, -1.31f)
+            close()
+            moveToRelative(-5.1f, -1.28f)
+            quadTo(9.3f, 12.63f, 9.3f, 11.5f)
+            reflectiveQuadTo(10.09f, 9.59f)
+            reflectiveQuadTo(12f, 8.8f)
+            reflectiveQuadToRelative(1.91f, 0.79f)
+            quadToRelative(0.79f, 0.79f, 0.79f, 1.91f)
+            reflectiveQuadToRelative(-0.79f, 1.91f)
+            reflectiveQuadTo(12f, 14.2f)
+            reflectiveQuadTo(10.09f, 13.41f)
+            close()
+            moveTo(5.35f, 16.96f)
+            quadTo(2.35f, 14.93f, 1f, 11.5f)
+            quadTo(2.35f, 8.07f, 5.35f, 6.04f)
+            reflectiveQuadTo(12f, 4f)
+            reflectiveQuadToRelative(6.65f, 2.04f)
+            reflectiveQuadTo(23f, 11.5f)
+            quadToRelative(-1.35f, 3.42f, -4.35f, 5.46f)
+            reflectiveQuadTo(12f, 19f)
+            reflectiveQuadTo(5.35f, 16.96f)
+            close()
+            moveTo(12f, 11.5f)
+            close()
+            moveToRelative(5.19f, 4.01f)
+            quadTo(19.55f, 14.02f, 20.8f, 11.5f)
+            quadTo(19.55f, 8.98f, 17.19f, 7.49f)
+            reflectiveQuadTo(12f, 6f)
+            quadTo(9.18f, 6f, 6.81f, 7.49f)
+            reflectiveQuadTo(3.2f, 11.5f)
+            quadToRelative(1.25f, 2.52f, 3.61f, 4.01f)
+            reflectiveQuadTo(12f, 17f)
+            reflectiveQuadToRelative(5.19f, -1.49f)
+            close()
+          }
+        }
+        .build()
+    return _Visibility!!
+  }
+
+private var _Visibility: ImageVector? = null

@@ -3,50 +3,67 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _repeat: ImageVector? = null
-
-val IconsData.Repeat: ImageVector
-    get() {
-        if (_repeat != null) return _repeat!!
-        _repeat = ImageVector.Builder(
-            name = "Repeat",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).path(
-            fill = SolidColor(Color(0xFF000000)),
-            pathFillType = PathFillType.NonZero
-        ) {
-            moveTo(7.0f, 22.0f)
-            quadToRelative(-0.825f, 0.0f, -1.412f, -0.587f)
-            quadTo(5.0f, 20.825f, 5.0f, 20.0f)
-            verticalLineToRelative(-7.0f)
-            horizontalLineToRelative(2.0f)
-            verticalLineToRelative(7.0f)
-            horizontalLineToRelative(10.0f)
-            verticalLineToRelative(-3.0f)
-            lineToRelative(4.0f, 4.0f)
-            lineToRelative(-4.0f, 4.0f)
-            close()
-            moveTo(3.0f, 7.0f)
-            lineToRelative(4.0f, -4.0f)
-            lineToRelative(4.0f, 4.0f)
-            lineToRelative(-4.0f, 0.0f)
-            verticalLineToRelative(3.0f)
-            horizontalLineToRelative(10.0f)
-            verticalLineToRelative(-7.0f)
-            horizontalLineToRelative(2.0f)
-            verticalLineToRelative(7.0f)
-            quadToRelative(0.0f, 0.825f, -0.587f, 1.413f)
-            quadTo(17.825f, 12.0f, 17.0f, 12.0f)
-            horizontalLineTo(7.0f)
-            verticalLineToRelative(3.0f)
-            close()
-        }.build()
-        return _repeat!!
+val Ico.Repeat: ImageVector
+  get() {
+    if (_Repeat != null) {
+      return _Repeat!!
     }
+    _Repeat =
+      ImageVector.Builder(
+          name = "Repeat",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(7f, 22f)
+            lineTo(3f, 18f)
+            lineTo(7f, 14f)
+            lineToRelative(1.4f, 1.45f)
+            lineTo(6.85f, 17f)
+            horizontalLineTo(17f)
+            verticalLineTo(13f)
+            horizontalLineToRelative(2f)
+            verticalLineToRelative(6f)
+            horizontalLineTo(6.85f)
+            lineTo(8.4f, 20.55f)
+            lineTo(7f, 22f)
+            close()
+            moveTo(5f, 11f)
+            verticalLineTo(5f)
+            horizontalLineTo(17.15f)
+            lineTo(15.6f, 3.45f)
+            lineTo(17f, 2f)
+            lineToRelative(4f, 4f)
+            lineToRelative(-4f, 4f)
+            lineTo(15.6f, 8.55f)
+            lineTo(17.15f, 7f)
+            horizontalLineTo(7f)
+            verticalLineToRelative(4f)
+            horizontalLineTo(5f)
+            close()
+          }
+        }
+        .build()
+    return _Repeat!!
+  }
+
+private var _Repeat: ImageVector? = null

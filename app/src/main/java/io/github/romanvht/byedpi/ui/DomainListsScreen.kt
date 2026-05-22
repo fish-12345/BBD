@@ -146,7 +146,7 @@ fun DomainListsScreen(
                                 headlineContent = { Text("Копировать") },
                                 leadingContent = {
                                     Icon(
-                                        IconsData.ContentCopy,
+                                        Ico.ContentCopy,
                                         contentDescription = null
                                     )
                                 },
@@ -250,7 +250,7 @@ fun DomainListsScreen(
                             headlineContent = { Text("Копировать") },
                             leadingContent = {
                                 Icon(
-                                    IconsData.ContentCopy,
+                                    Ico.ContentCopy,
                                     contentDescription = null
                                 )
                             },

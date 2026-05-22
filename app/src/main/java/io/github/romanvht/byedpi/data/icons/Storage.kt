@@ -3,63 +3,77 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _storage: ImageVector? = null
-
-val IconsData.Storage: ImageVector
-    get() {
-        if (_storage != null) return _storage!!
-        _storage = ImageVector.Builder(
-            name = "Storage",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(2.0f, 20.0f)
-                horizontalLineToRelative(20.0f)
-                verticalLineToRelative(-4.0f)
-                lineTo(2.0f, 16.0f)
-                verticalLineToRelative(4.0f)
-                close()
-                moveTo(4.0f, 17.0f)
-                horizontalLineToRelative(16.0f)
-                verticalLineToRelative(2.0f)
-                lineTo(4.0f, 19.0f)
-                verticalLineToRelative(-2.0f)
-                close()
-                moveTo(2.0f, 4.0f)
-                verticalLineToRelative(4.0f)
-                horizontalLineToRelative(20.0f)
-                lineTo(22.0f, 4.0f)
-                lineTo(2.0f, 4.0f)
-                close()
-                moveTo(20.0f, 7.0f)
-                lineTo(4.0f, 7.0f)
-                verticalLineToRelative(-1.0f)
-                horizontalLineToRelative(16.0f)
-                verticalLineToRelative(1.0f)
-                close()
-                moveTo(2.0f, 14.0f)
-                horizontalLineToRelative(20.0f)
-                verticalLineToRelative(-4.0f)
-                lineTo(2.0f, 10.0f)
-                verticalLineToRelative(4.0f)
-                close()
-                moveTo(4.0f, 11.0f)
-                horizontalLineToRelative(16.0f)
-                verticalLineToRelative(2.0f)
-                lineTo(4.0f, 13.0f)
-                verticalLineToRelative(-2.0f)
-                close()
-            }
-        }.build()
-        return _storage!!
+val Ico.Storage: ImageVector
+  get() {
+    if (_Storage != null) {
+      return _Storage!!
     }
+    _Storage =
+      ImageVector.Builder(
+          name = "Storage",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(3f, 20f)
+            verticalLineTo(16f)
+            horizontalLineTo(21f)
+            verticalLineToRelative(4f)
+            horizontalLineTo(3f)
+            close()
+            moveTo(5f, 19f)
+            horizontalLineTo(7f)
+            verticalLineTo(17f)
+            horizontalLineTo(5f)
+            verticalLineToRelative(2f)
+            close()
+            moveTo(3f, 8f)
+            verticalLineTo(4f)
+            horizontalLineTo(21f)
+            verticalLineTo(8f)
+            horizontalLineTo(3f)
+            close()
+            moveTo(5f, 7f)
+            horizontalLineTo(7f)
+            verticalLineTo(5f)
+            horizontalLineTo(5f)
+            verticalLineTo(7f)
+            close()
+            moveTo(3f, 14f)
+            verticalLineTo(10f)
+            horizontalLineTo(21f)
+            verticalLineToRelative(4f)
+            horizontalLineTo(3f)
+            close()
+            moveTo(5f, 13f)
+            horizontalLineTo(7f)
+            verticalLineTo(11f)
+            horizontalLineTo(5f)
+            verticalLineToRelative(2f)
+            close()
+          }
+        }
+        .build()
+    return _Storage!!
+  }
+
+private var _Storage: ImageVector? = null

@@ -3,34 +3,49 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _chevronRight: ImageVector? = null
-
-val IconsData.ChevronRight: ImageVector
-    get() {
-        if (_chevronRight != null) return _chevronRight!!
-        _chevronRight = ImageVector.Builder(
-            name = "ChevronRight",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(12.6f, 12.0f)
-                lineTo(8.0f, 7.4f)
-                lineToRelative(1.4f, -1.4f)
-                lineToRelative(6.0f, 6.0f)
-                lineToRelative(-6.0f, 6.0f)
-                lineTo(8.0f, 16.6f)
-                close()
-            }
-        }.build()
-        return _chevronRight!!
+val Ico.ChevronRight: ImageVector
+  get() {
+    if (_ChevronRight != null) {
+      return _ChevronRight!!
     }
+    _ChevronRight =
+      ImageVector.Builder(
+          name = "ChevronRight",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(12.6f, 12f)
+            lineTo(8f, 7.4f)
+            lineTo(9.4f, 6f)
+            lineToRelative(6f, 6f)
+            lineToRelative(-6f, 6f)
+            lineTo(8f, 16.6f)
+            lineTo(12.6f, 12f)
+            close()
+          }
+        }
+        .build()
+    return _ChevronRight!!
+  }
+
+private var _ChevronRight: ImageVector? = null

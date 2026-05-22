@@ -9,92 +9,77 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _speed: ImageVector? = null
-
-val IconsData.Speed: ImageVector
-    get() {
-        if (_speed != null) return _speed!!
-        _speed = ImageVector.Builder(
-            name = "Speed",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).path(
-            fill = SolidColor(Color(0xFF000000)),
-            pathFillType = PathFillType.NonZero
-        ) {
-            moveTo(12.0f, 18.0f)
-            quadToRelative(1.15f, 0.0f, 1.95f, -0.8f)
-            reflectiveQuadToRelative(0.8f, -1.95f)
-            quadToRelative(0.0f, -1.15f, -0.8f, -1.95f)
-            reflectiveQuadToRelative(-1.95f, -0.8f)
-            quadToRelative(-1.15f, 0.0f, -1.95f, 0.8f)
-            reflectiveQuadToRelative(-0.8f, 1.95f)
-            quadToRelative(0.0f, 1.15f, 0.8f, 1.95f)
-            reflectiveQuadToRelative(1.95f, 0.8f)
-            close()
-            moveTo(12.0f, 13.0f)
-            lineTo(12.0f, 13.0f)
-            close()
-            moveTo(7.1f, 10.3f)
-            lineTo(5.65f, 8.9f)
-            quadToRelative(-0.275f, -0.275f, -0.275f, -0.7f)
-            reflectiveQuadToRelative(0.275f, -0.7f)
-            quadToRelative(0.275f, -0.275f, 0.7f, -0.275f)
-            reflectiveQuadToRelative(0.7f, 0.275f)
-            lineToRelative(1.45f, 1.4f)
-            quadToRelative(0.3f, 0.275f, 0.288f, 0.688f)
-            reflectiveQuadToRelative(-0.313f, 0.712f)
-            quadToRelative(-0.3f, 0.275f, -0.7f, 0.275f)
-            reflectiveQuadToRelative(-0.7f, -0.3f)
-            close()
-            moveTo(16.9f, 10.3f)
-            quadToRelative(-0.3f, -0.3f, -0.3f, -0.712f)
-            reflectiveQuadToRelative(0.3f, -0.688f)
-            lineToRelative(1.45f, -1.4f)
-            quadToRelative(0.275f, -0.275f, 0.7f, -0.275f)
-            reflectiveQuadToRelative(0.7f, 0.275f)
-            quadToRelative(0.275f, 0.275f, 0.275f, 0.7f)
-            reflectiveQuadToRelative(-0.275f, 0.7f)
-            lineToRelative(-1.45f, 1.4f)
-            quadToRelative(-0.3f, 0.3f, -0.712f, 0.313f)
-            reflectiveQuadToRelative(-0.688f, -0.313f)
-            close()
-            moveTo(12.0f, 7.0f)
-            quadToRelative(-0.425f, 0.0f, -0.712f, -0.288f)
-            reflectiveQuadToRelative(-0.288f, -0.712f)
-            verticalLineToRelative(-2.0f)
-            quadToRelative(0.0f, -0.425f, 0.288f, -0.712f)
-            reflectiveQuadTo(12.0f, 3.0f)
-            quadToRelative(0.425f, 0.0f, 0.713f, 0.288f)
-            reflectiveQuadTo(13.0f, 4.0f)
-            verticalLineToRelative(2.0f)
-            quadToRelative(0.0f, 0.425f, -0.287f, 0.713f)
-            reflectiveQuadTo(12.0f, 7.0f)
-            close()
-            moveTo(12.0f, 21.0f)
-            quadToRelative(-3.125f, 0.0f, -5.575f, -1.825f)
-            reflectiveQuadTo(3.225f, 14.35f)
-            quadToRelative(-0.1f, -0.425f, 0.138f, -0.788f)
-            reflectiveQuadToRelative(0.662f, -0.462f)
-            quadToRelative(0.375f, -0.1f, 0.725f, 0.113f)
-            reflectiveQuadToRelative(0.475f, 0.537f)
-            quadToRelative(0.625f, 2.075f, 2.375f, 3.325f)
-            reflectiveQuadTo(12.0f, 18.4f)
-            quadToRelative(1.65f, 0.0f, 2.988f, -0.787f)
-            reflectiveQuadToRelative(2.212f, -2.163f)
-            lineToRelative(-1.85f, -1.85f)
-            quadToRelative(-0.275f, -0.275f, -0.275f, -0.7f)
-            reflectiveQuadToRelative(0.275f, -0.7f)
-            quadToRelative(0.3f, -0.3f, 0.713f, -0.3f)
-            reflectiveQuadToRelative(0.687f, 0.3f)
-            lineToRelative(2.2f, 2.2f)
-            quadToRelative(0.275f, 0.275f, 0.313f, 0.65f)
-            reflectiveQuadToRelative(-0.113f, 0.75f)
-            quadToRelative(-0.725f, 2.225f, -2.7f, 3.563f)
-            reflectiveQuadTo(12.0f, 21.0f)
-            close()
-        }.build()
-        return _speed!!
+val Ico.Speed: ImageVector
+  get() {
+    if (_Speed != null) {
+      return _Speed!!
     }
+    _Speed =
+      ImageVector.Builder(
+          name = "Speed",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(12f, 16.09f)
+            quadToRelative(0.95f, -0.01f, 1.4f, -0.69f)
+            lineTo(19f, 7f)
+            lineToRelative(-8.4f, 5.6f)
+            quadTo(9.93f, 13.05f, 9.89f, 13.98f)
+            reflectiveQuadToRelative(0.56f, 1.53f)
+            reflectiveQuadTo(12f, 16.09f)
+            close()
+            moveTo(12f, 4f)
+            quadToRelative(1.48f, 0f, 2.84f, 0.41f)
+            reflectiveQuadTo(17.4f, 5.65f)
+            lineToRelative(-1.9f, 1.2f)
+            quadTo(14.68f, 6.43f, 13.79f, 6.21f)
+            reflectiveQuadTo(12f, 6f)
+            quadTo(8.68f, 6f, 6.34f, 8.34f)
+            quadTo(4f, 10.68f, 4f, 14f)
+            quadToRelative(0f, 1.05f, 0.29f, 2.07f)
+            reflectiveQuadTo(5.1f, 18f)
+            horizontalLineTo(18.9f)
+            quadToRelative(0.57f, -0.95f, 0.84f, -1.98f)
+            reflectiveQuadTo(20f, 13.9f)
+            quadTo(20f, 13f, 19.79f, 12.15f)
+            reflectiveQuadTo(19.15f, 10.5f)
+            lineToRelative(1.2f, -1.9f)
+            quadToRelative(0.75f, 1.17f, 1.19f, 2.5f)
+            reflectiveQuadTo(22f, 13.85f)
+            reflectiveQuadToRelative(-0.32f, 2.72f)
+            reflectiveQuadToRelative(-1.02f, 2.48f)
+            quadToRelative(-0.28f, 0.45f, -0.75f, 0.7f)
+            reflectiveQuadTo(18.9f, 20f)
+            horizontalLineTo(5.1f)
+            quadToRelative(-0.53f, 0f, -1f, -0.25f)
+            reflectiveQuadTo(3.35f, 19.05f)
+            quadTo(2.7f, 17.93f, 2.35f, 16.66f)
+            reflectiveQuadTo(2f, 14f)
+            quadTo(2f, 11.93f, 2.79f, 10.11f)
+            reflectiveQuadTo(4.94f, 6.94f)
+            quadTo(6.3f, 5.57f, 8.13f, 4.79f)
+            reflectiveQuadTo(12f, 4f)
+            close()
+            moveToRelative(0.18f, 7.82f)
+            close()
+          }
+        }
+        .build()
+    return _Speed!!
+  }
+
+private var _Speed: ImageVector? = null

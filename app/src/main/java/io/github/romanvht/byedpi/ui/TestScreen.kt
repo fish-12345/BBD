@@ -517,7 +517,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         Icon(
-                                            IconsData.Error,
+                                            Ico.Error,
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.error,
                                             modifier = Modifier.size(16.dp)
@@ -544,7 +544,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
 
                         TvDialogButton(
                             text = stringResource(R.string.cmd_history_apply),
-                            icon = IconsData.Terminal,
+                            icon = Ico.Terminal,
                             onClick = {
                                 viewModel.applyCommand(command)
                                 viewModel.showCommandSheet = null
@@ -552,7 +552,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         )
                         TvDialogButton(
                             text = stringResource(R.string.cmd_history_copy),
-                            icon = IconsData.ContentCopy,
+                            icon = Ico.ContentCopy,
                             onClick = {
                                 viewModel.copyCommand(command)
                                 viewModel.showCommandSheet = null
@@ -601,7 +601,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                             headlineContent = { Text(stringResource(R.string.cmd_history_apply)) },
                             leadingContent = {
                                 Icon(
-                                    IconsData.Terminal,
+                                    Ico.Terminal,
                                     contentDescription = null
                                 )
                             }
@@ -620,7 +620,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                             headlineContent = { Text(stringResource(R.string.cmd_history_copy)) },
                             leadingContent = {
                                 Icon(
-                                    IconsData.ContentCopy,
+                                    Ico.ContentCopy,
                                     contentDescription = null
                                 )
                             }

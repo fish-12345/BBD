@@ -82,7 +82,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.reset_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    IconsData.RestartAlt,
+                                    Ico.RestartAlt,
                                     contentDescription = null
                                 )
                             },
@@ -95,7 +95,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.export_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    IconsData.FileUpload,
+                                    Ico.FileUpload,
                                     contentDescription = null
                                 )
                             },
@@ -108,7 +108,7 @@ fun SettingsScreen(
                             text = { Text(stringResource(R.string.import_settings)) },
                             leadingIcon = {
                                 Icon(
-                                    IconsData.FileDownload,
+                                    Ico.FileDownload,
                                     contentDescription = null
                                 )
                             },
@@ -142,21 +142,21 @@ fun SettingsScreen(
                             title = stringResource(R.string.use_command_line_settings),
                             checked = viewModel.cmdEnable,
                             onCheckedChange = { viewModel.updateCmdEnable(it) },
-                            icon = IconsData.Code
+                            icon = Ico.Code
                         )
 
                         PreferenceItem(
                             title = stringResource(R.string.ui_editor),
                             enabled = !viewModel.cmdEnable,
                             onClick = onNavigateToUISettings,
-                            icon = IconsData.EditNote
+                            icon = Ico.EditNote
                         )
 
                         PreferenceItem(
                             title = stringResource(R.string.command_line_editor),
                             enabled = viewModel.cmdEnable,
                             onClick = onNavigateToCmdSettings,
-                            icon = IconsData.Terminal
+                            icon = Ico.Terminal
                         )
 
                         PreferenceItem(
@@ -164,7 +164,7 @@ fun SettingsScreen(
                             summary = stringResource(R.string.summary_test),
                             enabled = viewModel.cmdEnable,
                             onClick = onNavigateToTest,
-                            icon = IconsData.BugReport
+                            icon = Ico.BugReport
                         )
 
                         if ((!isTv && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R))
@@ -178,7 +178,7 @@ fun SettingsScreen(
                                     title = stringResource(R.string.storage_access),
                                     summary = stringResource(R.string.storage_access_summary),
                                     onClick = onRequestStorageAccess,
-                                    icon = IconsData.Storage
+                                    icon = Ico.Storage
                                 )
                             }
                         }
@@ -201,7 +201,7 @@ fun SettingsScreen(
                             value = viewModel.mode.toString().lowercase(),
                             entries = modeMap,
                             onValueChange = { viewModel.updateMode(it) },
-                            icon = IconsData.SettingsInputComponent
+                            icon = Ico.SettingsInputComponent
                         )
 
                         AnimatedVisibility(
@@ -219,7 +219,7 @@ fun SettingsScreen(
                                     value = viewModel.dnsSolution,
                                     entries = dnsSolutionMap,
                                     onValueChange = { viewModel.updateDnsSolution(it) },
-                                    icon = IconsData.Dns
+                                    icon = Ico.Dns
                                 )
 
                                 AnimatedVisibility(
@@ -231,7 +231,7 @@ fun SettingsScreen(
                                         title = stringResource(R.string.dbs_ip_setting),
                                         value = viewModel.dnsIp,
                                         onValueChange = { viewModel.updateDns(it) },
-                                        icon = IconsData.Dns
+                                        icon = Ico.Dns
                                     )
                                 }
 
@@ -239,14 +239,14 @@ fun SettingsScreen(
                                     title = stringResource(R.string.ipv6_setting),
                                     checked = viewModel.ipv6Enable,
                                     onCheckedChange = { viewModel.updateIpv6(it) },
-                                    icon = IconsData.NetworkCheck
+                                    icon = Ico.NetworkCheck
                                 )
 
                                 SwitchPreference(
                                     title = stringResource(R.string.traffic_monitoring_setting),
                                     checked = viewModel.trafficMonitoring,
                                     onCheckedChange = { viewModel.updateTrafficMonitoring(it) },
-                                    icon = IconsData.Speed
+                                    icon = Ico.Speed
                                 )
 
                                 val applistTypes = stringArrayResource(R.array.applist_types)
@@ -258,7 +258,7 @@ fun SettingsScreen(
                                     value = viewModel.applistType,
                                     entries = applistMap,
                                     onValueChange = { viewModel.updateApplistType(it) },
-                                    icon = IconsData.FilterList
+                                    icon = Ico.FilterList
                                 )
 
                                 AnimatedVisibility(
@@ -269,7 +269,7 @@ fun SettingsScreen(
                                     PreferenceItem(
                                         title = stringResource(R.string.apps_select),
                                         onClick = onNavigateToAppSelection,
-                                        icon = IconsData.AppRegistration
+                                        icon = Ico.AppRegistration
                                     )
                                 }
                             }
@@ -296,7 +296,7 @@ fun SettingsScreen(
                                 viewModel.updateLanguage(it)
                                 (context as Activity).recreate()
                             },
-                            icon = IconsData.Language
+                            icon = Ico.Language
                         )
 
                         val themes = stringArrayResource(R.array.themes)
@@ -304,10 +304,10 @@ fun SettingsScreen(
                         val themeMap = themeValues.zip(themes).toMap()
                         val isSystemInDarkMode = isSystemInDarkTheme()
                         val themeIcon = when (viewModel.theme) {
-                            "light" -> IconsData.LightMode
-                            "dark" -> IconsData.Nightlight
-                            "system" -> if (isSystemInDarkMode) IconsData.Nightlight else IconsData.LightMode
-                            else -> IconsData.Nightlight
+                            "light" -> Ico.LightMode
+                            "dark" -> Ico.Nightlight
+                            "system" -> if (isSystemInDarkMode) Ico.Nightlight else Ico.LightMode
+                            else -> Ico.Nightlight
                         }
 
                         ListPreference(
@@ -330,7 +330,7 @@ fun SettingsScreen(
                             value = viewModel.colorScheme,
                             entries = colorSchemeMap,
                             onValueChange = { viewModel.updateColorScheme(it) },
-                            icon = IconsData.ColorLens,
+                            icon = Ico.ColorLens,
                             enabled = !viewModel.dynamicColors
                         )
 
@@ -339,7 +339,7 @@ fun SettingsScreen(
                                 title = stringResource(R.string.dynamic_colors_settings),
                                 checked = viewModel.dynamicColors,
                                 onCheckedChange = { viewModel.updateDynamicColors(it) },
-                                icon = IconsData.AutoFixHigh
+                                icon = Ico.AutoFixHigh
                             )
                         }
                     }
@@ -361,7 +361,7 @@ fun SettingsScreen(
                                 title = stringResource(R.string.bye_dpi_proxy_ip_setting),
                                 value = viewModel.proxyIp,
                                 onValueChange = { viewModel.updateProxyIp(it) },
-                                icon = IconsData.Router
+                                icon = Ico.Router
                             )
 
                             EditTextPreference(
@@ -370,7 +370,7 @@ fun SettingsScreen(
                                 value = viewModel.proxyPort,
                                 onValueChange = { viewModel.updateProxyPort(it) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                icon = IconsData.Numbers
+                                icon = Ico.Numbers
                             )
                         }
                     }
@@ -387,14 +387,14 @@ fun SettingsScreen(
                             title = stringResource(R.string.autostart_settings),
                             checked = viewModel.autostart,
                             onCheckedChange = { viewModel.updateAutostart(it) },
-                            icon = IconsData.PowerSettingsNew
+                            icon = Ico.PowerSettingsNew
                         )
 
                         SwitchPreference(
                             title = stringResource(R.string.autoconnect_settings),
                             checked = viewModel.autoConnect,
                             onCheckedChange = { viewModel.updateAutoConnect(it) },
-                            icon = IconsData.AutoMode
+                            icon = Ico.AutoMode
                         )
 
                         if (!isTv) {
@@ -407,7 +407,7 @@ fun SettingsScreen(
                                     title = stringResource(R.string.battery_optimization),
                                     summary = stringResource(R.string.battery_optimization_summary),
                                     onClick = onRequestDisableBatteryOptimization,
-                                    icon = IconsData.BatteryAlert
+                                    icon = Ico.BatteryAlert
                                 )
                             }
                         }
@@ -430,7 +430,7 @@ fun SettingsScreen(
                         PreferenceItem(
                             title = stringResource(R.string.source_code_link),
                             onClick = onOpenSourceCode,
-                            icon = IconsData.Source
+                            icon = Ico.Source
                         )
 
                         PreferenceItem(
@@ -442,7 +442,7 @@ fun SettingsScreen(
                         PreferenceItem(
                             title = stringResource(R.string.byedpi_version),
                             summary = "0.17.3",
-                            icon = IconsData.HistoryEdu
+                            icon = Ico.HistoryEdu
                         )
                     }
                 }

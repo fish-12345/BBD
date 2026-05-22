@@ -67,34 +67,34 @@ fun TestSettingsScreen(
                         value = viewModel.delay,
                         onValueChange = { viewModel.updateDelay(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = IconsData.Timer
+                        icon = Ico.Timer
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_requests),
                         value = viewModel.requests,
                         onValueChange = { viewModel.updateRequests(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = IconsData.Repeat
+                        icon = Ico.Repeat
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_timeout),
                         value = viewModel.timeout,
                         onValueChange = { viewModel.updateTimeout(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = IconsData.HourglassEmpty
+                        icon = Ico.HourglassEmpty
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_concurrent_requests),
                         value = viewModel.concurrentRequests,
                         onValueChange = { viewModel.updateConcurrentRequests(it) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        icon = IconsData.Speed
+                        icon = Ico.Speed
                     )
                     EditTextPreference(
                         title = stringResource(R.string.test_settings_sni),
                         value = viewModel.sni,
                         onValueChange = { viewModel.updateSni(it) },
-                        icon = IconsData.Dns
+                        icon = Ico.Dns
                     )
                 }
             }
@@ -123,7 +123,7 @@ fun TestSettingsScreen(
                             values = viewModel.strategyLists,
                             entries = entryMap,
                             onValuesChange = { viewModel.updateStrategyLists(it) },
-                            icon = IconsData.Terminal
+                            icon = Ico.Terminal
                         )
 
                         // Анимация теперь внутри Column карточки
@@ -143,7 +143,7 @@ fun TestSettingsScreen(
                                     placeholder = stringResource(R.string.some_strategy),
                                     values = viewModel.commandsList,
                                     onValuesChange = { viewModel.updateCommandsList(it) },
-                                    icon = IconsData.Code,
+                                    icon = Ico.Code,
                                     splitByLinesOnly = true
                                 )
                             }
@@ -159,25 +159,25 @@ fun TestSettingsScreen(
                         title = stringResource(R.string.test_settings_fulllog),
                         checked = viewModel.fullLog,
                         onCheckedChange = { viewModel.updateFullLog(it) },
-                        icon = IconsData.Notes
+                        icon = Ico.Notes
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_logclickable),
                         checked = viewModel.logClickable,
                         onCheckedChange = { viewModel.updateLogClickable(it) },
-                        icon = IconsData.TouchApp
+                        icon = Ico.TouchApp
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_autosort),
                         checked = viewModel.autoSort,
                         onCheckedChange = { viewModel.updateAutoSort(it) },
-                        icon = IconsData.Sort
+                        icon = Ico.Sort
                     )
                     SwitchPreference(
                         title = stringResource(R.string.test_settings_showall),
                         checked = viewModel.showAll,
                         onCheckedChange = { viewModel.updateShowAll(it) },
-                        icon = IconsData.Visibility
+                        icon = Ico.Visibility
                     )
                 }
             }

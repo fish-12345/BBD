@@ -3,59 +3,89 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _networkCheck: ImageVector? = null
-
-val IconsData.NetworkCheck: ImageVector
-    get() {
-        if (_networkCheck != null) return _networkCheck!!
-        _networkCheck = ImageVector.Builder(
-            name = "NetworkCheck",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(15.91f, 13.0f)
-                horizontalLineTo(21.0f)
-                verticalLineToRelative(-2.0f)
-                horizontalLineToRelative(-5.09f)
-                curveToRelative(-0.43f, -2.32f, -2.22f, -4.11f, -4.54f, -4.54f)
-                verticalLineTo(1.0f)
-                horizontalLineToRelative(-2.0f)
-                verticalLineToRelative(5.46f)
-                curveToRelative(-2.32f, 0.43f, -4.11f, 2.22f, -4.54f, 4.54f)
-                horizontalLineTo(0.0f)
-                verticalLineToRelative(2.0f)
-                horizontalLineToRelative(4.87f)
-                curveToRelative(0.36f, 1.93f, 1.7f, 3.53f, 3.51f, 4.25f)
-                lineToRelative(-2.6f, 2.6f)
-                lineTo(7.2f, 21.2f)
-                lineToRelative(2.55f, -2.55f)
-                curveToRelative(0.95f, 0.87f, 2.19f, 1.35f, 3.51f, 1.35f)
-                curveToRelative(2.8f, 0.0f, 5.16f, -2.01f, 5.65f, -4.65f)
-                lineToRelative(1.88f, 1.88f)
-                lineToRelative(1.41f, -1.41f)
-                lineTo(15.91f, 13.0f)
-                close()
-                moveTo(11.27f, 18.37f)
-                curveToRelative(-2.07f, -0.15f, -3.76f, -1.84f, -3.91f, -3.91f)
-                lineToRelative(2.48f, -2.48f)
-                curveToRelative(0.18f, 0.23f, 0.41f, 0.43f, 0.68f, 0.58f)
-                curveToRelative(0.33f, 0.19f, 0.7f, 0.29f, 1.08f, 0.29f)
-                curveToRelative(0.38f, 0.0f, 0.75f, -0.1f, 1.08f, -0.29f)
-                curveToRelative(0.27f, -0.15f, 0.5f, -0.35f, 0.68f, -0.58f)
-                lineToRelative(2.48f, 2.48f)
-                curveTo(13.11f, 16.53f, 11.42f, 18.22f, 11.27f, 18.37f)
-                close()
-            }
-        }.build()
-        return _networkCheck!!
+val Ico.NetworkCheck: ImageVector
+  get() {
+    if (_NetworkCheck != null) {
+      return _NetworkCheck!!
     }
+    _NetworkCheck =
+      ImageVector.Builder(
+          name = "NetworkCheck",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(2.1f, 11.1f)
+            lineTo(0f, 9f)
+            quadTo(2.38f, 6.57f, 5.49f, 5.29f)
+            reflectiveQuadTo(12f, 4f)
+            quadToRelative(0.6f, 0f, 1.2f, 0.04f)
+            reflectiveQuadToRelative(1.2f, 0.11f)
+            lineToRelative(-1.5f, 2.9f)
+            quadTo(12.68f, 7.02f, 12.45f, 7.01f)
+            reflectiveQuadTo(12f, 7f)
+            quadTo(9.2f, 7f, 6.64f, 8.06f)
+            quadTo(4.08f, 9.13f, 2.1f, 11.1f)
+            close()
+            moveToRelative(4.25f, 4.25f)
+            lineTo(4.25f, 13.2f)
+            quadTo(5.68f, 11.77f, 7.53f, 10.98f)
+            quadToRelative(1.85f, -0.8f, 3.88f, -0.93f)
+            lineTo(9.8f, 13.33f)
+            quadTo(8.83f, 13.6f, 7.95f, 14.11f)
+            quadToRelative(-0.88f, 0.51f, -1.6f, 1.24f)
+            close()
+            moveToRelative(4.95f, 4.5f)
+            quadTo(10.48f, 19.58f, 10.1f, 18.81f)
+            reflectiveQuadToRelative(0f, -1.51f)
+            lineToRelative(6f, -12.2f)
+            quadTo(16.2f, 4.9f, 16.4f, 4.84f)
+            reflectiveQuadToRelative(0.4f, 0.01f)
+            quadTo(17f, 4.93f, 17.1f, 5.11f)
+            reflectiveQuadTo(17.15f, 5.5f)
+            lineTo(13.9f, 18.65f)
+            quadToRelative(-0.2f, 0.83f, -0.99f, 1.18f)
+            quadToRelative(-0.79f, 0.35f, -1.61f, 0.03f)
+            close()
+            moveToRelative(6.35f, -4.5f)
+            quadTo(17.48f, 15.18f, 17.31f, 15.04f)
+            reflectiveQuadTo(16.95f, 14.75f)
+            lineToRelative(0.8f, -3.13f)
+            quadToRelative(0.53f, 0.35f, 1.04f, 0.74f)
+            reflectiveQuadToRelative(0.96f, 0.84f)
+            lineToRelative(-2.1f, 2.15f)
+            close()
+            moveToRelative(4.22f, -4.22f)
+            quadTo(21.08f, 10.4f, 20.24f, 9.75f)
+            reflectiveQuadTo(18.45f, 8.6f)
+            lineToRelative(0.7f, -3f)
+            quadToRelative(1.35f, 0.65f, 2.57f, 1.5f)
+            reflectiveQuadTo(24f, 9f)
+            lineToRelative(-2.13f, 2.13f)
+            close()
+          }
+        }
+        .build()
+    return _NetworkCheck!!
+  }
+
+private var _NetworkCheck: ImageVector? = null

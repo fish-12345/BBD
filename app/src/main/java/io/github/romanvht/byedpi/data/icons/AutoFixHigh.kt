@@ -3,68 +3,91 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _autoFixHigh: ImageVector? = null
-
-val IconsData.AutoFixHigh: ImageVector
-    get() {
-        if (_autoFixHigh != null) return _autoFixHigh!!
-        _autoFixHigh = ImageVector.Builder(
-            name = "AutoFixHigh",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(7.5f, 5.6f)
-                lineTo(10.0f, 7.0f)
-                lineTo(8.6f, 4.5f)
-                lineTo(10.0f, 2.0f)
-                lineTo(7.5f, 3.4f)
-                lineTo(5.0f, 2.0f)
-                lineTo(6.4f, 4.5f)
-                lineTo(5.0f, 7.0f)
-                close()
-                moveTo(19.5f, 9.6f)
-                lineTo(22.0f, 11.0f)
-                lineTo(20.6f, 8.5f)
-                lineTo(22.0f, 6.0f)
-                lineTo(19.5f, 7.4f)
-                lineTo(17.0f, 6.0f)
-                lineTo(18.4f, 8.5f)
-                lineTo(17.0f, 11.0f)
-                close()
-                moveTo(4.5f, 11.6f)
-                lineTo(7.0f, 13.0f)
-                lineTo(5.6f, 10.5f)
-                lineTo(7.0f, 8.0f)
-                lineTo(4.5f, 9.4f)
-                lineTo(2.0f, 8.0f)
-                lineTo(3.4f, 10.5f)
-                lineTo(2.0f, 13.0f)
-                close()
-                moveTo(14.06f, 6.19f)
-                lineTo(5.14f, 15.11f)
-                lineTo(8.89f, 18.86f)
-                lineTo(17.81f, 9.94f)
-                lineTo(14.06f, 6.19f)
-                close()
-                moveTo(17.61f, 2.74f)
-                curveTo(18.1f, 2.25f, 18.89f, 2.25f, 19.38f, 2.74f)
-                lineTo(21.26f, 4.62f)
-                curveTo(21.75f, 5.11f, 21.75f, 5.9f, 21.26f, 6.39f)
-                lineTo(19.16f, 8.49f)
-                lineTo(15.51f, 4.84f)
-                lineTo(17.61f, 2.74f)
-                close()
-            }
-        }.build()
-        return _autoFixHigh!!
+val Ico.AutoFixHigh: ImageVector
+  get() {
+    if (_AutoFixHigh != null) {
+      return _AutoFixHigh!!
     }
+    _AutoFixHigh =
+      ImageVector.Builder(
+          name = "AutoFixHigh",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(20f, 7f)
+            lineTo(19.05f, 4.95f)
+            lineTo(17f, 4f)
+            lineTo(19.05f, 3.05f)
+            lineTo(20f, 1f)
+            lineToRelative(0.95f, 2.05f)
+            lineTo(23f, 4f)
+            lineTo(20.95f, 4.95f)
+            lineTo(20f, 7f)
+            close()
+            moveTo(8.5f, 7f)
+            lineTo(7.55f, 4.95f)
+            lineTo(5.5f, 4f)
+            lineTo(7.55f, 3.05f)
+            lineTo(8.5f, 1f)
+            lineTo(9.45f, 3.05f)
+            lineTo(11.5f, 4f)
+            lineTo(9.45f, 4.95f)
+            lineTo(8.5f, 7f)
+            close()
+            moveTo(20f, 18.5f)
+            lineTo(19.05f, 16.45f)
+            lineTo(17f, 15.5f)
+            lineToRelative(2.05f, -0.95f)
+            lineTo(20f, 12.5f)
+            lineToRelative(0.95f, 2.05f)
+            lineTo(23f, 15.5f)
+            lineToRelative(-2.05f, 0.95f)
+            lineTo(20f, 18.5f)
+            close()
+            moveTo(5.1f, 21.7f)
+            lineTo(2.3f, 18.9f)
+            quadTo(2f, 18.6f, 2f, 18.18f)
+            reflectiveQuadTo(2.3f, 17.45f)
+            lineTo(13.45f, 6.3f)
+            quadTo(13.75f, 6f, 14.18f, 6f)
+            reflectiveQuadTo(14.9f, 6.3f)
+            lineToRelative(2.8f, 2.8f)
+            quadTo(18f, 9.4f, 18f, 9.82f)
+            reflectiveQuadToRelative(-0.3f, 0.72f)
+            lineTo(6.55f, 21.7f)
+            quadTo(6.25f, 22f, 5.83f, 22f)
+            reflectiveQuadTo(5.1f, 21.7f)
+            close()
+            moveTo(5.85f, 19.6f)
+            lineTo(13f, 12.4f)
+            lineTo(11.6f, 11f)
+            lineTo(4.4f, 18.15f)
+            lineTo(5.85f, 19.6f)
+            close()
+          }
+        }
+        .build()
+    return _AutoFixHigh!!
+  }
+
+private var _AutoFixHigh: ImageVector? = null

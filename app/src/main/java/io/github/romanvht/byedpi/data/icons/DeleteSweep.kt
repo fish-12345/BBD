@@ -3,71 +3,87 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _deleteSweep: ImageVector? = null
-
-val IconsData.DeleteSweep: ImageVector
-    get() {
-        if (_deleteSweep != null) return _deleteSweep!!
-        _deleteSweep = ImageVector.Builder(
-            name = "DeleteSweep",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(15f, 16f)
-                horizontalLineToRelative(4f)
-                verticalLineToRelative(2f)
-                horizontalLineToRelative(-4f)
-                verticalLineToRelative(-2f)
-                close()
-                moveTo(15f, 8f)
-                horizontalLineToRelative(7f)
-                verticalLineToRelative(2f)
-                horizontalLineToRelative(-7f)
-                verticalLineTo(8f)
-                close()
-                moveTo(15f, 12f)
-                horizontalLineToRelative(6f)
-                verticalLineToRelative(2f)
-                horizontalLineToRelative(-6f)
-                verticalLineToRelative(-2f)
-                close()
-                
-                moveTo(3f, 18f)
-                curveToRelative(0f, 1.1f, 0.9f, 2f, 2f, 2f)
-                horizontalLineToRelative(6f)
-                curveToRelative(1.1f, 0f, 2f, -0.9f, 2f, -2f)
-                verticalLineTo(8f)
-                horizontalLineTo(3f)
-                verticalLineToRelative(10f)
-                close()
-                moveTo(5f, 10f)
-                horizontalLineToRelative(6f)
-                verticalLineToRelative(8f)
-                horizontalLineTo(5f)
-                verticalLineToRelative(-8f)
-                close()
-                
-                moveTo(14f, 5f)
-                horizontalLineToRelative(-3f)
-                lineToRelative(-1f, -1f)
-                horizontalLineTo(6f)
-                lineTo(5f, 5f)
-                horizontalLineTo(2f)
-                verticalLineToRelative(2f)
-                horizontalLineToRelative(12f)
-                verticalLineTo(5f)
-                close()
-            }
-        }.build()
-        return _deleteSweep!!
+val Ico.DeleteSweep: ImageVector
+  get() {
+    if (_DeleteSweep != null) {
+      return _DeleteSweep!!
     }
+    _DeleteSweep =
+      ImageVector.Builder(
+          name = "DeleteSweep",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(15f, 18f)
+            verticalLineTo(16f)
+            horizontalLineToRelative(4f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(15f)
+            close()
+            moveToRelative(0f, -8f)
+            verticalLineTo(8f)
+            horizontalLineToRelative(7f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(15f)
+            close()
+            moveToRelative(0f, 4f)
+            verticalLineTo(12f)
+            horizontalLineToRelative(6f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(15f)
+            close()
+            moveTo(3f, 8f)
+            horizontalLineTo(2f)
+            verticalLineTo(6f)
+            horizontalLineTo(6f)
+            verticalLineTo(4.5f)
+            horizontalLineToRelative(4f)
+            verticalLineTo(6f)
+            horizontalLineToRelative(4f)
+            verticalLineTo(8f)
+            horizontalLineTo(13f)
+            verticalLineToRelative(9f)
+            quadToRelative(0f, 0.82f, -0.59f, 1.41f)
+            reflectiveQuadTo(11f, 19f)
+            horizontalLineTo(5f)
+            quadTo(4.18f, 19f, 3.59f, 18.41f)
+            reflectiveQuadTo(3f, 17f)
+            verticalLineTo(8f)
+            close()
+            moveTo(5f, 8f)
+            verticalLineToRelative(9f)
+            horizontalLineToRelative(6f)
+            verticalLineTo(8f)
+            horizontalLineTo(5f)
+            close()
+            moveTo(5f, 8f)
+            verticalLineToRelative(9f)
+            verticalLineTo(8f)
+            close()
+          }
+        }
+        .build()
+    return _DeleteSweep!!
+  }
+
+private var _DeleteSweep: ImageVector? = null

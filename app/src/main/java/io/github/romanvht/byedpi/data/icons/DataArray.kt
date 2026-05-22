@@ -9,49 +9,55 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _dataArray: ImageVector? = null
-
-val IconsData.DataArray: ImageVector
-    get() {
-        if (_dataArray != null) return _dataArray!!
-        _dataArray = ImageVector.Builder(
-            name = "DataArray",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(15.0f, 4.0f)
-                horizontalLineToRelative(5.0f)
-                verticalLineToRelative(16.0f)
-                horizontalLineToRelative(-5.0f)
-                verticalLineToRelative(-2.0f)
-                horizontalLineToRelative(3.0f)
-                verticalLineTo(6.0f)
-                horizontalLineToRelative(-3.0f)
-                verticalLineTo(4.0f)
-                close()
-                moveTo(9.0f, 20.0f)
-                horizontalLineTo(4.0f)
-                verticalLineTo(4.0f)
-                horizontalLineToRelative(5.0f)
-                verticalLineToRelative(2.0f)
-                horizontalLineTo(6.0f)
-                verticalLineToRelative(12.0f)
-                horizontalLineToRelative(3.0f)
-                verticalLineTo(20.0f)
-                close()
-                moveTo(13.0f, 16.0f)
-                horizontalLineToRelative(-2.0f)
-                verticalLineTo(8.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineTo(16.0f)
-                close()
-            }
-        }.build()
-        return _dataArray!!
+val Ico.DataArray: ImageVector
+  get() {
+    if (_DataArray != null) {
+      return _DataArray!!
     }
+    _DataArray =
+      ImageVector.Builder(
+          name = "DataArray",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(15f, 20f)
+            verticalLineTo(18f)
+            horizontalLineToRelative(3f)
+            verticalLineTo(6f)
+            horizontalLineTo(15f)
+            verticalLineTo(4f)
+            horizontalLineToRelative(5f)
+            verticalLineTo(20f)
+            horizontalLineTo(15f)
+            close()
+            moveTo(4f, 20f)
+            verticalLineTo(4f)
+            horizontalLineTo(9f)
+            verticalLineTo(6f)
+            horizontalLineTo(6f)
+            verticalLineTo(18f)
+            horizontalLineTo(9f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(4f)
+            close()
+          }
+        }
+        .build()
+    return _DataArray!!
+  }
+
+private var _DataArray: ImageVector? = null

@@ -3,45 +3,63 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _syncAlt: ImageVector? = null
-
-val IconsData.SyncAlt: ImageVector
-    get() {
-        if (_syncAlt != null) return _syncAlt!!
-        _syncAlt = ImageVector.Builder(
-            name = "SyncAlt",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).path(
-            fill = SolidColor(Color(0xFF000000)),
-            pathFillType = PathFillType.NonZero
-        ) {
-            moveTo(18.0f, 12.0f)
-            lineToRelative(-1.41f, 1.41f)
-            lineTo(18.17f, 15.0f)
-            horizontalLineTo(7.0f)
-            verticalLineToRelative(2.0f)
-            horizontalLineToRelative(11.17f)
-            lineToRelative(-1.58f, 1.59f)
-            lineTo(18.0f, 20.0f)
-            lineToRelative(4.0f, -4.0f)
-            close()
-            moveTo(6.0f, 12.0f)
-            lineToRelative(-4.0f, 4.0f)
-            lineToRelative(4.0f, 4.0f)
-            lineToRelative(1.41f, -1.41f)
-            lineTo(5.83f, 17.0f)
-            horizontalLineTo(17.0f)
-            verticalLineToRelative(-2.0f)
-            horizontalLineTo(5.83f)
-            lineToRelative(1.58f, -1.59f)
-            close()
-        }.build()
-        return _syncAlt!!
+val Ico.SyncAlt: ImageVector
+  get() {
+    if (_SyncAlt != null) {
+      return _SyncAlt!!
     }
+    _SyncAlt =
+      ImageVector.Builder(
+          name = "SyncAlt",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(7f, 21f)
+            lineTo(2f, 16f)
+            lineTo(7f, 11f)
+            lineToRelative(1.43f, 1.4f)
+            lineTo(5.83f, 15f)
+            horizontalLineTo(21f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(5.83f)
+            lineToRelative(2.6f, 2.6f)
+            lineTo(7f, 21f)
+            close()
+            moveTo(17f, 13f)
+            lineTo(15.58f, 11.6f)
+            lineTo(18.18f, 9f)
+            horizontalLineTo(3f)
+            verticalLineTo(7f)
+            horizontalLineTo(18.18f)
+            lineTo(15.58f, 4.4f)
+            lineTo(17f, 3f)
+            lineToRelative(5f, 5f)
+            lineToRelative(-5f, 5f)
+            close()
+          }
+        }
+        .build()
+    return _SyncAlt!!
+  }
+
+private var _SyncAlt: ImageVector? = null

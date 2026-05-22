@@ -3,61 +3,78 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _history: ImageVector? = null
-
-val IconsData.History: ImageVector
-    get() {
-        if (_history != null) return _history!!
-        _history = ImageVector.Builder(
-            name = "History",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(12.5f, 15.25f)
-                lineTo(15.9f, 11.85f)
-                lineTo(14.85f, 10.8f)
-                lineTo(12.0f, 13.65f)
-                verticalLineTo(8.0f)
-                horizontalLineTo(10.5f)
-                verticalLineTo(14.25f)
-                lineTo(12.5f, 15.25f)
-                close()
-                moveTo(12.02f, 20.0f)
-                curveToRelative(-1.88f, 0.0f, -3.54f, -0.55f, -4.98f, -1.65f)
-                curveToRelative(-1.44f, -1.1f, -2.43f, -2.53f, -2.97f, -4.3f)
-                horizontalLineTo(5.62f)
-                curveToRelative(0.52f, 1.37f, 1.4f, 2.47f, 2.65f, 3.32f)
-                curveToRelative(1.25f, 0.85f, 2.58f, 1.28f, 4.02f, 1.28f)
-                curveToRelative(2.05f, 0.0f, 3.79f, -0.72f, 5.22f, -2.15f)
-                curveToRelative(1.43f, -1.43f, 2.15f, -3.17f, 2.15f, -5.22f)
-                curveToRelative(0.0f, -2.05f, -0.72f, -3.79f, -2.15f, -5.22f)
-                curveToRelative(-1.43f, -1.43f, -3.17f, -2.15f, -5.22f, -2.15f)
-                curveToRelative(-1.27f, 0.0f, -2.43f, 0.38f, -3.48f, 1.15f)
-                curveToRelative(-1.05f, 0.77f, -1.87f, 1.77f, -2.45f, 3.0f)
-                lineTo(9.5f, 8.05f)
-                verticalLineTo(4.0f)
-                horizontalLineTo(4.0f)
-                verticalLineTo(9.5f)
-                horizontalLineTo(9.5f)
-                lineTo(7.35f, 7.35f)
-                curveToRelative(0.48f, -0.92f, 1.14f, -1.66f, 1.98f, -2.23f)
-                curveToRelative(0.84f, -0.57f, 1.73f, -0.85f, 2.67f, -0.85f)
-                curveToRelative(1.63f, 0.0f, 3.03f, 0.58f, 4.18f, 1.72f)
-                curveToRelative(1.15f, 1.14f, 1.72f, 2.54f, 1.72f, 4.18f)
-                curveToRelative(0.0f, 1.63f, -0.58f, 3.03f, -1.72f, 4.18f)
-                curveToRelative(-1.14f, 1.15f, -2.54f, 1.72f, -4.18f, 1.72f)
-                close()
-            }
-        }.build()
-        return _history!!
+val Ico.History: ImageVector
+  get() {
+    if (_History != null) {
+      return _History!!
     }
+    _History =
+      ImageVector.Builder(
+          name = "History",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(12f, 21f)
+            quadTo(8.55f, 21f, 5.99f, 18.71f)
+            quadTo(3.43f, 16.43f, 3.05f, 13f)
+            horizontalLineTo(5.1f)
+            quadToRelative(0.35f, 2.6f, 2.31f, 4.3f)
+            reflectiveQuadTo(12f, 19f)
+            quadToRelative(2.93f, 0f, 4.96f, -2.04f)
+            quadTo(19f, 14.93f, 19f, 12f)
+            quadTo(19f, 9.07f, 16.96f, 7.04f)
+            reflectiveQuadTo(12f, 5f)
+            quadTo(10.28f, 5f, 8.78f, 5.8f)
+            reflectiveQuadTo(6.25f, 8f)
+            horizontalLineTo(9f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(3f)
+            verticalLineTo(4f)
+            horizontalLineTo(5f)
+            verticalLineTo(6.35f)
+            quadTo(6.28f, 4.75f, 8.11f, 3.88f)
+            reflectiveQuadTo(12f, 3f)
+            quadToRelative(1.88f, 0f, 3.51f, 0.71f)
+            reflectiveQuadToRelative(2.85f, 1.93f)
+            reflectiveQuadToRelative(1.93f, 2.85f)
+            reflectiveQuadTo(21f, 12f)
+            reflectiveQuadToRelative(-0.71f, 3.51f)
+            reflectiveQuadToRelative(-1.93f, 2.85f)
+            reflectiveQuadToRelative(-2.85f, 1.93f)
+            reflectiveQuadTo(12f, 21f)
+            close()
+            moveToRelative(2.8f, -4.8f)
+            lineTo(11f, 12.4f)
+            verticalLineTo(7f)
+            horizontalLineToRelative(2f)
+            verticalLineToRelative(4.6f)
+            lineToRelative(3.2f, 3.2f)
+            lineToRelative(-1.4f, 1.4f)
+            close()
+          }
+        }
+        .build()
+    return _History!!
+  }
+
+private var _History: ImageVector? = null

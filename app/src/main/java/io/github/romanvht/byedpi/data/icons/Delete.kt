@@ -3,62 +3,81 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _delete: ImageVector? = null
-
-val IconsData.Delete: ImageVector
-    get() {
-        if (_delete != null) return _delete!!
-        _delete = ImageVector.Builder(
-            name = "Delete",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(7.0f, 21.0f)
-                quadToRelative(-0.825f, 0.0f, -1.412f, -0.587f)
-                quadTo(5.0f, 19.825f, 5.0f, 19.0f)
-                verticalLineTo(6.0f)
-                horizontalLineTo(4.0f)
-                verticalLineTo(4.0f)
-                horizontalLineToRelative(5.0f)
-                verticalLineTo(3.0f)
-                horizontalLineToRelative(6.0f)
-                verticalLineToRelative(1.0f)
-                horizontalLineToRelative(5.0f)
-                verticalLineToRelative(2.0f)
-                horizontalLineToRelative(-1.0f)
-                verticalLineToRelative(13.0f)
-                quadToRelative(0.0f, 0.825f, -0.587f, 1.413f)
-                quadTo(17.825f, 21.0f, 17.0f, 21.0f)
-                close()
-                moveTo(17.0f, 6.0f)
-                horizontalLineTo(7.0f)
-                verticalLineToRelative(13.0f)
-                horizontalLineToRelative(10.0f)
-                close()
-                moveTo(9.0f, 17.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineTo(8.0f)
-                horizontalLineTo(9.0f)
-                close()
-                moveTo(13.0f, 17.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineTo(8.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-                moveTo(7.0f, 6.0f)
-                verticalLineToRelative(13.0f)
-                close()
-            }
-        }.build()
-        return _delete!!
+val Ico.Delete: ImageVector
+  get() {
+    if (_Delete != null) {
+      return _Delete!!
     }
+    _Delete =
+      ImageVector.Builder(
+          name = "Delete",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(7f, 21f)
+            quadTo(6.18f, 21f, 5.59f, 20.41f)
+            reflectiveQuadTo(5f, 19f)
+            verticalLineTo(6f)
+            horizontalLineTo(4f)
+            verticalLineTo(4f)
+            horizontalLineTo(9f)
+            verticalLineTo(3f)
+            horizontalLineToRelative(6f)
+            verticalLineTo(4f)
+            horizontalLineToRelative(5f)
+            verticalLineTo(6f)
+            horizontalLineTo(19f)
+            verticalLineTo(19f)
+            quadToRelative(0f, 0.82f, -0.59f, 1.41f)
+            reflectiveQuadTo(17f, 21f)
+            horizontalLineTo(7f)
+            close()
+            moveTo(17f, 6f)
+            horizontalLineTo(7f)
+            verticalLineTo(19f)
+            horizontalLineTo(17f)
+            verticalLineTo(6f)
+            close()
+            moveTo(9f, 17f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(8f)
+            horizontalLineTo(9f)
+            verticalLineToRelative(9f)
+            close()
+            moveToRelative(4f, 0f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(8f)
+            horizontalLineTo(13f)
+            verticalLineToRelative(9f)
+            close()
+            moveTo(7f, 6f)
+            verticalLineTo(19f)
+            verticalLineTo(6f)
+            close()
+          }
+        }
+        .build()
+    return _Delete!!
+  }
+
+private var _Delete: ImageVector? = null

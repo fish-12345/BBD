@@ -114,7 +114,7 @@ fun MainScreen(
                             text = { Text(stringResource(R.string.save_logs)) },
                             leadingIcon = {
                                 Icon(
-                                    IconsData.BugReport,
+                                    Ico.BugReport,
                                     contentDescription = null
                                 )
                             },
@@ -154,7 +154,7 @@ fun MainScreen(
             val actions = remember(preferredMode, viewModel.isCmdEnabled, isRunning) {
                 listOf(
                     DashboardAction(
-                        icon = if (viewModel.isCmdEnabled) IconsData.Terminal else IconsData.EditNote,
+                        icon = if (viewModel.isCmdEnabled) Ico.Terminal else Ico.EditNote,
                         label = R.string.editor,
                         onClick = { viewModel.performActionIfStopped(onOpenEditor) },
                         enabled = !isRunning
@@ -166,7 +166,7 @@ fun MainScreen(
                         enabled = !isRunning
                     ),
                     DashboardAction(
-                        icon = if (preferredMode == Mode.VPN) IconsData.VpnKey else IconsData.Router,
+                        icon = if (preferredMode == Mode.VPN) Ico.VpnKey else Ico.Router,
                         label = if (preferredMode == Mode.VPN) R.string.vpn_mode else R.string.proxy_mode,
                         onClick = {
                             val newMode = if (preferredMode == Mode.VPN) Mode.Proxy else Mode.VPN
@@ -588,7 +588,7 @@ fun StatusButton(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = IconsData.PowerSettingsNew,
+                    imageVector = Ico.PowerSettingsNew,
                     contentDescription = stringResource(if (isRunning) R.string.status_connected else R.string.status_disconnected),
                     modifier = Modifier.size(80.dp),
                     tint = iconColor
@@ -675,7 +675,7 @@ fun StatusText(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = IconsData.ArrowDownward,
+                                    imageVector = Ico.ArrowDownward,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.primary
@@ -697,7 +697,7 @@ fun StatusText(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = IconsData.ArrowUpward,
+                                    imageVector = Ico.ArrowUpward,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.secondary

@@ -3,61 +3,83 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _hourglassEmpty: ImageVector? = null
-
-val IconsData.HourglassEmpty: ImageVector
-    get() {
-        if (_hourglassEmpty != null) return _hourglassEmpty!!
-        _hourglassEmpty = ImageVector.Builder(
-            name = "HourglassEmpty",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(6.0f, 2.0f)
-                verticalLineToRelative(6.0f)
-                horizontalLineToRelative(0.01f)
-                lineTo(6.0f, 8.01f)
-                lineTo(10.0f, 12.0f)
-                lineToRelative(-4.0f, 4.0f)
-                lineToRelative(0.01f, 0.01f)
-                horizontalLineTo(6.0f)
-                verticalLineTo(22.0f)
-                horizontalLineToRelative(12.0f)
-                verticalLineToRelative(-5.99f)
-                horizontalLineToRelative(-0.01f)
-                lineTo(18.0f, 16.0f)
-                lineToRelative(-4.0f, -4.0f)
-                lineToRelative(4.0f, -3.99f)
-                lineToRelative(-0.01f, -0.01f)
-                horizontalLineTo(18.0f)
-                verticalLineTo(2.0f)
-                horizontalLineTo(6.0f)
-                close()
-                moveTo(16.0f, 16.5f)
-                verticalLineTo(20.0f)
-                horizontalLineTo(8.0f)
-                verticalLineToRelative(-3.5f)
-                lineToRelative(4.0f, -4.0f)
-                lineToRelative(4.0f, 4.0f)
-                close()
-                moveTo(12.0f, 11.5f)
-                lineToRelative(-4.0f, -4.0f)
-                verticalLineTo(4.0f)
-                horizontalLineToRelative(8.0f)
-                verticalLineToRelative(3.5f)
-                lineToRelative(-4.0f, 4.0f)
-                close()
-            }
-        }.build()
-        return _hourglassEmpty!!
+val Ico.HourglassEmpty: ImageVector
+  get() {
+    if (_HourglassEmpty != null) {
+      return _HourglassEmpty!!
     }
+    _HourglassEmpty =
+      ImageVector.Builder(
+          name = "HourglassEmpty",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(8f, 20f)
+            horizontalLineToRelative(8f)
+            verticalLineTo(17f)
+            quadToRelative(0f, -1.65f, -1.17f, -2.83f)
+            reflectiveQuadTo(12f, 13f)
+            reflectiveQuadTo(9.18f, 14.18f)
+            reflectiveQuadTo(8f, 17f)
+            verticalLineToRelative(3f)
+            close()
+            moveTo(14.83f, 9.82f)
+            quadTo(16f, 8.65f, 16f, 7f)
+            verticalLineTo(4f)
+            horizontalLineTo(8f)
+            verticalLineTo(7f)
+            quadTo(8f, 8.65f, 9.18f, 9.82f)
+            reflectiveQuadTo(12f, 11f)
+            reflectiveQuadTo(14.83f, 9.82f)
+            close()
+            moveTo(4f, 22f)
+            verticalLineTo(20f)
+            horizontalLineTo(6f)
+            verticalLineTo(17f)
+            quadTo(6f, 15.48f, 6.71f, 14.14f)
+            reflectiveQuadTo(8.7f, 12f)
+            quadTo(7.43f, 11.2f, 6.71f, 9.86f)
+            reflectiveQuadTo(6f, 7f)
+            verticalLineTo(4f)
+            horizontalLineTo(4f)
+            verticalLineTo(2f)
+            horizontalLineTo(20f)
+            verticalLineTo(4f)
+            horizontalLineTo(18f)
+            verticalLineTo(7f)
+            quadToRelative(0f, 1.52f, -0.71f, 2.86f)
+            reflectiveQuadTo(15.3f, 12f)
+            quadToRelative(1.27f, 0.8f, 1.99f, 2.14f)
+            reflectiveQuadTo(18f, 17f)
+            verticalLineToRelative(3f)
+            horizontalLineToRelative(2f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(4f)
+            close()
+          }
+        }
+        .build()
+    return _HourglassEmpty!!
+  }
+
+private var _HourglassEmpty: ImageVector? = null

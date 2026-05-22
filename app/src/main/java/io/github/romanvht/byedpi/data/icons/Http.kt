@@ -3,74 +3,93 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _http: ImageVector? = null
-
-val IconsData.Http: ImageVector
-    get() {
-        if (_http != null) return _http!!
-        _http = ImageVector.Builder(
-            name = "Http",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(4.5f, 11.0f)
-                horizontalLineToRelative(-2.0f)
-                verticalLineTo(9.0f)
-                horizontalLineTo(1.0f)
-                verticalLineToRelative(6.0f)
-                horizontalLineTo(1.5f)
-                verticalLineToRelative(-2.5f)
-                horizontalLineToRelative(2.0f)
-                verticalLineTo(15.0f)
-                horizontalLineTo(6.0f)
-                verticalLineTo(9.0f)
-                horizontalLineTo(4.5f)
-                close()
-                
-                moveTo(7.0f, 10.5f)
-                horizontalLineToRelative(1.5f)
-                verticalLineTo(15.0f)
-                horizontalLineTo(10.0f)
-                verticalLineToRelative(-4.5f)
-                horizontalLineToRelative(1.5f)
-                verticalLineTo(9.0f)
-                horizontalLineTo(7.0f)
-                close()
-                
-                moveTo(12.5f, 10.5f)
-                horizontalLineToRelative(1.5f)
-                verticalLineTo(15.0f)
-                horizontalLineTo(15.5f)
-                verticalLineToRelative(-4.5f)
-                horizontalLineTo(17.0f)
-                verticalLineTo(9.0f)
-                horizontalLineToRelative(-4.5f)
-                close()
-                
-                moveTo(18.0f, 9.0f)
-                verticalLineToRelative(4.5f)
-                horizontalLineToRelative(2.5f)
-                curveToRelative(0.83f, 0.0f, 1.5f, -0.67f, 1.5f, -1.5f)
-                verticalLineToRelative(-1.5f)
-                curveToRelative(0.0f, -0.83f, -0.67f, -1.5f, -1.5f, -1.5f)
-                horizontalLineTo(18.0f)
-                close()
-                moveTo(20.5f, 12.0f)
-                horizontalLineToRelative(-1.0f)
-                verticalLineToRelative(-1.5f)
-                horizontalLineToRelative(1.0f)
-                close()
-            }
-        }.build()
-        return _http!!
+val Ico.Http: ImageVector
+  get() {
+    if (_Http != null) {
+      return _Http!!
     }
+    _Http =
+      ImageVector.Builder(
+          name = "Http",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(1f, 15f)
+            verticalLineTo(9f)
+            horizontalLineTo(2.5f)
+            verticalLineToRelative(2f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(9f)
+            horizontalLineTo(6f)
+            verticalLineToRelative(6f)
+            horizontalLineTo(4.5f)
+            verticalLineTo(12.5f)
+            horizontalLineToRelative(-2f)
+            verticalLineTo(15f)
+            horizontalLineTo(1f)
+            close()
+            moveToRelative(7.5f, 0f)
+            verticalLineTo(10.5f)
+            horizontalLineTo(7f)
+            verticalLineTo(9f)
+            horizontalLineToRelative(4.5f)
+            verticalLineToRelative(1.5f)
+            horizontalLineTo(10f)
+            verticalLineTo(15f)
+            horizontalLineTo(8.5f)
+            close()
+            moveTo(14f, 15f)
+            verticalLineTo(10.5f)
+            horizontalLineTo(12.5f)
+            verticalLineTo(9f)
+            horizontalLineTo(17f)
+            verticalLineToRelative(1.5f)
+            horizontalLineTo(15.5f)
+            verticalLineTo(15f)
+            horizontalLineTo(14f)
+            close()
+            moveToRelative(4f, 0f)
+            verticalLineTo(9f)
+            horizontalLineToRelative(3.5f)
+            quadToRelative(0.6f, 0f, 1.05f, 0.45f)
+            reflectiveQuadTo(23f, 10.5f)
+            verticalLineToRelative(1f)
+            quadToRelative(0f, 0.6f, -0.45f, 1.05f)
+            reflectiveQuadTo(21.5f, 13f)
+            horizontalLineToRelative(-2f)
+            verticalLineToRelative(2f)
+            horizontalLineTo(18f)
+            close()
+            moveToRelative(1.5f, -3.5f)
+            horizontalLineToRelative(2f)
+            verticalLineToRelative(-1f)
+            horizontalLineToRelative(-2f)
+            verticalLineToRelative(1f)
+            close()
+          }
+        }
+        .build()
+    return _Http!!
+  }
+
+private var _Http: ImageVector? = null

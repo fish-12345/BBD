@@ -3,36 +3,51 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _spaceBar: ImageVector? = null
-
-val IconsData.SpaceBar: ImageVector
-    get() {
-        if (_spaceBar != null) return _spaceBar!!
-        _spaceBar = ImageVector.Builder(
-            name = "SpaceBar",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(18.0f, 9.0f)
-                verticalLineToRelative(4.0f)
-                horizontalLineTo(6.0f)
-                verticalLineTo(9.0f)
-                horizontalLineTo(4.0f)
-                verticalLineToRelative(6.0f)
-                horizontalLineToRelative(16.0f)
-                verticalLineTo(9.0f)
-                close()
-            }
-        }.build()
-        return _spaceBar!!
+val Ico.SpaceBar: ImageVector
+  get() {
+    if (_SpaceBar != null) {
+      return _SpaceBar!!
     }
+    _SpaceBar =
+      ImageVector.Builder(
+          name = "SpaceBar",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(4f, 15f)
+            verticalLineTo(9f)
+            horizontalLineTo(6f)
+            verticalLineToRelative(4f)
+            horizontalLineTo(18f)
+            verticalLineTo(9f)
+            horizontalLineToRelative(2f)
+            verticalLineToRelative(6f)
+            horizontalLineTo(4f)
+            close()
+          }
+        }
+        .build()
+    return _SpaceBar!!
+  }
+
+private var _SpaceBar: ImageVector? = null

@@ -3,35 +3,75 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _nightlight: ImageVector? = null
-
-val IconsData.Nightlight: ImageVector
-    get() {
-        if (_nightlight != null) return _nightlight!!
-        _nightlight = ImageVector.Builder(
-            name = "Nightlight",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(11.1f, 12.08f)
-                curveToRelative(0.0f, -2.26f, 1.01f, -4.28f, 2.6f, -5.64f)
-                curveToRelative(-0.83f, -0.28f, -1.73f, -0.44f, -2.67f, -0.44f)
-                curveToRelative(-2.78f, 0.0f, -5.03f, 2.25f, -5.03f, 5.03f)
-                curveToRelative(0.0f, 2.78f, 2.25f, 5.03f, 5.03f, 5.03f)
-                curveToRelative(0.94f, 0.0f, 1.84f, -0.16f, 2.67f, -0.44f)
-                curveToRelative(-1.59f, -1.36f, -2.6f, -3.38f, -2.6f, -3.54f)
-                close()
-            }
-        }.build()
-        return _nightlight!!
+val Ico.Nightlight: ImageVector
+  get() {
+    if (_Nightlight != null) {
+      return _Nightlight!!
     }
+    _Nightlight =
+      ImageVector.Builder(
+          name = "Nightlight",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(14f, 22f)
+            quadToRelative(-2.05f, 0f, -3.88f, -0.79f)
+            quadTo(8.3f, 20.43f, 6.94f, 19.06f)
+            quadTo(5.58f, 17.7f, 4.79f, 15.88f)
+            reflectiveQuadTo(4f, 11.99f)
+            reflectiveQuadTo(4.79f, 8.11f)
+            reflectiveQuadTo(6.94f, 4.94f)
+            reflectiveQuadTo(10.13f, 2.79f)
+            reflectiveQuadTo(14f, 2f)
+            quadToRelative(1.35f, 0f, 2.63f, 0.35f)
+            reflectiveQuadToRelative(2.38f, 1f)
+            quadTo(16.73f, 4.67f, 15.36f, 6.94f)
+            reflectiveQuadTo(14f, 12f)
+            reflectiveQuadToRelative(1.36f, 5.06f)
+            reflectiveQuadTo(19f, 20.65f)
+            quadToRelative(-1.1f, 0.65f, -2.38f, 1f)
+            reflectiveQuadTo(14f, 22f)
+            close()
+            moveToRelative(0f, -2f)
+            quadToRelative(0.28f, 0f, 0.53f, 0f)
+            reflectiveQuadTo(15f, 19.95f)
+            quadTo(13.58f, 18.3f, 12.79f, 16.26f)
+            quadTo(12f, 14.23f, 12f, 12f)
+            quadTo(12f, 9.77f, 12.79f, 7.74f)
+            reflectiveQuadTo(15f, 4.05f)
+            quadTo(14.78f, 4f, 14.53f, 4f)
+            reflectiveQuadTo(14f, 4f)
+            quadTo(10.68f, 4f, 8.34f, 6.34f)
+            reflectiveQuadTo(6f, 12f)
+            reflectiveQuadToRelative(2.34f, 5.66f)
+            reflectiveQuadTo(14f, 20f)
+            close()
+            moveTo(12f, 12f)
+            close()
+          }
+        }
+        .build()
+    return _Nightlight!!
+  }
+
+private var _Nightlight: ImageVector? = null

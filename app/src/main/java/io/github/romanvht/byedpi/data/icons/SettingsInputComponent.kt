@@ -3,92 +3,149 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _settingsInputComponent: ImageVector? = null
-
-val IconsData.SettingsInputComponent: ImageVector
-    get() {
-        if (_settingsInputComponent != null) return _settingsInputComponent!!
-        _settingsInputComponent = ImageVector.Builder(
-            name = "SettingsInputComponent",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(2.0f, 21.0f)
-                verticalLineToRelative(-12.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(12.0f)
-                close()
-                moveTo(4.0f, 19.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-10.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-
-                moveTo(10.0f, 21.0f)
-                verticalLineToRelative(-12.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(12.0f)
-                close()
-                moveTo(12.0f, 19.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-10.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-
-                moveTo(18.0f, 21.0f)
-                verticalLineToRelative(-12.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(12.0f)
-                close()
-                moveTo(20.0f, 19.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-10.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-
-                moveTo(2.0f, 7.0f)
-                verticalLineToRelative(-4.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(4.0f)
-                close()
-                moveTo(4.0f, 5.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-2.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-
-                moveTo(10.0f, 7.0f)
-                verticalLineToRelative(-4.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(4.0f)
-                close()
-                moveTo(12.0f, 5.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-2.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-
-                moveTo(18.0f, 7.0f)
-                verticalLineToRelative(-4.0f)
-                horizontalLineToRelative(4.0f)
-                verticalLineToRelative(4.0f)
-                close()
-                moveTo(20.0f, 5.0f)
-                horizontalLineToRelative(2.0f)
-                verticalLineToRelative(-2.0f)
-                horizontalLineToRelative(-2.0f)
-                close()
-            }
-        }.build()
-        return _settingsInputComponent!!
+val Ico.SettingsInputComponent: ImageVector
+  get() {
+    if (_SettingsInputComponent != null) {
+      return _SettingsInputComponent!!
     }
+    _SettingsInputComponent =
+      ImageVector.Builder(
+          name = "SettingsInputComponent",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(3f, 23f)
+            verticalLineTo(18.8f)
+            quadTo(2.13f, 18.5f, 1.56f, 17.74f)
+            reflectiveQuadTo(1f, 16f)
+            verticalLineTo(6f)
+            horizontalLineTo(3f)
+            verticalLineTo(2f)
+            quadTo(3f, 1.57f, 3.29f, 1.29f)
+            reflectiveQuadTo(4f, 1f)
+            reflectiveQuadTo(4.71f, 1.29f)
+            reflectiveQuadTo(5f, 2f)
+            verticalLineTo(6f)
+            horizontalLineTo(7f)
+            verticalLineTo(16f)
+            quadToRelative(0f, 0.98f, -0.56f, 1.74f)
+            reflectiveQuadTo(5f, 18.8f)
+            verticalLineTo(23f)
+            horizontalLineTo(3f)
+            close()
+            moveToRelative(8f, 0f)
+            verticalLineTo(18.8f)
+            quadTo(10.13f, 18.5f, 9.56f, 17.74f)
+            reflectiveQuadTo(9f, 16f)
+            verticalLineTo(6f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(2f)
+            quadTo(11f, 1.57f, 11.29f, 1.29f)
+            reflectiveQuadTo(12f, 1f)
+            reflectiveQuadToRelative(0.71f, 0.29f)
+            reflectiveQuadTo(13f, 2f)
+            verticalLineTo(6f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(16f)
+            quadToRelative(0f, 0.98f, -0.56f, 1.74f)
+            reflectiveQuadTo(13f, 18.8f)
+            verticalLineTo(23f)
+            horizontalLineTo(11f)
+            close()
+            moveToRelative(8f, 0f)
+            verticalLineTo(18.8f)
+            quadTo(18.13f, 18.5f, 17.56f, 17.74f)
+            reflectiveQuadTo(17f, 16f)
+            verticalLineTo(6f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(2f)
+            quadTo(19f, 1.57f, 19.29f, 1.29f)
+            reflectiveQuadTo(20f, 1f)
+            quadToRelative(0.43f, 0f, 0.71f, 0.29f)
+            reflectiveQuadTo(21f, 2f)
+            verticalLineTo(6f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(16f)
+            quadToRelative(0f, 0.98f, -0.56f, 1.74f)
+            reflectiveQuadTo(21f, 18.8f)
+            verticalLineTo(23f)
+            horizontalLineTo(19f)
+            close()
+            moveTo(3f, 8f)
+            verticalLineToRelative(4f)
+            horizontalLineTo(5f)
+            verticalLineTo(8f)
+            horizontalLineTo(3f)
+            close()
+            moveToRelative(8f, 0f)
+            verticalLineToRelative(4f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(8f)
+            horizontalLineTo(11f)
+            close()
+            moveToRelative(8f, 0f)
+            verticalLineToRelative(4f)
+            horizontalLineToRelative(2f)
+            verticalLineTo(8f)
+            horizontalLineTo(19f)
+            close()
+            moveTo(4f, 17f)
+            quadToRelative(0.42f, 0f, 0.71f, -0.29f)
+            quadTo(5f, 16.43f, 5f, 16f)
+            verticalLineTo(14f)
+            horizontalLineTo(3f)
+            verticalLineToRelative(2f)
+            quadToRelative(0f, 0.43f, 0.29f, 0.71f)
+            reflectiveQuadTo(4f, 17f)
+            close()
+            moveToRelative(8f, 0f)
+            quadToRelative(0.43f, 0f, 0.71f, -0.29f)
+            quadTo(13f, 16.43f, 13f, 16f)
+            verticalLineTo(14f)
+            horizontalLineTo(11f)
+            verticalLineToRelative(2f)
+            quadToRelative(0f, 0.43f, 0.29f, 0.71f)
+            reflectiveQuadTo(12f, 17f)
+            close()
+            moveToRelative(8f, 0f)
+            quadToRelative(0.43f, 0f, 0.71f, -0.29f)
+            quadTo(21f, 16.43f, 21f, 16f)
+            verticalLineTo(14f)
+            horizontalLineTo(19f)
+            verticalLineToRelative(2f)
+            quadToRelative(0f, 0.43f, 0.29f, 0.71f)
+            reflectiveQuadTo(20f, 17f)
+            close()
+            moveTo(4f, 13f)
+            close()
+            moveToRelative(8f, 0f)
+            close()
+            moveToRelative(8f, 0f)
+            close()
+          }
+        }
+        .build()
+    return _SettingsInputComponent!!
+  }
+
+private var _SettingsInputComponent: ImageVector? = null

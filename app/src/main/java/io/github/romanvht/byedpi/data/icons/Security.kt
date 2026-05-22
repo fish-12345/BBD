@@ -3,43 +3,63 @@ package io.github.romanvht.byedpi.data.icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private var _security: ImageVector? = null
-
-val IconsData.Security: ImageVector
-    get() {
-        if (_security != null) return _security!!
-        _security = ImageVector.Builder(
-            name = "Security",
-            defaultWidth = 24.0.dp,
-            defaultHeight = 24.0.dp,
-            viewportWidth = 24.0f,
-            viewportHeight = 24.0f
-        ).apply {
-            path(
-                fill = SolidColor(Color(0xFF000000)),
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(12.0f, 1.0f)
-                lineTo(3.0f, 5.0f)
-                verticalLineToRelative(6.0f)
-                curveToRelative(0.0f, 5.55f, 3.84f, 10.74f, 9.0f, 12.0f)
-                curveToRelative(5.16f, -1.26f, 9.0f, -6.45f, 9.0f, -12.0f)
-                verticalLineTo(5.0f)
-                lineTo(12.0f, 1.0f)
-                close()
-                moveTo(19.0f, 11.0f)
-                curveToRelative(0.0f, 4.52f, -2.98f, 8.69f, -7.0f, 9.93f)
-                curveToRelative(-4.02f, -1.24f, -7.0f, -5.41f, -7.0f, -9.93f)
-                verticalLineTo(6.3f)
-                lineToRelative(7.0f, -3.11f)
-                lineToRelative(7.0f, 3.11f)
-                verticalLineTo(11.0f)
-                close()
-            }
-        }.build()
-        return _security!!
+val Ico.Security: ImageVector
+  get() {
+    if (_Security != null) {
+      return _Security!!
     }
+    _Security =
+      ImageVector.Builder(
+          name = "Security",
+          defaultWidth = 24.dp,
+          defaultHeight = 24.dp,
+          viewportWidth = 24f,
+          viewportHeight = 24f,
+        )
+        .apply {
+          path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1f,
+            stroke = null,
+            strokeAlpha = 1f,
+            strokeLineWidth = 1f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Bevel,
+            strokeLineMiter = 1f,
+            pathFillType = PathFillType.NonZero,
+          ) {
+            moveTo(12f, 22f)
+            quadTo(8.53f, 21.13f, 6.26f, 18.01f)
+            reflectiveQuadTo(4f, 11.1f)
+            verticalLineTo(5f)
+            lineTo(12f, 2f)
+            lineToRelative(8f, 3f)
+            verticalLineToRelative(6.1f)
+            quadToRelative(0f, 3.8f, -2.26f, 6.91f)
+            reflectiveQuadTo(12f, 22f)
+            close()
+            moveToRelative(0f, -2.1f)
+            quadToRelative(2.43f, -0.75f, 4.05f, -2.96f)
+            reflectiveQuadTo(17.95f, 12f)
+            horizontalLineTo(12f)
+            verticalLineTo(4.13f)
+            lineTo(6f, 6.38f)
+            verticalLineTo(11.1f)
+            quadToRelative(0f, 0.28f, 0f, 0.45f)
+            quadTo(6f, 11.73f, 6.05f, 12f)
+            horizontalLineTo(12f)
+            verticalLineToRelative(7.9f)
+            close()
+          }
+        }
+        .build()
+    return _Security!!
+  }
+
+private var _Security: ImageVector? = null

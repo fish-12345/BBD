@@ -44,7 +44,7 @@ fun CmdSettingsScreen(
                 title = { Text(stringResource(R.string.command_line_editor)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(IconsData.ArrowBack, contentDescription = null)
+                        Icon(Ico.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -64,7 +64,7 @@ fun CmdSettingsScreen(
                         placeholder = stringResource(R.string.some_strategy),
                         value = viewModel.cmdArgs,
                         onValueChange = { viewModel.updateCmdArgs(it) },
-                        icon = IconsData.Terminal
+                        icon = Ico.Terminal
                     )
 
                     PreferenceItem(
@@ -79,13 +79,13 @@ fun CmdSettingsScreen(
                                 }
                             }
                         },
-                        icon = IconsData.ContentPaste
+                        icon = Ico.ContentPaste
                     )
 
                     PreferenceItem(
                         title = stringResource(R.string.cmd_args_clear),
                         onClick = { viewModel.clearCmdArgs() },
-                        icon = IconsData.Delete
+                        icon = Ico.Delete
                     )
                 }
             }
@@ -97,7 +97,7 @@ fun CmdSettingsScreen(
                             title = stringResource(R.string.cmd_history_delete_all),
                             summary = stringResource(R.string.cmd_history_title_summary),
                             onClick = { showClearHistoryDialog = true },
-                            icon = IconsData.ClearAll
+                            icon = Ico.ClearAll
                         )
 
                         val sortedHistory = viewModel.history.sortedWith(
@@ -117,14 +117,14 @@ fun CmdSettingsScreen(
                                 title = command.text,
                                 summary = summary.ifEmpty { null },
                                 onClick = { showActionDialog = command },
-                                icon = if (command.pinned) IconsData.PushPin else IconsData.History,
+                                icon = if (command.pinned) Ico.PushPin else Ico.History,
                                 trailing = {
                                     IconButton(onClick = {
                                         if (command.pinned) viewModel.unpinCommand(command.text)
                                         else viewModel.pinCommand(command.text)
                                     }) {
                                         Icon(
-                                            if (command.pinned) IconsData.PushPin else IconsData.PushPinOutlined,
+                                            if (command.pinned) Ico.PushPin else Ico.PushPin,
                                             contentDescription = null,
                                             tint = if (command.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -228,7 +228,7 @@ fun CmdSettingsScreen(
                 text = {
                     Column {
                         val actions = mutableListOf(
-                            Triple(stringResource(R.string.cmd_history_apply), IconsData.Terminal) {
+                            Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
                                 viewModel.updateCmdArgs(command.text)
                             }
                         )
@@ -246,11 +246,11 @@ fun CmdSettingsScreen(
                             Triple(editLabel, Icons.Default.Edit) {
                                 showEditDialog = command
                             },
-                            Triple(stringResource(R.string.cmd_history_copy), IconsData.ContentCopy) {
+                            Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
                             },
-                            Triple(stringResource(R.string.cmd_history_delete), IconsData.Delete) {
+                            Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
                                 viewModel.deleteCommand(command.text)
                             }
                         ))
@@ -293,7 +293,7 @@ fun CmdSettingsScreen(
                         modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
                     )
                     val actions = mutableListOf(
-                        Triple(stringResource(R.string.cmd_history_apply), IconsData.Terminal) {
+                        Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
                             viewModel.updateCmdArgs(command.text)
                         }
                     )
@@ -311,11 +311,11 @@ fun CmdSettingsScreen(
                         Triple(editLabel, Icons.Default.Edit) {
                             showEditDialog = command
                         },
-                        Triple(stringResource(R.string.cmd_history_copy), IconsData.ContentCopy) {
+                        Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
                         },
-                        Triple(stringResource(R.string.cmd_history_delete), IconsData.Delete) {
+                        Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
                             viewModel.deleteCommand(command.text)
                         }
                     ))

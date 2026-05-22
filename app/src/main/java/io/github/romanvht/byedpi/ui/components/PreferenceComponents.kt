@@ -99,7 +99,7 @@ fun NavigationPreference(
         }
 
         Icon(
-            imageVector = IconsData.ChevronRight,
+            imageVector = Ico.ChevronRight,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )

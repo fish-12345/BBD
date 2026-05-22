@@ -109,7 +109,7 @@ fun ProfilesScreen(
                     AutoSwitchCard(
                         title = wifiTitle,
                         profileName = wifiProfileName,
-                        icon = IconsData.Wifi,
+                        icon = Ico.Wifi,
                         isTv = isTv,
                         showChevron = viewModel.profiles.isNotEmpty(),
                         onClick = {
@@ -134,7 +134,7 @@ fun ProfilesScreen(
                     AutoSwitchCard(
                         title = mobileTitle,
                         profileName = mobileProfileName,
-                        icon = IconsData.SignalCellularAlt,
+                        icon = Ico.SignalCellularAlt,
                         isTv = isTv,
                         showChevron = viewModel.profiles.isNotEmpty(),
                         onClick = {
@@ -178,7 +178,7 @@ fun ProfilesScreen(
                                     onClick = onNavigateToTest,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(IconsData.BugReport, contentDescription = null)
+                                    Icon(Ico.BugReport, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(stringResource(R.string.title_test))
                                 }
