@@ -124,7 +124,7 @@ fun CmdSettingsScreen(
                                         else viewModel.pinCommand(command.text)
                                     }) {
                                         Icon(
-                                            if (command.pinned) Ico.PushPin else Ico.PushPin,
+                                            if (command.pinned) Ico.PushPin else Ico.PushPinOutlined,
                                             contentDescription = null,
                                             tint = if (command.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                         )

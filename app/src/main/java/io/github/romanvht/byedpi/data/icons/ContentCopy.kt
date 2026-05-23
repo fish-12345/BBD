@@ -48,12 +48,6 @@ val Ico.ContentCopy: ImageVector
             reflectiveQuadTo(18f, 18f)
             horizontalLineTo(9f)
             close()
-            moveTo(9f, 16f)
-            horizontalLineToRelative(9f)
-            verticalLineTo(4f)
-            horizontalLineTo(9f)
-            verticalLineTo(16f)
-            close()
             moveTo(5f, 22f)
             quadTo(4.18f, 22f, 3.59f, 21.41f)
             reflectiveQuadTo(3f, 20f)
@@ -63,10 +57,6 @@ val Ico.ContentCopy: ImageVector
             horizontalLineTo(16f)
             verticalLineToRelative(2f)
             horizontalLineTo(5f)
-            close()
-            moveTo(9f, 16f)
-            verticalLineTo(4f)
-            verticalLineTo(16f)
             close()
           }
         }

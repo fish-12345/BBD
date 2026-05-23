@@ -53,16 +53,6 @@ val Ico.PushPin: ImageVector
             horizontalLineTo(16f)
             verticalLineToRelative(7f)
             close()
-            moveTo(8.85f, 14f)
-            horizontalLineToRelative(6.3f)
-            lineTo(14f, 12.85f)
-            verticalLineTo(5f)
-            horizontalLineTo(10f)
-            verticalLineToRelative(7.85f)
-            lineTo(8.85f, 14f)
-            close()
-            moveTo(12f, 14f)
-            close()
           }
         }
         .build()

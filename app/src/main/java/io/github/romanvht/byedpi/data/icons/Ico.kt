@@ -70,6 +70,7 @@ object Ico {
             "Visibility" -> Visibility
             "VpnKey" -> VpnKey
             "Wifi" -> Wifi
+            "PushPinOutlined" -> PushPinOutlined
             else -> throw IllegalArgumentException("Unknown icon: $name")
         }
     }

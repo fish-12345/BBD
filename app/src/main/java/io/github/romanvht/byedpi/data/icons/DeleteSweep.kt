@@ -70,16 +70,6 @@ val Ico.DeleteSweep: ImageVector
             reflectiveQuadTo(3f, 17f)
             verticalLineTo(8f)
             close()
-            moveTo(5f, 8f)
-            verticalLineToRelative(9f)
-            horizontalLineToRelative(6f)
-            verticalLineTo(8f)
-            horizontalLineTo(5f)
-            close()
-            moveTo(5f, 8f)
-            verticalLineToRelative(9f)
-            verticalLineTo(8f)
-            close()
           }
         }
         .build()

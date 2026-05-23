@@ -67,18 +67,6 @@ val Ico.Timer: ImageVector
             reflectiveQuadTo(12f, 22f)
             reflectiveQuadTo(8.51f, 21.29f)
             close()
-            moveToRelative(8.44f, -3.34f)
-            quadTo(19f, 15.9f, 19f, 13f)
-            reflectiveQuadTo(16.95f, 8.05f)
-            reflectiveQuadTo(12f, 6f)
-            reflectiveQuadTo(7.05f, 8.05f)
-            reflectiveQuadTo(5f, 13f)
-            reflectiveQuadToRelative(2.05f, 4.95f)
-            reflectiveQuadTo(12f, 20f)
-            reflectiveQuadToRelative(4.95f, -2.05f)
-            close()
-            moveTo(12f, 13f)
-            close()
           }
         }
         .build()

@@ -52,12 +52,6 @@ val Ico.Delete: ImageVector
             reflectiveQuadTo(17f, 21f)
             horizontalLineTo(7f)
             close()
-            moveTo(17f, 6f)
-            horizontalLineTo(7f)
-            verticalLineTo(19f)
-            horizontalLineTo(17f)
-            verticalLineTo(6f)
-            close()
             moveTo(9f, 17f)
             horizontalLineToRelative(2f)
             verticalLineTo(8f)
@@ -69,10 +63,6 @@ val Ico.Delete: ImageVector
             verticalLineTo(8f)
             horizontalLineTo(13f)
             verticalLineToRelative(9f)
-            close()
-            moveTo(7f, 6f)
-            verticalLineTo(19f)
-            verticalLineTo(6f)
             close()
           }
         }

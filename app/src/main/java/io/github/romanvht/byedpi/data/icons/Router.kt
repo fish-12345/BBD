@@ -52,12 +52,6 @@ val Ico.Router: ImageVector
             reflectiveQuadTo(19f, 21f)
             horizontalLineTo(5f)
             close()
-            moveTo(5f, 19f)
-            horizontalLineTo(19f)
-            verticalLineTo(15f)
-            horizontalLineTo(5f)
-            verticalLineToRelative(4f)
-            close()
             moveTo(7.71f, 17.71f)
             quadTo(8f, 17.43f, 8f, 17f)
             reflectiveQuadTo(7.71f, 16.29f)
@@ -111,10 +105,6 @@ val Ico.Router: ImageVector
             reflectiveQuadTo(16f, 4f)
             reflectiveQuadTo(13.66f, 4.46f)
             quadTo(12.58f, 4.93f, 11.75f, 5.75f)
-            close()
-            moveTo(5f, 19f)
-            verticalLineTo(15f)
-            verticalLineToRelative(4f)
             close()
           }
         }

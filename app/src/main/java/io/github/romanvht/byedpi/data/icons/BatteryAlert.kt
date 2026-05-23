@@ -68,16 +68,6 @@ val Ico.BatteryAlert: ImageVector
             reflectiveQuadTo(16f, 22f)
             horizontalLineTo(8f)
             close()
-            moveTo(9f, 20f)
-            horizontalLineToRelative(6f)
-            verticalLineTo(6f)
-            horizontalLineTo(9f)
-            verticalLineTo(20f)
-            close()
-            moveToRelative(0f, 0f)
-            horizontalLineToRelative(6f)
-            horizontalLineTo(9f)
-            close()
           }
         }
         .build()

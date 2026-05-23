@@ -34,16 +34,6 @@ val Ico.LightMode: ImageVector
             strokeLineMiter = 1f,
             pathFillType = PathFillType.NonZero,
           ) {
-            moveTo(14.13f, 14.13f)
-            quadTo(15f, 13.25f, 15f, 12f)
-            reflectiveQuadTo(14.13f, 9.88f)
-            reflectiveQuadTo(12f, 9f)
-            reflectiveQuadTo(9.88f, 9.88f)
-            reflectiveQuadTo(9f, 12f)
-            reflectiveQuadToRelative(0.88f, 2.13f)
-            reflectiveQuadTo(12f, 15f)
-            reflectiveQuadToRelative(2.13f, -0.88f)
-            close()
             moveTo(8.46f, 15.54f)
             quadTo(7f, 14.08f, 7f, 12f)
             quadTo(7f, 9.92f, 8.46f, 8.46f)
@@ -101,8 +91,6 @@ val Ico.LightMode: ImageVector
             lineTo(7.75f, 17.6f)
             lineTo(5.33f, 20.13f)
             lineTo(3.85f, 18.7f)
-            close()
-            moveTo(12f, 12f)
             close()
           }
         }

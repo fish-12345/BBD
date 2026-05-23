@@ -78,11 +78,11 @@ val Ico.AutoFixHigh: ImageVector
             quadTo(6.25f, 22f, 5.83f, 22f)
             reflectiveQuadTo(5.1f, 21.7f)
             close()
-            moveTo(5.85f, 19.6f)
-            lineTo(13f, 12.4f)
-            lineTo(11.6f, 11f)
-            lineTo(4.4f, 18.15f)
-            lineTo(5.85f, 19.6f)
+            moveTo(14.18f, 11.23f)
+            lineToRelative(1.4f, -1.4f)
+            lineToRelative(-1.4f, -1.4f)
+            lineToRelative(-1.4f, 1.4f)
+            lineToRelative(1.4f, 1.4f)
             close()
           }
         }
