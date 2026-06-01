@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -55,7 +54,6 @@ import io.github.romanvht.byedpi.utility.isTablet
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = viewModel(),
@@ -64,7 +62,7 @@ fun MainScreen(
     onSaveLogs: () -> Unit,
     onCloseApp: () -> Unit,
     onOpenEditor: () -> Unit,
-    onOpenProfiles: () -> Unit
+    onOpenTest: () -> Unit
 ) {
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
@@ -175,9 +173,9 @@ fun MainScreen(
                         enabled = !isRunning
                     ),
                     DashboardAction(
-                        icon = Icons.AutoMirrored.Filled.List,
-                        label = R.string.profiles_title,
-                        onClick = { viewModel.performActionIfStopped(onOpenProfiles) },
+                        icon = Ico.BugReport,
+                        label = R.string.title_test,
+                        onClick = { viewModel.performActionIfStopped(onOpenTest) },
                         enabled = !isRunning
                     )
                 )

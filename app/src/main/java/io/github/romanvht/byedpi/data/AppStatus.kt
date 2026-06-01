@@ -10,10 +10,6 @@ enum class Mode {
     VPN;
 
     companion object {
-        fun fromSender(sender: Sender): Mode = when (sender) {
-            Sender.Proxy -> Proxy
-            Sender.VPN -> VPN
-        }
 
         fun fromString(name: String): Mode = when (name) {
             "proxy" -> Proxy

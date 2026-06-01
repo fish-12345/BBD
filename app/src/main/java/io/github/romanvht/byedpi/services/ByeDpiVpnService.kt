@@ -92,6 +92,22 @@ class ByeDpiVpnService : LifecycleVpnService() {
                 START_NOT_STICKY
             }
 
+            SERVICE_INTERFACE -> {
+                Log.i(TAG, "Started by Android")
+                val dataStore = application.getDataStore()
+                if (dataStore.get("byedpi_mode", "vpn") != "vpn") {
+                    Log.w(TAG, "Always-On disabled in proxy mode")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+
+                lifecycleScope.launch {
+                    start()
+                }
+
+                START_STICKY
+            }
+
             else -> {
                 Log.w(TAG, "Unknown action: $action")
                 START_NOT_STICKY
@@ -254,10 +270,8 @@ class ByeDpiVpnService : LifecycleVpnService() {
         val tun2socksConfig = buildString {
             appendLine("tunnel:")
             appendLine("  mtu: 8500")
-
             appendLine("misc:")
             appendLine("  task-stack-size: 81920")
-
             appendLine("socks5:")
             appendLine("  address: $ip")
             appendLine("  port: $port")

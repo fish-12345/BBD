@@ -347,9 +347,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             MainScreen(
                                 onPrepareVpn = { vpnRegister.launch(it) },
-                                onOpenSettings = {
-                                    navController.navigate("settings")
-                                },
+                                onOpenSettings = { navController.navigate("settings") },
                                 onSaveLogs = { saveLogs() },
                                 onCloseApp = { closeApp() },
                                 onOpenEditor = {
@@ -359,8 +357,8 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("settings/ui")
                                     }
                                 },
-                                onOpenProfiles = {
-                                    navController.navigate("profiles")
+                                onOpenTest = {
+                                    navController.navigate("settings/test")
                                 }
                             )
                         }

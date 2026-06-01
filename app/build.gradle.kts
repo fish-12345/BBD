@@ -18,7 +18,6 @@ configure<ApplicationExtension> {
         targetSdk = 34
         versionCode = 1707
         versionName = "1.7.7"
-        ndkVersion = "29.0.14206865"
         buildToolsVersion = "37.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
