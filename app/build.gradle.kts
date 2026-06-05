@@ -45,8 +45,8 @@ configure<ApplicationExtension> {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 
     lint {
@@ -80,13 +80,11 @@ configure<ApplicationExtension> {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.google.material)
     implementation(libs.google.gson)
-    implementation(libs.androidx.compose.material3)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))

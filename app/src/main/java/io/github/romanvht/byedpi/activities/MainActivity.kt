@@ -358,7 +358,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onOpenTest = {
-                                    navController.navigate("settings/test")
+                                    navController.navigate("test")
                                 }
                             )
                         }

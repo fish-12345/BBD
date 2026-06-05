@@ -54,6 +54,7 @@ import io.github.romanvht.byedpi.utility.isTablet
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = viewModel(),

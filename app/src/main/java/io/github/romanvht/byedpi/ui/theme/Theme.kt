@@ -84,25 +84,7 @@ private fun getColorScheme(
 
     return when {
         isDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val dynamic = if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            preset.copy(
-                primary = dynamic.primary,
-                onPrimary = dynamic.onPrimary,
-                primaryContainer = dynamic.primaryContainer,
-                onPrimaryContainer = dynamic.onPrimaryContainer,
-                inversePrimary = dynamic.inversePrimary,
-                secondary = dynamic.secondary,
-                onSecondary = dynamic.onSecondary,
-                secondaryContainer = dynamic.secondaryContainer,
-                onSecondaryContainer = dynamic.onSecondaryContainer,
-                tertiary = dynamic.tertiary,
-                onTertiary = dynamic.onTertiary,
-                tertiaryContainer = dynamic.tertiaryContainer,
-                onTertiaryContainer = dynamic.onTertiaryContainer,
-                outline = dynamic.outline,
-                outlineVariant = dynamic.outlineVariant,
-                surfaceTint = dynamic.primary
-            )
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         else -> preset
     }

@@ -36,6 +36,7 @@ import io.github.romanvht.byedpi.ui.viewmodel.SettingsViewModel
 import io.github.romanvht.byedpi.utility.isTablet
 import io.github.romanvht.byedpi.utility.isTv
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),

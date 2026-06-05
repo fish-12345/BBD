@@ -29,6 +29,7 @@ import io.github.romanvht.byedpi.ui.components.*
 import io.github.romanvht.byedpi.ui.viewmodel.UISettingsViewModel
 import io.github.romanvht.byedpi.utility.isTv
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UISettingsScreen(
     viewModel: UISettingsViewModel = viewModel(),
