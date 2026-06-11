@@ -34,6 +34,7 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
         }
         cmdArgs = newValue
         appPrefs.cmdArgs = newValue
+        historyUtils.saveHistory(historyUtils.getHistory())
     }
 
     fun clearCmdArgs() {
