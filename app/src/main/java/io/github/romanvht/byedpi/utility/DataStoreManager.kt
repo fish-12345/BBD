@@ -19,7 +19,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     }
 )
 
-class DataStoreManager(private val context: Context) {
+class DataStoreManager(context: Context) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dataStore = context.dataStore
 

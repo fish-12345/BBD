@@ -66,14 +66,6 @@ class AppPreferences(private val dataStore: DataStoreManager) {
         get() = dataStore.get("byedpi_cmd_args", "")
         set(value) = dataStore.setAsync("byedpi_cmd_args", value)
 
-    var wifiProfile: String
-        get() = dataStore.get("byedpi_wifi_profile", "")
-        set(value) = dataStore.setAsync("byedpi_wifi_profile", value)
-
-    var mobileProfile: String
-        get() = dataStore.get("byedpi_mobile_profile", "")
-        set(value) = dataStore.setAsync("byedpi_mobile_profile", value)
-
     var trafficMonitoring: Boolean
         get() = dataStore.get("traffic_monitoring", true)
         set(value) = dataStore.setAsync("traffic_monitoring", value)

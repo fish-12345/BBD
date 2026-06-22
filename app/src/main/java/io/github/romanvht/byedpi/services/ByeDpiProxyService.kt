@@ -16,6 +16,7 @@ import io.github.romanvht.byedpi.utility.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration.Companion.milliseconds
 
 class ByeDpiProxyService : LifecycleService() {
     private var proxy = ByeDpiProxy()
@@ -167,7 +168,7 @@ class ByeDpiProxyService : LifecycleService() {
         proxyJob = lifecycleScope.launch(Dispatchers.IO) {
             val code = proxy.startProxy(preferences)
 
-            delay(500)
+            delay(500.milliseconds)
 
             if (code != 0) {
                 Log.e(TAG, "Proxy stopped with code $code")
@@ -194,7 +195,7 @@ class ByeDpiProxyService : LifecycleService() {
             proxy.stopProxy()
             proxyJob?.cancel()
 
-            val completed = withTimeoutOrNull(2000) {
+            val completed = withTimeoutOrNull(2000.milliseconds) {
                 proxyJob?.join()
                 true
             }

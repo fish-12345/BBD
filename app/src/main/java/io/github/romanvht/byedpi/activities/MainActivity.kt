@@ -442,12 +442,6 @@ class MainActivity : ComponentActivity() {
                                 onBack = { navController.popBackStack() }
                             )
                         }
-                        composable("profiles") {
-                            ProfilesScreen(
-                                onBack = { navController.popBackStack() },
-                                onNavigateToTest = { navController.navigate("test") }
-                            )
-                        }
                     }
                 }
             }
