@@ -47,7 +47,6 @@ import io.github.romanvht.byedpi.ui.viewmodel.TestViewModel
 import io.github.romanvht.byedpi.utility.isTv
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestScreen(
     viewModel: TestViewModel = viewModel(),

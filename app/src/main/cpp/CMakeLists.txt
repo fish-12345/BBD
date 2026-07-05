@@ -14,3 +14,4 @@ target_compile_options(byedpi PRIVATE -std=c99 -Wall -Wno-unused -Wextra -Wno-un
 target_compile_definitions(byedpi PRIVATE ANDROID_APP)
 
 target_link_libraries(byedpi PRIVATE android log)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384")
