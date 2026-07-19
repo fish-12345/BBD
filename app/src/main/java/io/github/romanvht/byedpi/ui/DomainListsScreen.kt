@@ -13,6 +13,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -125,31 +127,17 @@ fun DomainListsScreen(
                     text = {
                         Column {
                             ListItem(
-                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                headlineContent = { Text("Редактировать") },
-                                leadingContent = {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = null
-                                    )
-                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         viewModel.hideActionDialog()
-                                        viewModel.showEditDialogAction(list)
-                                    }
+                                        viewModel.showEditDialogAction(list)},
+                                leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                content = { Text("Редактировать") },
                             )
 
                             ListItem(
-                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                headlineContent = { Text("Копировать") },
-                                leadingContent = {
-                                    Icon(
-                                        Ico.ContentCopy,
-                                        contentDescription = null
-                                    )
-                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -162,9 +150,12 @@ fun DomainListsScreen(
                                         clipboardManager.setPrimaryClip(clip)
 
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT)
-                                            .show()
-                                    }
+                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
+                                               },
+                                leadingContent = { Icon(Ico.ContentCopy, contentDescription = null)
+                                                 },
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                content = { Text("Копировать") },
                             )
 
                             if (!list.isBuiltIn) {
@@ -175,31 +166,20 @@ fun DomainListsScreen(
                                 )
 
                                 ListItem(
-                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                    headlineContent = {
-                                        Text(
-                                            "Удалить",
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                    },
-                                    leadingContent = {
-                                        Icon(
-                                            Icons.Default.Delete,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error
-                                        )
-                                    },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
                                             viewModel.deleteList(list.id)
                                             viewModel.hideActionDialog()
-                                            Toast.makeText(
-                                                context,
-                                                "Список удален",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
+                                            Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
+                                                   },
+                                    leadingContent = {
+                                        Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                                                     },
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                    content = {
+                                        Text("Удалить", color = MaterialTheme.colorScheme.error)
+                                              },
                                 )
                             }
                         }
@@ -228,75 +208,47 @@ fun DomainListsScreen(
                         )
 
                         ListItem(
-                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                            headlineContent = { Text("Редактировать") },
-                            leadingContent = {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    contentDescription = null
-                                )
-                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     viewModel.hideActionDialog()
                                     viewModel.showEditDialogAction(list)
                                 }
-                                .padding(horizontal = 12.dp, vertical = 2.dp)
+                                .padding(horizontal = 12.dp, vertical = 2.dp),
+                            leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                            content = { Text("Редактировать") },
                         )
 
                         ListItem(
-                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                            headlineContent = { Text("Копировать") },
-                            leadingContent = {
-                                Icon(
-                                    Ico.ContentCopy,
-                                    contentDescription = null
-                                )
-                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val clipboardManager =
-                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newPlainText(
-                                        list.name,
-                                        viewModel.copyDomainsToClipboard(list)
-                                    )
+                                    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText(list.name, viewModel.copyDomainsToClipboard(list))
                                     clipboardManager.setPrimaryClip(clip)
-
                                     viewModel.hideActionDialog()
-                                    Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT)
-                                        .show()
+                                    Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
                                 }
-                                .padding(horizontal = 12.dp, vertical = 2.dp)
+                                .padding(horizontal = 12.dp, vertical = 2.dp),
+                            leadingContent = { Icon(Ico.ContentCopy, contentDescription = null) },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                            content = { Text("Копировать") },
                         )
 
                         if (!list.isBuiltIn) {
                             ListItem(
-                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                headlineContent = {
-                                    Text(
-                                        "Удалить",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                },
-                                leadingContent = {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         viewModel.deleteList(list.id)
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT)
-                                            .show()
+                                        Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
                                     }
-                                    .padding(horizontal = 12.dp, vertical = 2.dp)
+                                    .padding(horizontal = 12.dp, vertical = 2.dp),
+                                leadingContent = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                content = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
                             )
                         }
                     }

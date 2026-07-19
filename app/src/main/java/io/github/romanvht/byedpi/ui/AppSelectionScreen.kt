@@ -433,32 +433,33 @@ fun AppItem(
         modifier = modifier
     ) {
         ListItem(
-            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
-            headlineContent = { Text(app.appName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            supportingContent = {
-                Text(
-                    app.packageName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
             leadingContent = {
-                if (icon != null) {
-                    Image(
-                        bitmap = icon!!.toBitmap().asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp)
-                    )
-                } else {
-                    Box(modifier = Modifier.size(40.dp))
-                }
-            },
+                        if (icon != null) {
+                            Image(
+                                bitmap = icon!!.toBitmap().asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        } else {
+                            Box(modifier = Modifier.size(40.dp))
+                        }
+                    },
             trailingContent = {
-                Switch(
-                    checked = app.isSelected,
-                    onCheckedChange = onCheckedChange
-                )
-            }
+                        Switch(
+                            checked = app.isSelected,
+                            onCheckedChange = onCheckedChange
+                        )
+                    },
+            supportingContent = {
+                        Text(
+                            app.packageName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
+            elevation = ListItemDefaults.elevation(),
+            content = { Text(app.appName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         )
     }
 }

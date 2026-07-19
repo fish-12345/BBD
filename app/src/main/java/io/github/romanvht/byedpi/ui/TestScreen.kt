@@ -597,13 +597,8 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         ListItem(
-                            headlineContent = { Text(stringResource(R.string.cmd_history_apply)) },
-                            leadingContent = {
-                                Icon(
-                                    Ico.Terminal,
-                                    contentDescription = null
-                                )
-                            }
+                            leadingContent = { Icon(Ico.Terminal, contentDescription = null) },
+                            content = { Text(stringResource(R.string.cmd_history_apply)) },
                         )
                     }
                     Surface(
@@ -616,13 +611,8 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         ListItem(
-                            headlineContent = { Text(stringResource(R.string.cmd_history_copy)) },
-                            leadingContent = {
-                                Icon(
-                                    Ico.ContentCopy,
-                                    contentDescription = null
-                                )
-                            }
+                            leadingContent = { Icon(Ico.ContentCopy, contentDescription = null) },
+                            content = { Text(stringResource(R.string.cmd_history_copy)) },
                         )
                     }
                     Surface(
@@ -635,7 +625,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         ListItem(
-                            headlineContent = { Text(stringResource(R.string.profiles_add)) },
+                            content = { Text(stringResource(R.string.profiles_add)) },
                             leadingContent = { Icon(Icons.Default.Add, contentDescription = null) }
                         )
                     }

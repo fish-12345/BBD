@@ -196,7 +196,7 @@ fun CmdSettingsScreen(
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         ListItem(
-                            headlineContent = { Text(stringResource(R.string.cmd_history_delete_unpinned)) }
+                            content = { Text(stringResource(R.string.cmd_history_delete_unpinned)) }
                         )
                     }
                     Surface(
@@ -209,7 +209,7 @@ fun CmdSettingsScreen(
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         ListItem(
-                            headlineContent = { Text(stringResource(R.string.cmd_history_delete_all)) }
+                            content = { Text(stringResource(R.string.cmd_history_delete_all)) }
                         )
                     }
                 }
@@ -333,8 +333,8 @@ fun CmdSettingsScreen(
                             color = MaterialTheme.colorScheme.surface
                         ) {
                             ListItem(
-                                headlineContent = { Text(label) },
-                                leadingContent = { Icon(icon, contentDescription = null) }
+                                leadingContent = { Icon(icon, contentDescription = null) },
+                                content = { Text(label) }
                             )
                         }
                     }
