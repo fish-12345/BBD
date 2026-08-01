@@ -1,13 +1,15 @@
-import com.android.build.api.dsl.ApplicationExtension
-
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+kotlin {
+    jvmToolchain(25)
 }
 
 val abis = setOf("arm64-v8a")
 
-configure<ApplicationExtension> {
+android {
     namespace = "io.github.romanvht.byedpi"
     compileSdk = 37
 
@@ -15,7 +17,7 @@ configure<ApplicationExtension> {
         applicationId = "io.github.romanvht.byedpi"
         minSdk = 23
         //noinspection OldTargetApi
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1707
         versionName = "1.7.7"
         buildToolsVersion = "37.0.0"
@@ -44,10 +46,7 @@ configure<ApplicationExtension> {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_25
-        targetCompatibility = JavaVersion.VERSION_25
-    }
+
 
     lint {
         checkReleaseBuilds = false

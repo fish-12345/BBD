@@ -9,6 +9,7 @@ import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.data.START_ACTION
 import io.github.romanvht.byedpi.data.STOP_ACTION
 import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.milliseconds
 
 object ServiceManager {
     private val TAG: String = ServiceManager::class.java.simpleName
@@ -61,13 +62,10 @@ object ServiceManager {
             val startTime = System.currentTimeMillis()
             while (System.currentTimeMillis() - startTime < 3000L) {
                 if (appStatus.first == AppStatus.Halted) break
-                delay(100)
+                delay(100.milliseconds)
             }
             start(context, mode)
         }
     }
 
-    fun isVpnMode(): Boolean {
-        return appStatus.second == Mode.VPN
-    }
 }

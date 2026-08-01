@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 object TrafficMonitor {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -49,7 +50,7 @@ object TrafficMonitor {
             val startTime = System.currentTimeMillis()
 
             while (isActive) {
-                delay(1000)
+                delay(1000.milliseconds)
                 val currentRx = TrafficStats.getUidRxBytes(Process.myUid())
                 val currentTx = TrafficStats.getUidTxBytes(Process.myUid())
                 

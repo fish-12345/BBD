@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = application.getDataStore()
@@ -97,7 +98,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 stopService()
             }
-            delay(1000)
+            delay(1000.milliseconds)
             isClickable = true
         }
     }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 class ByeDpiVpnService : LifecycleVpnService() {
     private val byeDpiProxy = ByeDpiProxy()
@@ -209,7 +210,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
 
         proxyJob = lifecycleScope.launch(Dispatchers.IO) {
             val code = byeDpiProxy.startProxy(preferences)
-            delay(500)
+            delay(500.milliseconds)
 
             if (code != 0) {
                 Log.e(TAG, "Proxy stopped with code $code")
@@ -236,7 +237,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
             byeDpiProxy.stopProxy()
             proxyJob?.cancel()
 
-            val completed = withTimeoutOrNull(2000) {
+            val completed = withTimeoutOrNull(2000.milliseconds) {
                 proxyJob?.join()
                 true
             }
