@@ -494,48 +494,43 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                 title = { Text(stringResource(R.string.cmd_history_menu)) },
                 text = {
                     Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (result != null) {
                             Text(
-                                text = "${result.successCount}/${result.total} (${result.percentage}%)",
+                                text = "${result.successCount}/${result.total} (${result.percentage}%)" +
+                                        if (result.avgPing > 0) " | ${result.avgPing}ms" else "",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                             )
 
-                            val failedSites = result.siteResults.filter { it.successCount == 0 }
-                            if (failedSites.isNotEmpty()) {
+                            if (result.siteResults.isNotEmpty()) {
                                 Text(
                                     text = stringResource(R.string.test_details),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                failedSites.take(3).forEach { site ->
+                                result.siteResults.forEach { site ->
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         Icon(
-                                            Ico.Error,
+                                            if (site.successCount > 0) Icons.Default.CheckCircle else Ico.Error,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error,
+                                            tint = if (site.successCount > 0) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
                                             modifier = Modifier.size(16.dp)
                                         )
                                         Text(
-                                            text = site.domain,
+                                            text = "${site.domain}: ${site.successCount}/${site.total}" +
+                                                    if (site.avgPing > 0) " (${site.avgPing}ms)" else "",
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.error,
+                                            color = if (site.successCount > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                }
-                                if (failedSites.size > 3) {
-                                    Text(
-                                        text = "... ${failedSites.size - 3} more",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
                                 }
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             }
@@ -734,7 +729,8 @@ fun TestResultCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "${result.successCount}/${result.total} (${result.percentage}%)",
+                        text = "${result.successCount}/${result.total} (${result.percentage}%)" +
+                                if (result.avgPing > 0) " | ${result.avgPing}ms" else "",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )
@@ -763,17 +759,17 @@ fun TestResultCard(
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        val failedSites = result.siteResults.filter { it.successCount == 0 }
+                        val allSites = result.siteResults
 
-                        if (failedSites.isEmpty()) {
+                        if (allSites.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.test_all_connected),
+                                text = stringResource(R.string.test_settings_domain_empty),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF4CAF50),
+                                color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
                         } else {
-                            failedSites.forEach { site ->
+                            allSites.forEach { site ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -781,22 +777,30 @@ fun TestResultCard(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = site.domain,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = site.domain,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        if (site.avgPing > 0) {
+                                            Text(
+                                                text = "${site.avgPing}ms",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                            )
+                                        }
+                                    }
 
                                     Surface(
-                                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
+                                        color = if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.1f) else MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
                                         shape = RoundedCornerShape(4.dp)
                                     ) {
                                         Text(
-                                            text = stringResource(R.string.test_not_connected),
+                                            text = if (site.successCount > 0) "${site.successCount}/${site.total}" else stringResource(R.string.test_not_connected),
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.error,
+                                            color = if (site.successCount > 0) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
                                             modifier = Modifier.padding(
                                                 horizontal = 6.dp,
                                                 vertical = 2.dp

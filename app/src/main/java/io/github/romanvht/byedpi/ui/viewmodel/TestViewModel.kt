@@ -27,11 +27,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 data class SiteResult(
     val domain: String,
     val successCount: Int,
-    val total: Int
+    val total: Int,
+    val avgPing: Long = 0
 )
 
 data class TestResult(
@@ -39,6 +41,7 @@ data class TestResult(
     val successCount: Int,
     val total: Int,
     val percentage: Int,
+    val avgPing: Long = 0,
     val siteResults: List<SiteResult> = emptyList()
 )
 
@@ -209,7 +212,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                     if (!fullLog) appendToResults(": ") else appendToResults("\n")
                 }
 
-                delay(delaySec * 500L)
+                delay((delaySec * 500L).milliseconds)
 
                 val totalRequests = sites.size * requestsCount
                 val checkResults = siteChecker.checkSitesAsync(
@@ -229,13 +232,17 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 )
 
-                val successfulCount = checkResults.sumOf { it.second }
+                val successfulCount = checkResults.sumOf { it.successCount }
+                val totalPing = checkResults.filter { it.successCount > 0 }.sumOf { it.avgPing }
+                val successfulSitesCount = checkResults.count { it.successCount > 0 }
+                val avgPing = if (successfulSitesCount > 0) totalPing / successfulSitesCount else 0L
+
                 val successPercentage = if (totalRequests > 0) (successfulCount * 100) / totalRequests else 0
-                val siteResults = checkResults.map { SiteResult(it.first, it.second, requestsCount) }.toList()
+                val siteResults = checkResults.map { SiteResult(it.domain, it.successCount, requestsCount, it.avgPing) }.toList()
 
                 withContext(Dispatchers.Main) {
                     if (showAll || successfulCount > 0) {
-                        val result = TestResult(cmd, successfulCount, totalRequests, successPercentage, siteResults)
+                        val result = TestResult(cmd, successfulCount, totalRequests, successPercentage, avgPing, siteResults)
                         testResults.add(result)
                         inMemoryResults.add(result)
                         if (autoSort) {
@@ -246,14 +253,14 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                             inMemoryResults.addAll(sorted)
                         }
                     }
-                    appendToResults("$successfulCount/$totalRequests ($successPercentage%)\n\n")
+                    appendToResults("$successfulCount/$totalRequests ($successPercentage%) | Ping: ${avgPing}ms\n\n")
                 }
 
-                delay(delaySec * 500L)
+                delay((delaySec * 500L).milliseconds)
 
                 ServiceManager.stop(context)
                 waitForProxyStatus(AppStatus.Halted)
-                delay(1000L)
+                delay(1000L.milliseconds)
             }
 
             withContext(Dispatchers.Main) {
@@ -361,10 +368,10 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
         val startTime = System.currentTimeMillis()
         while (System.currentTimeMillis() - startTime < 3000) {
             if (appStatus.first == statusNeeded) {
-                delay(500)
+                delay(500.milliseconds)
                 return true
             }
-            delay(100)
+            delay(100.milliseconds)
         }
         return false
     }

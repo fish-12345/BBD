@@ -15,9 +15,8 @@ android {
 
     defaultConfig {
         applicationId = "io.github.romanvht.byedpi"
-        minSdk = 23
-        //noinspection OldTargetApi
-        targetSdk = 35
+        minSdk = 24
+        targetSdk = 37
         versionCode = 1707
         versionName = "1.7.7"
         buildToolsVersion = "37.0.0"

@@ -18,21 +18,27 @@ class SiteCheckUtils(
     private val proxyPort: Int
 ) {
 
+    data class SiteCheckResult(
+        val domain: String,
+        val successCount: Int,
+        val avgPing: Long
+    )
+
     suspend fun checkSitesAsync(
         sites: List<String>,
         requestsCount: Int,
         requestTimeout: Long,
         concurrentRequests: Int = 20,
         onSiteChecked: ((String, Int, Int) -> Unit)? = null
-    ): List<Pair<String, Int>> {
+    ): List<SiteCheckResult> {
         val semaphore = Semaphore(concurrentRequests)
         return withContext(Dispatchers.IO) {
             sites.map { site ->
                 async {
                     semaphore.withPermit {
-                        val successCount = checkSiteAccess(site, requestsCount, requestTimeout)
-                        onSiteChecked?.invoke(site, successCount, requestsCount)
-                        site to successCount
+                        val result = checkSiteAccess(site, requestsCount, requestTimeout)
+                        onSiteChecked?.invoke(site, result.first, requestsCount)
+                        SiteCheckResult(site, result.first, result.second)
                     }
                 }
             }.awaitAll()
@@ -43,8 +49,9 @@ class SiteCheckUtils(
         site: String,
         requestsCount: Int,
         timeout: Long
-    ): Int = withContext(Dispatchers.IO) {
+    ): Pair<Int, Long> = withContext(Dispatchers.IO) {
         var responseCount = 0
+        var totalPing = 0L
 
         val formattedUrl = if (site.startsWith("http://") || site.startsWith("https://")) site
         else "https://$site"
@@ -53,7 +60,7 @@ class SiteCheckUtils(
             URL(formattedUrl)
         } catch (_: Exception) {
             Log.e("SiteChecker", "Invalid URL: $formattedUrl")
-            return@withContext 0
+            return@withContext 0 to 0L
         }
 
         val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress(proxyIp, proxyPort))
@@ -62,6 +69,7 @@ class SiteCheckUtils(
             Log.i("SiteChecker", "Attempt ${attempt + 1}/$requestsCount for $site")
 
             var connection: HttpURLConnection? = null
+            val startTime = System.currentTimeMillis()
             try {
                 connection = url.openConnection(proxy) as HttpURLConnection
                 connection.connectTimeout = (timeout * 1000).toInt()
@@ -70,6 +78,8 @@ class SiteCheckUtils(
                 connection.setRequestProperty("Connection", "close")
 
                 val responseCode = connection.responseCode
+                val endTime = System.currentTimeMillis()
+                
                 val declaredLength = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     connection.contentLengthLong
                 } else {
@@ -100,6 +110,7 @@ class SiteCheckUtils(
                 if (declaredLength <= 0L || actualLength >= declaredLength) {
                     Log.i("SiteChecker", "Response for $site: $responseCode, Declared: $declaredLength, Actual: $actualLength")
                     responseCount++
+                    totalPing += (endTime - startTime)
                 } else {
                     Log.w("SiteChecker", "Block detected for $site, Declared: $declaredLength, Actual: $actualLength")
                 }
@@ -111,6 +122,7 @@ class SiteCheckUtils(
             }
         }
 
-        responseCount
+        val avgPing = if (responseCount > 0) totalPing / responseCount else 0L
+        responseCount to avgPing
     }
 }

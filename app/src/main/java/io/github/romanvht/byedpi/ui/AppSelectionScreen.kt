@@ -8,12 +8,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -62,9 +63,9 @@ fun AppSelectionScreen(
     val isLargeScreen = isTv || isTablet
     val focusManager = LocalFocusManager.current
 
-    BackHandler(enabled = viewModel.searchQuery.isNotEmpty() || viewModel.showSelectedOnly) {
-        if (viewModel.searchQuery.isNotEmpty()) {
-            viewModel.searchQuery = ""
+    BackHandler(enabled = viewModel.searchQuery.text.isNotEmpty() || viewModel.showSelectedOnly) {
+        if (viewModel.searchQuery.text.isNotEmpty()) {
+            viewModel.searchQuery.clearText()
         } else if (viewModel.showSelectedOnly) {
             viewModel.showSelectedOnly = false
         }
@@ -82,7 +83,7 @@ fun AppSelectionScreen(
 @Composable
 fun AppSelectionScreenPhone(
     viewModel: AppSelectionViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val isTablet = remember { context.isTablet() }
@@ -111,14 +112,14 @@ fun AppSelectionScreenPhone(
             modifier = Modifier.padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val searchBarState = rememberSearchBarState()
             SearchBar(
+                state = searchBarState,
                 inputField = {
                     SearchBarDefaults.InputField(
-                        query = viewModel.searchQuery,
-                        onQueryChange = { viewModel.searchQuery = it },
+                        textFieldState = viewModel.searchQuery,
+                        searchBarState = searchBarState,
                         onSearch = { },
-                        expanded = false,
-                        onExpandedChange = { },
                         placeholder = { Text(stringResource(R.string.search_apps)) },
                         leadingIcon = {
                             Icon(
@@ -128,23 +129,20 @@ fun AppSelectionScreenPhone(
                             )
                         },
                         trailingIcon = {
-                            if (viewModel.searchQuery.isNotEmpty()) {
-                                IconButton(onClick = { viewModel.searchQuery = "" }) {
+                            if (viewModel.searchQuery.text.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.searchQuery.clearText() }) {
                                     Icon(Icons.Default.Close, contentDescription = null)
                                 }
                             }
                         }
                     )
                 },
-                expanded = false,
-                onExpandedChange = { },
                 modifier = Modifier
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp),
-                windowInsets = WindowInsets(0, 0, 0, 0)
-            ) { }
+                    .padding(bottom = 8.dp)
+            )
 
             MultiChoiceSegmentedButtonRow(
                 modifier = Modifier
@@ -219,7 +217,7 @@ fun AppSelectionScreenPhone(
 @Composable
 fun AppSelectionScreenTv(
     viewModel: AppSelectionViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val searchFocusRequester = remember { FocusRequester() }
@@ -256,8 +254,7 @@ fun AppSelectionScreenTv(
 
             // Search
             OutlinedTextField(
-                value = viewModel.searchQuery,
-                onValueChange = { viewModel.searchQuery = it },
+                state = viewModel.searchQuery,
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(searchFocusRequester)
@@ -287,16 +284,16 @@ fun AppSelectionScreenTv(
                     },
                 placeholder = { Text(stringResource(R.string.search_apps)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 shape = MaterialTheme.shapes.medium,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { focusManager.moveFocus(FocusDirection.Right) })
+                onKeyboardAction = { focusManager.moveFocus(FocusDirection.Right) }
             )
 
-            if (viewModel.searchQuery.isNotEmpty()) {
+            if (viewModel.searchQuery.text.isNotEmpty()) {
                 Button(
                     onClick = {
-                        viewModel.searchQuery = ""
+                        viewModel.searchQuery.clearText()
                         searchFocusRequester.requestFocus()
                     },
                     modifier = Modifier.fillMaxWidth(),

@@ -2,6 +2,7 @@ package io.github.romanvht.byedpi.ui.viewmodel
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,11 +23,11 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
 
     var apps by mutableStateOf<List<AppInfo>>(emptyList())
         private set
-    var searchQuery by mutableStateOf("")
-    var isLoading by mutableStateOf(true)
+    val searchQuery = TextFieldState()
+    var isLoading by mutableStateOf(value = true)
         private set
-    var showSelectedOnly by mutableStateOf(false)
-    var showSystemApps by mutableStateOf(false)
+    var showSelectedOnly by mutableStateOf(value = false)
+    var showSystemApps by mutableStateOf(value = false)
 
     init {
         loadApps()
@@ -53,7 +54,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
                                 appName,
                                 appInfo.packageName,
                                 selectedApps.contains(appInfo.packageName),
-                                isSystem
+                                isSystem,
                             )
                         }
                     }
@@ -85,8 +86,9 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
 
     val filteredApps: List<AppInfo>
         get() {
-            var filtered = if (searchQuery.isEmpty()) apps
-            else apps.filter { it.appName.contains(searchQuery.trim(), ignoreCase = true) || it.packageName.contains(searchQuery.trim(), ignoreCase = true) }
+            val query = searchQuery.text.toString().trim()
+            var filtered = if (query.isEmpty()) apps
+            else apps.filter { it.appName.contains(query, ignoreCase = true) || it.packageName.contains(query, ignoreCase = true) }
             
             if (showSelectedOnly) {
                 filtered = filtered.filter { it.isSelected }
