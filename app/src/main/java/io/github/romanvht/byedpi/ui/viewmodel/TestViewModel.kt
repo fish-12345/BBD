@@ -33,7 +33,7 @@ data class SiteResult(
     val domain: String,
     val successCount: Int,
     val total: Int,
-    val avgPing: Long = 0
+    val avgPing: Long = 0,
 )
 
 data class TestResult(
@@ -49,7 +49,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dataStore = application.getDataStore()
 
-    var isTestingState by mutableStateOf(false)
+    var isTestingState by mutableStateOf(value = false)
         private set
     var testHasEverRun by mutableStateOf(false)
         private set
@@ -219,21 +219,20 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                     sites = sites,
                     requestsCount = requestsCount,
                     requestTimeout = requestTimeout,
-                    concurrentRequests = concurrentRequests,
-                    onSiteChecked = { site, successCount, countRequests ->
-                        viewModelScope.launch(Dispatchers.Main) {
-                            if (fullLog) {
-                                appendToResults("$site - $successCount/$countRequests\n")
-                            }
-                            checkedSitesCount++
-                            currentStrategyProgress = checkedSitesCount.toFloat() / sites.size
-                            overallProgress = (index + currentStrategyProgress) / cmds.size
+                    concurrentRequests = concurrentRequests
+                ) { site, successCount, countRequests ->
+                    viewModelScope.launch(Dispatchers.Main) {
+                        if (fullLog) {
+                            appendToResults("$site - $successCount/$countRequests\n")
                         }
+                        checkedSitesCount++
+                        currentStrategyProgress = checkedSitesCount.toFloat() / sites.size
+                        overallProgress = (index + currentStrategyProgress) / cmds.size
                     }
-                )
+                }
 
                 val successfulCount = checkResults.sumOf { it.successCount }
-                val totalPing = checkResults.filter { it.successCount > 0 }.sumOf { it.avgPing }
+                val totalPing = checkResults.asSequence().filter { it.successCount > 0 }.sumOf { it.avgPing }
                 val successfulSitesCount = checkResults.count { it.successCount > 0 }
                 val avgPing = if (successfulSitesCount > 0) totalPing / successfulSitesCount else 0L
 
@@ -241,12 +240,15 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 val siteResults = checkResults.map { SiteResult(it.domain, it.successCount, requestsCount, it.avgPing) }.toList()
 
                 withContext(Dispatchers.Main) {
-                    if (showAll || successfulCount > 0) {
+                    if (showAll || (successfulCount > 0)) {
                         val result = TestResult(cmd, successfulCount, totalRequests, successPercentage, avgPing, siteResults)
                         testResults.add(result)
                         inMemoryResults.add(result)
                         if (autoSort) {
-                            val sorted = testResults.sortedByDescending { it.successCount }
+                            val sorted = testResults.sortedWith(
+                                compareByDescending<TestResult> { it.successCount }
+                                    .thenBy { if (it.successCount > 0) it.avgPing else Long.MAX_VALUE }
+                            )
                             testResults.clear()
                             testResults.addAll(sorted)
                             inMemoryResults.clear()
@@ -414,8 +416,6 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     override fun onCleared() {
-        super.onCleared()
-
         testJob?.cancel()
 
         if (originalCommandData != null) {

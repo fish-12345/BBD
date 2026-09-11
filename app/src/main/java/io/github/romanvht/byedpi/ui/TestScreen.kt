@@ -511,8 +511,11 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                result.siteResults.forEach { site ->
+                                result.siteResults.forEachIndexed { index, site ->
                                     Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
@@ -529,6 +532,12 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                                             color = if (site.successCount > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    if (index < result.siteResults.size - 1) {
+                                        HorizontalDivider(
+                                            thickness = 0.5.dp,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                                         )
                                     }
                                 }
@@ -766,21 +775,21 @@ fun TestResultCard(
                                 text = stringResource(R.string.test_settings_domain_empty),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(vertical = 4.dp)
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
                         } else {
-                            allSites.forEach { site ->
+                            allSites.forEachIndexed { index, site ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 2.dp),
+                                        .padding(vertical = 6.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = site.domain,
-                                            style = MaterialTheme.typography.bodySmall,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
@@ -794,19 +803,29 @@ fun TestResultCard(
                                     }
 
                                     Surface(
-                                        color = if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.1f) else MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                                        shape = RoundedCornerShape(4.dp)
+                                        color = if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.15f) else MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        border = BorderStroke(
+                                            1.dp,
+                                            if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.3f) else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
+                                        )
                                     ) {
                                         Text(
                                             text = if (site.successCount > 0) "${site.successCount}/${site.total}" else stringResource(R.string.test_not_connected),
-                                            style = MaterialTheme.typography.labelSmall,
+                                            style = MaterialTheme.typography.labelMedium,
                                             color = if (site.successCount > 0) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
                                             modifier = Modifier.padding(
-                                                horizontal = 6.dp,
-                                                vertical = 2.dp
+                                                horizontal = 8.dp,
+                                                vertical = 4.dp
                                             )
                                         )
                                     }
+                                }
+                                if (index < allSites.size - 1) {
+                                    HorizontalDivider(
+                                        thickness = 0.5.dp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
+                                    )
                                 }
                             }
                         }
