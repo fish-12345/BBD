@@ -17,49 +17,40 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val appPrefs = AppPreferences(dataStore)
     private val themeManager = ThemeManager(application)
 
-    var language by mutableStateOf(appPrefs.language)
-        private set
-    var theme by mutableStateOf(appPrefs.theme)
-        private set
-    var colorScheme by mutableStateOf(appPrefs.colorScheme)
-        private set
+    // Простые независимые поля — через composeState, без ручного observe
+    val language by dataStore.composeState(viewModelScope, "language", "system")
+    val theme by dataStore.composeState(viewModelScope, "app_theme", "system")
+    val colorScheme by dataStore.composeState(viewModelScope, "color_scheme", "Default")
+    val dnsIp by dataStore.composeState(viewModelScope, "dns_ip", "1.1.1.1")
+    val dnsSolution by dataStore.composeState(viewModelScope, "dns_solution", "1.1.1.1")
+    val ipv6Enable by dataStore.composeState(viewModelScope, "ipv6_enable", false)
+    val applistType by dataStore.composeState(viewModelScope, "applist_type", "disable")
+    val autostart by dataStore.composeState(viewModelScope, "autostart", false)
+    val autoConnect by dataStore.composeState(viewModelScope, "auto_connect", false)
+    val proxyIp by dataStore.composeState(viewModelScope, "byedpi_proxy_ip", "127.0.0.1")
+    val proxyPort by dataStore.composeState(viewModelScope, "byedpi_proxy_port", "1080")
+
+    // Эти поля идут через кастомные Flow (маппинг типов / внешний источник), оставляем как раньше
     var mode by mutableStateOf(appPrefs.mode)
-        private set
-    var dnsIp by mutableStateOf(appPrefs.dnsIp)
-        private set
-    var dnsSolution by mutableStateOf(appPrefs.dnsSolution)
-        private set
-    var ipv6Enable by mutableStateOf(appPrefs.ipv6Enable)
-        private set
-    var applistType by mutableStateOf(appPrefs.applistType)
-        private set
-    var autostart by mutableStateOf(appPrefs.autostart)
-        private set
-    var autoConnect by mutableStateOf(appPrefs.autoConnect)
         private set
     var cmdEnable by mutableStateOf(appPrefs.cmdEnable)
         private set
-    var proxyIp by mutableStateOf(appPrefs.proxyIp)
-        private set
-    var proxyPort by mutableStateOf(appPrefs.proxyPort)
+    var trafficMonitoring by mutableStateOf(appPrefs.trafficMonitoring)
         private set
     var dynamicColors by mutableStateOf(themeManager.getDynamicColor())
         private set
+
+    // Не из DataStore — читаются из системных API по требованию
     var isBatteryOptimizationEnabled by mutableStateOf(application.isBatteryOptimizationEnabled())
         private set
     var hasStorageAccess by mutableStateOf(application.hasStorageAccess())
         private set
-    var trafficMonitoring by mutableStateOf(appPrefs.trafficMonitoring)
-        private set
 
     val isProxyVisible: Boolean
         get() {
-            val cmdEnableSync = dataStore.get("byedpi_enable_cmd_settings", true)
-            val cmdArgsStr = dataStore.get("byedpi_cmd_args", "")
-            
-            if (!cmdEnableSync) return true
-            
-            val cmdArgs = shellSplit(cmdArgsStr)
+            if (!appPrefs.cmdEnable) return true
+
+            val cmdArgs = shellSplit(appPrefs.cmdArgs)
             fun hasArg(argsList: List<String>, keys: List<String>): Boolean {
                 for (arg in argsList) {
                     for (key in keys) {
@@ -68,27 +59,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 return false
             }
-            
+
             val hasIp = hasArg(cmdArgs, listOf("--ip", "-i"))
             val hasPort = hasArg(cmdArgs, listOf("--port", "-p"))
-            
+
             return !hasIp && !hasPort
         }
 
     init {
-        dataStore.run {
-            observe(viewModelScope, "language", "system") { language = it }
-            observe(viewModelScope, "app_theme", "system") { theme = it }
-            observe(viewModelScope, "color_scheme", "Default") { colorScheme = it }
-            observe(viewModelScope, "dns_ip", "1.1.1.1") { dnsIp = it }
-            observe(viewModelScope, "dns_solution", "1.1.1.1") { dnsSolution = it }
-            observe(viewModelScope, "ipv6_enable", false) { ipv6Enable = it }
-            observe(viewModelScope, "applist_type", "disable") { applistType = it }
-            observe(viewModelScope, "autostart", false) { autostart = it }
-            observe(viewModelScope, "auto_connect", false) { autoConnect = it }
-            observe(viewModelScope, "byedpi_proxy_ip", "127.0.0.1") { proxyIp = it }
-            observe(viewModelScope, "byedpi_proxy_port", "1080") { proxyPort = it }
-        }
         viewModelScope.launch {
             launch { appPrefs.modeFlow.collectLatest { mode = it } }
             launch { appPrefs.cmdEnableFlow.collectLatest { cmdEnable = it } }
@@ -117,8 +95,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateMode(newValue: String) {
-        val newMode = Mode.fromString(newValue)
-        appPrefs.mode = newMode
+        appPrefs.mode = Mode.fromString(newValue)
     }
 
     fun updateDns(newValue: String) {

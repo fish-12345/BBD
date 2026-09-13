@@ -27,12 +27,12 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
 
     init {
         dataStore.run {
-            observe(viewModelScope, "byedpi_cmd_args", "") { 
+            observe(viewModelScope, "byedpi_cmd_args", "") {
                 cmdArgs = it
                 updateFullAssembled()
             }
             observe(viewModelScope, "byedpi_command_history", "") { refreshHistory() }
-            observe(viewModelScope, "byedpi_domain_strategies", "[]") { 
+            observe(viewModelScope, "byedpi_domain_strategies", "[]") {
                 hasDomainGroups = it != "[]" && it.isNotBlank()
                 updateFullAssembled()
             }

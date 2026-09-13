@@ -20,7 +20,6 @@ import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.Command
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.services.ServiceManager
-import io.github.romanvht.byedpi.utility.DomainListUtils
 import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.utility.*
 import kotlinx.coroutines.*
@@ -48,6 +47,8 @@ data class TestResult(
 class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dataStore = application.getDataStore()
+    private val appPrefs = AppPreferences(dataStore)
+    private val testPrefs = TestPreferences(dataStore)
 
     var isTestingState by mutableStateOf(value = false)
         private set
@@ -149,7 +150,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
         inMemoryLog = AnnotatedString("")
         hasEverRun = false
 
-        val currentCmdText = dataStore.get("byedpi_cmd_args", "")
+        val currentCmdText = appPrefs.cmdArgs
         originalCommandData = HistoryUtils(context).findCommandByText(currentCmdText)
             ?: Command(text = currentCmdText, pinned = false, name = "")
 
@@ -169,16 +170,16 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                 overallProgress = 0f
             }
 
-            val fullLog = dataStore.get("byedpi_proxytest_fulllog", false)
-            val logClickable = dataStore.get("byedpi_proxytest_logclickable", false)
-            val autoSort = dataStore.get("byedpi_proxytest_autosort", true)
-            val delaySec = dataStore.get("byedpi_proxytest_delay", "6").toIntOrNull() ?: 6
-            val requestsCount = dataStore.get("byedpi_proxytest_requests", "1").toIntOrNull() ?: 1
-            val requestTimeout = dataStore.get("byedpi_proxytest_timeout", "5").toLongOrNull() ?: 5L
-            val concurrentRequests = dataStore.get("byedpi_proxytest_concurrent_requests", "20").toIntOrNull() ?: 20
+            val fullLog = testPrefs.fullLog
+            val logClickable = testPrefs.logClickable
+            val autoSort = testPrefs.autoSort
+            val delaySec = testPrefs.delay.toIntOrNull() ?: 6
+            val requestsCount = testPrefs.requests.toIntOrNull() ?: 1
+            val requestTimeout = testPrefs.timeout.toLongOrNull() ?: 5L
+            val concurrentRequests = testPrefs.concurrentRequests.toIntOrNull() ?: 20
 
-            val ip = dataStore.get("byedpi_proxy_ip", "127.0.0.1")
-            val port = dataStore.get("byedpi_proxy_port", "1080").toIntOrNull() ?: 1080
+            val ip = appPrefs.proxyIp
+            val port = appPrefs.proxyPort.toIntOrNull() ?: 1080
             val siteChecker = SiteCheckUtils(ip, port)
 
             totalCmdCount = cmds.size
@@ -284,7 +285,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     private fun restoreOriginalCommand() {
         originalCommandData?.let { command ->
             val context = getApplication<Application>()
-            dataStore.setAsync("byedpi_cmd_args", command.text)
+            appPrefs.cmdArgs = command.text
 
             val historyUtils = HistoryUtils(context)
 
@@ -381,7 +382,7 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateCmdArgs(cmd: String) {
-        dataStore.setAsync("byedpi_cmd_args", cmd)
+        appPrefs.cmdArgs = cmd
     }
 
     private fun saveLog(text: String) {
@@ -402,13 +403,13 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadCmds(): List<String> {
         val context = getApplication<Application>()
-        val selectedStrategyLists = dataStore.get("byedpi_proxytest_strategy_lists", setOf("builtin"))
-        val sniValue = dataStore.get("byedpi_proxytest_sni", "max.ru")
+        val selectedStrategyLists = testPrefs.strategyLists
+        val sniValue = testPrefs.sni
 
         val allCmds = mutableListOf<String>()
         for (strategyList in selectedStrategyLists) {
             val cmds = when (strategyList) {
-                "custom" -> dataStore.get("byedpi_proxytest_commands", "").lines()
+                "custom" -> testPrefs.commands.lines()
                 else -> context.assets.open("proxytest_strategies.list").bufferedReader().readText().lines()
             }
             allCmds.addAll(cmds.map { it.trim() }.filter { it.isNotEmpty() })

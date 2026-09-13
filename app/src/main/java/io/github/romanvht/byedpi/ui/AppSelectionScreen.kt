@@ -222,7 +222,6 @@ fun AppSelectionScreenTv(
     val focusManager = LocalFocusManager.current
     val searchFocusRequester = remember { FocusRequester() }
 
-    // Initial focus
     LaunchedEffect(Unit) {
         searchFocusRequester.requestFocus()
     }

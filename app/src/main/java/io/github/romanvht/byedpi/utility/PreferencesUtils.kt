@@ -10,69 +10,27 @@ import kotlinx.coroutines.flow.map
 fun Context.getDataStore(): DataStoreManager = DataStoreManager(this)
 
 class AppPreferences(private val dataStore: DataStoreManager) {
-    var language: String
-        get() = dataStore.get("language", "system")
-        set(value) = dataStore.setAsync("language", value)
+    var language by dataStore.pref("language", "system")
+    var theme by dataStore.pref("app_theme", "system")
+    var colorScheme by dataStore.pref("color_scheme", "Default")
 
-    var theme: String
-        get() = dataStore.get("app_theme", "system")
-        set(value) = dataStore.setAsync("app_theme", value)
-
-    var colorScheme: String
-        get() = dataStore.get("color_scheme", "Default")
-        set(value) = dataStore.setAsync("color_scheme", value)
-
+    private var modeRaw by dataStore.pref("byedpi_mode", "vpn")
     var mode: Mode
-        get() = Mode.fromString(dataStore.get("byedpi_mode", "vpn"))
-        set(value) = dataStore.setAsync("byedpi_mode", value.toString().lowercase())
+        get() = Mode.fromString(modeRaw)
+        set(value) { modeRaw = value.toString().lowercase() }
 
-    var dnsIp: String
-        get() = dataStore.get("dns_ip", "1.1.1.1")
-        set(value) = dataStore.setAsync("dns_ip", value)
-
-    var dnsSolution: String
-        get() = dataStore.get("dns_solution", "1.1.1.1")
-        set(value) = dataStore.setAsync("dns_solution", value)
-
-    var ipv6Enable: Boolean
-        get() = dataStore.get("ipv6_enable", false)
-        set(value) = dataStore.setAsync("ipv6_enable", value)
-
-    var applistType: String
-        get() = dataStore.get("applist_type", "disable")
-        set(value) = dataStore.setAsync("applist_type", value)
-
-    var autostart: Boolean
-        get() = dataStore.get("autostart", false)
-        set(value) = dataStore.setAsync("autostart", value)
-
-    var autoConnect: Boolean
-        get() = dataStore.get("auto_connect", false)
-        set(value) = dataStore.setAsync("auto_connect", value)
-
-    var cmdEnable: Boolean
-        get() = dataStore.get("byedpi_enable_cmd_settings", false)
-        set(value) = dataStore.setAsync("byedpi_enable_cmd_settings", value)
-
-    var proxyIp: String
-        get() = dataStore.get("byedpi_proxy_ip", "127.0.0.1")
-        set(value) = dataStore.setAsync("byedpi_proxy_ip", value)
-
-    var proxyPort: String
-        get() = dataStore.get("byedpi_proxy_port", "1080")
-        set(value) = dataStore.setAsync("byedpi_proxy_port", value)
-
-    var cmdArgs: String
-        get() = dataStore.get("byedpi_cmd_args", "")
-        set(value) = dataStore.setAsync("byedpi_cmd_args", value)
-
-    var trafficMonitoring: Boolean
-        get() = dataStore.get("traffic_monitoring", true)
-        set(value) = dataStore.setAsync("traffic_monitoring", value)
-
-    var domainStrategiesJson: String
-        get() = dataStore.get("byedpi_domain_strategies", "[]")
-        set(value) = dataStore.setAsync("byedpi_domain_strategies", value)
+    var dnsIp by dataStore.pref("dns_ip", "1.1.1.1")
+    var dnsSolution by dataStore.pref("dns_solution", "1.1.1.1")
+    var ipv6Enable by dataStore.pref("ipv6_enable", false)
+    var applistType by dataStore.pref("applist_type", "disable")
+    var autostart by dataStore.pref("autostart", false)
+    var autoConnect by dataStore.pref("auto_connect", false)
+    var cmdEnable by dataStore.pref("byedpi_enable_cmd_settings", false)
+    var proxyIp by dataStore.pref("byedpi_proxy_ip", "127.0.0.1")
+    var proxyPort by dataStore.pref("byedpi_proxy_port", "1080")
+    var cmdArgs by dataStore.pref("byedpi_cmd_args", "")
+    var trafficMonitoring by dataStore.pref("traffic_monitoring", true)
+    var domainStrategiesJson by dataStore.pref("byedpi_domain_strategies", "[]")
 
     fun getProfileName(command: String): String? {
         try {
@@ -93,155 +51,46 @@ class AppPreferences(private val dataStore: DataStoreManager) {
 }
 
 class TestPreferences(private val dataStore: DataStoreManager) {
-    var delay: String
-        get() = dataStore.get("byedpi_proxytest_delay", "6")
-        set(value) = dataStore.setAsync("byedpi_proxytest_delay", value)
-
-    var requests: String
-        get() = dataStore.get("byedpi_proxytest_requests", "1")
-        set(value) = dataStore.setAsync("byedpi_proxytest_requests", value)
-
-    var timeout: String
-        get() = dataStore.get("byedpi_proxytest_timeout", "5")
-        set(value) = dataStore.setAsync("byedpi_proxytest_timeout", value)
-
-    var sni: String
-        get() = dataStore.get("byedpi_proxytest_sni", "max.ru")
-        set(value) = dataStore.setAsync("byedpi_proxytest_sni", value)
-
-    var fullLog: Boolean
-        get() = dataStore.get("byedpi_proxytest_fulllog", false)
-        set(value) = dataStore.setAsync("byedpi_proxytest_fulllog", value)
-
-    var logClickable: Boolean
-        get() = dataStore.get("byedpi_proxytest_logclickable", false)
-        set(value) = dataStore.setAsync("byedpi_proxytest_logclickable", value)
-
-    var autoSort: Boolean
-        get() = dataStore.get("byedpi_proxytest_autosort", true)
-        set(value) = dataStore.setAsync("byedpi_proxytest_autosort", value)
-
-    var showAll: Boolean
-        get() = dataStore.get("byedpi_proxytest_showall", false)
-        set(value) = dataStore.setAsync("byedpi_proxytest_showall", value)
-
-    var strategyLists: Set<String>
-        get() = dataStore.get("byedpi_proxytest_strategy_lists", setOf("builtin"))
-        set(value) = dataStore.setAsync("byedpi_proxytest_strategy_lists", value)
-
-    var commands: String
-        get() = dataStore.get("byedpi_proxytest_commands", "")
-        set(value) = dataStore.setAsync("byedpi_proxytest_commands", value)
-
-    var concurrentRequests: String
-        get() = dataStore.get("byedpi_proxytest_concurrent_requests", "20")
-        set(value) = dataStore.setAsync("byedpi_proxytest_concurrent_requests", value)
+    var delay by dataStore.pref("byedpi_proxytest_delay", "6")
+    var requests by dataStore.pref("byedpi_proxytest_requests", "1")
+    var timeout by dataStore.pref("byedpi_proxytest_timeout", "5")
+    var sni by dataStore.pref("byedpi_proxytest_sni", "max.ru")
+    var fullLog by dataStore.pref("byedpi_proxytest_fulllog", false)
+    var logClickable by dataStore.pref("byedpi_proxytest_logclickable", false)
+    var autoSort by dataStore.pref("byedpi_proxytest_autosort", true)
+    var showAll by dataStore.pref("byedpi_proxytest_showall", false)
+    var strategyLists by dataStore.pref("byedpi_proxytest_strategy_lists", setOf("builtin"))
+    var commands by dataStore.pref("byedpi_proxytest_commands", "")
+    var concurrentRequests by dataStore.pref("byedpi_proxytest_concurrent_requests", "20")
 }
 
 class UIPreferences(private val dataStore: DataStoreManager) {
-    var maxConnections: String
-        get() = dataStore.get("byedpi_max_connections", "512")
-        set(value) = dataStore.setAsync("byedpi_max_connections", value)
-
-    var bufferSize: String
-        get() = dataStore.get("byedpi_buffer_size", "16384")
-        set(value) = dataStore.setAsync("byedpi_buffer_size", value)
-
-    var noDomain: Boolean
-        get() = dataStore.get("byedpi_no_domain", false)
-        set(value) = dataStore.setAsync("byedpi_no_domain", value)
-
-    var tcpFastOpen: Boolean
-        get() = dataStore.get("byedpi_tcp_fast_open", false)
-        set(value) = dataStore.setAsync("byedpi_tcp_fast_open", value)
-
-    var desyncMethod: String
-        get() = dataStore.get("byedpi_desync_method", "oob")
-        set(value) = dataStore.setAsync("byedpi_desync_method", value)
-
-    var hostsMode: String
-        get() = dataStore.get("byedpi_hosts_mode", "disable")
-        set(value) = dataStore.setAsync("byedpi_hosts_mode", value)
-
-    var hostsBlacklist: String
-        get() = dataStore.get("byedpi_hosts_blacklist", "")
-        set(value) = dataStore.setAsync("byedpi_hosts_blacklist", value)
-
-    var hostsWhitelist: String
-        get() = dataStore.get("byedpi_hosts_whitelist", "")
-        set(value) = dataStore.setAsync("byedpi_hosts_whitelist", value)
-
-    var defaultTtl: String
-        get() = dataStore.get("byedpi_default_ttl", "0")
-        set(value) = dataStore.setAsync("byedpi_default_ttl", value)
-
-    var splitPosition: String
-        get() = dataStore.get("byedpi_split_position", "1")
-        set(value) = dataStore.setAsync("byedpi_split_position", value)
-
-    var splitAtHost: Boolean
-        get() = dataStore.get("byedpi_split_at_host", false)
-        set(value) = dataStore.setAsync("byedpi_split_at_host", value)
-
-    var dropSack: Boolean
-        get() = dataStore.get("byedpi_drop_sack", false)
-        set(value) = dataStore.setAsync("byedpi_drop_sack", value)
-
-    var fakeTtl: String
-        get() = dataStore.get("byedpi_fake_ttl", "8")
-        set(value) = dataStore.setAsync("byedpi_fake_ttl", value)
-
-    var fakeOffset: String
-        get() = dataStore.get("byedpi_fake_offset", "0")
-        set(value) = dataStore.setAsync("byedpi_fake_offset", value)
-
-    var fakeSni: String
-        get() = dataStore.get("byedpi_fake_sni", "www.iana.org")
-        set(value) = dataStore.setAsync("byedpi_fake_sni", value)
-
-    var oobData: String
-        get() = dataStore.get("byedpi_oob_data", "a")
-        set(value) = dataStore.setAsync("byedpi_oob_data", value)
-
-    var desyncHttp: Boolean
-        get() = dataStore.get("byedpi_desync_http", true)
-        set(value) = dataStore.setAsync("byedpi_desync_http", value)
-
-    var desyncHttps: Boolean
-        get() = dataStore.get("byedpi_desync_https", true)
-        set(value) = dataStore.setAsync("byedpi_desync_https", value)
-
-    var desyncUdp: Boolean
-        get() = dataStore.get("byedpi_desync_udp", true)
-        set(value) = dataStore.setAsync("byedpi_desync_udp", value)
-
-    var hostMixedCase: Boolean
-        get() = dataStore.get("byedpi_host_mixed_case", false)
-        set(value) = dataStore.setAsync("byedpi_host_mixed_case", value)
-
-    var domainMixedCase: Boolean
-        get() = dataStore.get("byedpi_domain_mixed_case", false)
-        set(value) = dataStore.setAsync("byedpi_domain_mixed_case", value)
-
-    var hostRemoveSpaces: Boolean
-        get() = dataStore.get("byedpi_host_remove_spaces", false)
-        set(value) = dataStore.setAsync("byedpi_host_remove_spaces", value)
-
-    var tlsRecEnabled: Boolean
-        get() = dataStore.get("byedpi_tlsrec_enabled", false)
-        set(value) = dataStore.setAsync("byedpi_tlsrec_enabled", value)
-
-    var tlsRecPosition: String
-        get() = dataStore.get("byedpi_tlsrec_position", "0")
-        set(value) = dataStore.setAsync("byedpi_tlsrec_position", value)
-
-    var tlsRecAtSni: Boolean
-        get() = dataStore.get("byedpi_tlsrec_at_sni", false)
-        set(value) = dataStore.setAsync("byedpi_tlsrec_at_sni", value)
-
-    var udpFakeCount: String
-        get() = dataStore.get("byedpi_udp_fake_count", "1")
-        set(value) = dataStore.setAsync("byedpi_udp_fake_count", value)
+    var maxConnections by dataStore.pref("byedpi_max_connections", "512")
+    var bufferSize by dataStore.pref("byedpi_buffer_size", "16384")
+    var noDomain by dataStore.pref("byedpi_no_domain", false)
+    var tcpFastOpen by dataStore.pref("byedpi_tcp_fast_open", false)
+    var desyncMethod by dataStore.pref("byedpi_desync_method", "oob")
+    var hostsMode by dataStore.pref("byedpi_hosts_mode", "disable")
+    var hostsBlacklist by dataStore.pref("byedpi_hosts_blacklist", "")
+    var hostsWhitelist by dataStore.pref("byedpi_hosts_whitelist", "")
+    var defaultTtl by dataStore.pref("byedpi_default_ttl", "0")
+    var splitPosition by dataStore.pref("byedpi_split_position", "1")
+    var splitAtHost by dataStore.pref("byedpi_split_at_host", false)
+    var dropSack by dataStore.pref("byedpi_drop_sack", false)
+    var fakeTtl by dataStore.pref("byedpi_fake_ttl", "8")
+    var fakeOffset by dataStore.pref("byedpi_fake_offset", "0")
+    var fakeSni by dataStore.pref("byedpi_fake_sni", "www.iana.org")
+    var oobData by dataStore.pref("byedpi_oob_data", "a")
+    var desyncHttp by dataStore.pref("byedpi_desync_http", true)
+    var desyncHttps by dataStore.pref("byedpi_desync_https", true)
+    var desyncUdp by dataStore.pref("byedpi_desync_udp", true)
+    var hostMixedCase by dataStore.pref("byedpi_host_mixed_case", false)
+    var domainMixedCase by dataStore.pref("byedpi_domain_mixed_case", false)
+    var hostRemoveSpaces by dataStore.pref("byedpi_host_remove_spaces", false)
+    var tlsRecEnabled by dataStore.pref("byedpi_tlsrec_enabled", false)
+    var tlsRecPosition by dataStore.pref("byedpi_tlsrec_position", "0")
+    var tlsRecAtSni by dataStore.pref("byedpi_tlsrec_at_sni", false)
+    var udpFakeCount by dataStore.pref("byedpi_udp_fake_count", "1")
 }
 
 // Extension to get DataStore based proxy ip and port
@@ -253,7 +102,7 @@ fun DataStoreManager.getProxyIpAndPort(): Pair<String, String> {
     var cmdPort: String? = null
 
     if (cmdEnable && cmdArgsStr.isNotBlank()) {
-        val cmdArgs = shellSplit(cmdArgsStr)
+        val cmdArgsList = shellSplit(cmdArgsStr)
 
         fun getArgValue(argsList: List<String>, keys: List<String>): String? {
             for (i in argsList.indices) {
@@ -271,8 +120,8 @@ fun DataStoreManager.getProxyIpAndPort(): Pair<String, String> {
             return null
         }
 
-        cmdIp = getArgValue(cmdArgs, listOf("--ip", "-i"))
-        cmdPort = getArgValue(cmdArgs, listOf("--port", "-p"))
+        cmdIp = getArgValue(cmdArgsList, listOf("--ip", "-i"))
+        cmdPort = getArgValue(cmdArgsList, listOf("--port", "-p"))
     }
 
     val ip = cmdIp ?: get("byedpi_proxy_ip", "127.0.0.1")

@@ -1,6 +1,5 @@
 package io.github.romanvht.byedpi.ui
 
-import android.content.res.Configuration
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -11,19 +10,70 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,8 +82,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,7 +92,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.activities.MainActivity
-import io.github.romanvht.byedpi.data.icons.*
+import io.github.romanvht.byedpi.data.icons.ContentCopy
+import io.github.romanvht.byedpi.data.icons.Error
+import io.github.romanvht.byedpi.data.icons.Ico
+import io.github.romanvht.byedpi.data.icons.Terminal
 import io.github.romanvht.byedpi.ui.viewmodel.TestResult
 import io.github.romanvht.byedpi.ui.viewmodel.TestViewModel
 import io.github.romanvht.byedpi.utility.isTv
@@ -56,9 +110,14 @@ fun TestScreen(
     val context = LocalContext.current
     val activity = context as? MainActivity
     val isTv = remember { context.isTv() }
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val isTablet = configuration.screenWidthDp >= 600
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val containerSize = windowInfo.containerSize
+    val screenWidthDp = with(density) { containerSize.width.toDp() }
+    val screenHeightDp = with(density) { containerSize.height.toDp() }
+
+    val isLandscape = screenWidthDp > screenHeightDp
+    val isTablet = screenWidthDp >= 600.dp
     val useSplitLayout = isLandscape || isTablet
     val colorFloatingActionButton by animateColorAsState(
         if (viewModel.isTestingState) MaterialTheme.colorScheme.errorContainer
@@ -367,8 +426,10 @@ fun TestLogsSection(
     titleContent: @Composable (() -> Unit)? = null
 ) {
     var showLogs by remember { mutableStateOf(false) }
-    val configuration = LocalConfiguration.current
-    val logHeight = if (compact) 200.dp else (configuration.screenHeightDp.dp / 2).coerceIn(200.dp, 600.dp)
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val screenHeightDp = with(density) { windowInfo.containerSize.height.toDp() }
+    val logHeight = if (compact) 200.dp else (screenHeightDp / 2).coerceIn(200.dp, 600.dp)
 
     Column {
         if (compact) {
@@ -498,17 +559,12 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (result != null) {
-                            val resultColor = when {
-                                result.percentage == 100 -> Color(0xFF4CAF50)
-                                result.percentage > 0 -> Color(0xFFFFB300)
-                                else -> MaterialTheme.colorScheme.error
-                            }
                             val msText = stringResource(R.string.test_ms)
                             Text(
                                 text = "${result.successCount}/${result.total} (${result.percentage}%)" +
                                         if (result.avgPing > 0) " | ${result.avgPing}$msText" else "",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = resultColor
+                                color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                             )
 
                             if (result.siteResults.isNotEmpty()) {
@@ -743,17 +799,12 @@ fun TestResultCard(
                         fontFamily = FontFamily.Monospace
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    val resultColor = when {
-                        result.percentage == 100 -> Color(0xFF4CAF50)
-                        result.percentage > 0 -> Color(0xFFFFB300)
-                        else -> MaterialTheme.colorScheme.error
-                    }
                     val msText = stringResource(R.string.test_ms)
                     Text(
                         text = "${result.successCount}/${result.total} (${result.percentage}%)" +
                                 if (result.avgPing > 0) " | ${result.avgPing}$msText" else "",
                         style = MaterialTheme.typography.bodySmall,
-                        color = resultColor
+                        color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )
                 }
 
@@ -792,11 +843,8 @@ fun TestResultCard(
                         } else {
                             allSites.forEachIndexed { index, site ->
                                 val sitePercentage = if (site.total > 0) (site.successCount * 100 / site.total) else 0
-                                val siteColor = when {
-                                    sitePercentage == 100 -> Color(0xFF4CAF50)
-                                    sitePercentage > 0 -> Color(0xFFFFB300)
-                                    else -> MaterialTheme.colorScheme.error
-                                }
+                                val siteColor = if (sitePercentage >= 50) MaterialTheme.colorScheme.primary else Color.Red
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()

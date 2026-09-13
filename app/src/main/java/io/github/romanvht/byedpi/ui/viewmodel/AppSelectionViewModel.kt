@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.data.AppInfo
 import io.github.romanvht.byedpi.utility.getDataStore
+import io.github.romanvht.byedpi.utility.pref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,6 +21,8 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
     private val context = application.applicationContext
     private val dataStore = context.getDataStore()
     private val pm = context.packageManager
+
+    private var selectedApps by dataStore.pref("selected_apps", setOf<String>())
 
     var apps by mutableStateOf<List<AppInfo>>(emptyList())
         private set
@@ -38,7 +41,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
             isLoading = true
             apps = withContext(Dispatchers.IO) {
                 val installedApps = pm.getInstalledApplications(0)
-                val selectedApps = dataStore.get("selected_apps", setOf<String>())
+                val selected = selectedApps
 
                 installedApps
                     .filter { it.packageName != context.packageName }
@@ -53,7 +56,7 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
                             AppInfo(
                                 appName,
                                 appInfo.packageName,
-                                selectedApps.contains(appInfo.packageName),
+                                selected.contains(appInfo.packageName),
                                 isSystem,
                             )
                         }
@@ -66,21 +69,18 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun toggleAppSelection(app: AppInfo, isChecked: Boolean) {
-        viewModelScope.launch {
-            val currentSelected = dataStore.get("selected_apps", setOf<String>()).toMutableSet()
-            if (isChecked) currentSelected.add(app.packageName)
-            else currentSelected.remove(app.packageName)
-            dataStore.set("selected_apps", currentSelected)
+        val currentSelected = selectedApps.toMutableSet()
+        if (isChecked) currentSelected.add(app.packageName) else currentSelected.remove(app.packageName)
+        selectedApps = currentSelected
 
-            apps = apps.map {
-                if (it.packageName == app.packageName) it.copy(isSelected = isChecked)
-                else it
-            }
+        apps = apps.map {
+            if (it.packageName == app.packageName) it.copy(isSelected = isChecked)
+            else it
         }
     }
 
     fun clearSelection() {
-        dataStore.removeAsync("selected_apps", setOf<String>())
+        selectedApps = emptySet()
         apps = apps.map { it.copy(isSelected = false) }
     }
 
@@ -89,15 +89,15 @@ class AppSelectionViewModel(application: Application) : AndroidViewModel(applica
             val query = searchQuery.text.toString().trim()
             var filtered = if (query.isEmpty()) apps
             else apps.filter { it.appName.contains(query, ignoreCase = true) || it.packageName.contains(query, ignoreCase = true) }
-            
+
             if (showSelectedOnly) {
                 filtered = filtered.filter { it.isSelected }
             }
-            
+
             if (!showSystemApps) {
                 filtered = filtered.filter { !it.isSystem || it.isSelected }
             }
-            
+
             return filtered
         }
 }

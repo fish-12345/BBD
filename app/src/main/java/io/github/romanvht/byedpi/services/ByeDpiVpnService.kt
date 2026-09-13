@@ -188,12 +188,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
         }
         updateStatus(ServiceStatus.Disconnected)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
 
         stopSelf()
     }
@@ -360,9 +355,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
         intent.putExtra(SENDER, Sender.VPN.ordinal)
         sendBroadcast(intent)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            QuickTileService.updateTile()
-        }
+        QuickTileService.updateTile()
     }
 
     private fun createNotification(

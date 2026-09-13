@@ -15,5 +15,3 @@
 -renamesourcefileattribute ''
 -keepattributes SourceFile,InnerClasses,EnclosingMethod,Signature,RuntimeVisibleAnnotations,*Annotation*,*Parcelable*
 -allowaccessmodification
--verbose
--adaptclassstrings
