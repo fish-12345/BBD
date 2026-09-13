@@ -70,6 +70,10 @@ class AppPreferences(private val dataStore: DataStoreManager) {
         get() = dataStore.get("traffic_monitoring", true)
         set(value) = dataStore.setAsync("traffic_monitoring", value)
 
+    var domainStrategiesJson: String
+        get() = dataStore.get("byedpi_domain_strategies", "[]")
+        set(value) = dataStore.setAsync("byedpi_domain_strategies", value)
+
     fun getProfileName(command: String): String? {
         try {
             val historyJson = dataStore.get("byedpi_command_history", "")

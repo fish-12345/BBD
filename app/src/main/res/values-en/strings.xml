@@ -146,6 +146,23 @@
     <string name="status_disconnected">Disconnected</string>
     <string name="test_process_strategy">Strategy process</string>
     <string name="test_process_domain">Domain process</string>
+    <string name="test_ping">Ping</string>
+    <string name="test_ms">ms</string>
+    <string name="test_more">more</string>
     <string name="traffic_monitoring_setting">Traffic monitoring</string>
     <string name="domain_lists">Domain Lists</string>
+    <string name="domain_settings_title">Domain Settings</string>
+    <string name="composite_strategy_hint">Composite strategy with groups (-H :domain -A n)</string>
+    <string name="add_group">Add group</string>
+    <string name="edit_group">Edit group</string>
+    <string name="delete_group_title">Delete group</string>
+    <string name="delete_group_confirm">Are you sure you want to delete group \"%1$s\"?</string>
+    <string name="no_domain_strategies">You don\'t have any domain strategies yet</string>
+    <string name="group_name_label">Group name</string>
+    <string name="domains_label">Domains (each on a new line)</string>
+    <string name="strategy_label">Strategy</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="composite_badge">Composite</string>
+    <string name="composite_strategy_active_desc">Domain rules will be added before your main strategy on startup.</string>
 </resources>

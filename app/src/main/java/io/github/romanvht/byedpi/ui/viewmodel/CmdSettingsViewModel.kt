@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.romanvht.byedpi.utility.AppPreferences
+import io.github.romanvht.byedpi.utility.CommandUtils
 import io.github.romanvht.byedpi.utility.HistoryUtils
 import io.github.romanvht.byedpi.utility.getDataStore
 
@@ -19,12 +20,28 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
         private set
     var history by mutableStateOf(historyUtils.getHistory())
         private set
+    var fullAssembledCommand by mutableStateOf("")
+        private set
+    var hasDomainGroups by mutableStateOf(false)
+        private set
 
     init {
         dataStore.run {
-            observe(viewModelScope, "byedpi_cmd_args", "") { cmdArgs = it }
+            observe(viewModelScope, "byedpi_cmd_args", "") { 
+                cmdArgs = it
+                updateFullAssembled()
+            }
             observe(viewModelScope, "byedpi_command_history", "") { refreshHistory() }
+            observe(viewModelScope, "byedpi_domain_strategies", "[]") { 
+                hasDomainGroups = it != "[]" && it.isNotBlank()
+                updateFullAssembled()
+            }
         }
+    }
+
+    private fun updateFullAssembled() {
+        val groupsJson = dataStore.get("byedpi_domain_strategies", "[]")
+        fullAssembledCommand = CommandUtils.assembleFullCommand(cmdArgs, groupsJson)
     }
 
     fun updateCmdArgs(newValue: String) {
@@ -61,6 +78,11 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
     fun unpinCommand(command: String) {
         historyUtils.unpinCommand(command)
         refreshHistory()
+    }
+
+    fun applyComposite(text: String) {
+        updateCmdArgs(text)
+        dataStore.setAsync("byedpi_domain_strategies", "[]")
     }
 
     fun renameCommand(command: String, newName: String) {

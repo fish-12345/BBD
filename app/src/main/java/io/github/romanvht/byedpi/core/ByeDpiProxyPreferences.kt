@@ -2,7 +2,11 @@ package io.github.romanvht.byedpi.core
 
 import android.content.Context
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import io.github.romanvht.byedpi.data.StrategyGroup
 import io.github.romanvht.byedpi.data.UISettings
+import io.github.romanvht.byedpi.utility.CommandUtils
 import io.github.romanvht.byedpi.utility.DataStoreManager
 import io.github.romanvht.byedpi.utility.DomainListUtils
 import io.github.romanvht.byedpi.utility.getProxyIpAndPort
@@ -25,8 +29,11 @@ class ByeDpiProxyCmdPreferences(val args: Array<String>) : ByeDpiProxyPreference
 
     companion object {
         private fun parseCmdToArguments(dataStore: DataStoreManager, context: Context): Array<String> {
-            val cmd = dataStore.get("byedpi_cmd_args", "-o1 -a1 -r-5+se")
-            val preparedCmd = getLists(cmd, context)
+            val baseCmd = dataStore.get("byedpi_cmd_args", "-o1 -a1 -r-5+se")
+            val groupsJson = dataStore.get("byedpi_domain_strategies", "[]")
+
+            val compositeCmd = CommandUtils.assembleFullCommand(baseCmd, groupsJson)
+            val preparedCmd = getLists(compositeCmd, context)
 
             val firstArgIndex = preparedCmd.indexOf("-")
             val args = (if (firstArgIndex > 0) preparedCmd.substring(firstArgIndex) else preparedCmd).trim()

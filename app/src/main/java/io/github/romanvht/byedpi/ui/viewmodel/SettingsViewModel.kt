@@ -54,7 +54,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val isProxyVisible: Boolean
         get() {
-            val cmdEnableSync = dataStore.get("byedpi_enable_cmd_settings", false)
+            val cmdEnableSync = dataStore.get("byedpi_enable_cmd_settings", true)
             val cmdArgsStr = dataStore.get("byedpi_cmd_args", "")
             
             if (!cmdEnableSync) return true

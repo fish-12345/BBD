@@ -47,6 +47,7 @@ fun SettingsScreen(
     onNavigateToAppSelection: () -> Unit = {},
     onNavigateToCmdSettings: () -> Unit = {},
     onNavigateToUISettings: () -> Unit = {},
+    onNavigateToDomainSettings: () -> Unit = {},
     onOpenTelegram: () -> Unit = {},
     onOpenSourceCode: () -> Unit = {},
     onRequestStorageAccess: () -> Unit = {},
@@ -164,6 +165,13 @@ fun SettingsScreen(
                             enabled = viewModel.cmdEnable,
                             onClick = onNavigateToTest,
                             icon = Ico.BugReport
+                        )
+
+                        PreferenceItem(
+                            title = stringResource(R.string.domain_settings_title),
+                            enabled = viewModel.cmdEnable,
+                            onClick = onNavigateToDomainSettings,
+                            icon = Ico.Language
                         )
 
                         if ((!isTv && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R))

@@ -90,7 +90,8 @@ fun CmdSettingsScreen(
                 }
             }
 
-            if (viewModel.history.isNotEmpty()) {
+
+            if (viewModel.history.isNotEmpty() || viewModel.hasDomainGroups) {
                 item {
                     SettingsCard(title = stringResource(R.string.cmd_history_title)) {
                         PreferenceItem(
@@ -99,6 +100,34 @@ fun CmdSettingsScreen(
                             onClick = { showClearHistoryDialog = true },
                             icon = Ico.ClearAll
                         )
+
+                        if (viewModel.hasDomainGroups) {
+                            PreferenceItem(
+                                title = viewModel.fullAssembledCommand,
+                                onClick = { 
+                                    showActionDialog = Command(
+                                        name = "COMPOSITE_SPECIAL_MARKER",
+                                        text = viewModel.fullAssembledCommand,
+                                        pinned = false
+                                    ) 
+                                },
+                                icon = Ico.AutoMode,
+                                trailing = {
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        shape = MaterialTheme.shapes.extraSmall,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.composite_badge),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                }
+                            )
+                        }
 
                         val sortedHistory = viewModel.history.sortedWith(
                             compareByDescending<Command> { it.pinned }
@@ -220,40 +249,47 @@ fun CmdSettingsScreen(
     showActionDialog?.let { command ->
         val renameLabel = stringResource(R.string.cmd_history_rename)
         val editLabel = stringResource(R.string.cmd_history_edit)
+        val isComposite = command.name == "COMPOSITE_SPECIAL_MARKER"
 
         if (isTv) {
             AlertDialog(
                 onDismissRequest = { showActionDialog = null },
-                title = { Text(stringResource(R.string.cmd_history_menu)) },
+                title = { Text(if (isComposite) stringResource(R.string.composite_badge) else stringResource(R.string.cmd_history_menu)) },
                 text = {
                     Column {
                         val actions = mutableListOf(
                             Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
-                                viewModel.updateCmdArgs(command.text)
+                                if (isComposite) {
+                                    viewModel.applyComposite(command.text)
+                                } else {
+                                    viewModel.updateCmdArgs(command.text)
+                                }
                             }
                         )
 
-                        if (!command.pinned) {
-                            actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
-                                viewModel.pinCommand(command.text)
-                            })
-                        }
-
-                        actions.addAll(listOf(
-                            Triple(renameLabel, Icons.Default.Edit) {
-                                showRenameDialog = command
-                            },
-                            Triple(editLabel, Icons.Default.Edit) {
-                                showEditDialog = command
-                            },
-                            Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
-                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
-                            },
-                            Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
-                                viewModel.deleteCommand(command.text)
+                        if (!isComposite) {
+                            if (!command.pinned) {
+                                actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
+                                    viewModel.pinCommand(command.text)
+                                })
                             }
-                        ))
+
+                            actions.addAll(listOf(
+                                Triple(renameLabel, Icons.Default.Edit) {
+                                    showRenameDialog = command
+                                },
+                                Triple(editLabel, Icons.Default.Edit) {
+                                    showEditDialog = command
+                                },
+                                Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
+                                },
+                                Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
+                                    viewModel.deleteCommand(command.text)
+                                }
+                            ))
+                        }
 
                         actions.forEach { (label, icon, action) ->
                             TextButton(
@@ -288,37 +324,43 @@ fun CmdSettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(bottom = 32.dp)) {
                     Text(
-                        text = stringResource(R.string.cmd_history_menu),
+                        text = if (isComposite) stringResource(R.string.composite_badge) else stringResource(R.string.cmd_history_menu),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
                     )
                     val actions = mutableListOf(
                         Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
-                            viewModel.updateCmdArgs(command.text)
+                            if (isComposite) {
+                                viewModel.applyComposite(command.text)
+                            } else {
+                                viewModel.updateCmdArgs(command.text)
+                            }
                         }
                     )
 
-                    if (!command.pinned) {
-                        actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
-                            viewModel.pinCommand(command.text)
-                        })
-                    }
-
-                    actions.addAll(listOf(
-                        Triple(renameLabel, Icons.Default.Edit) {
-                            showRenameDialog = command
-                        },
-                        Triple(editLabel, Icons.Default.Edit) {
-                            showEditDialog = command
-                        },
-                        Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
-                        },
-                        Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
-                            viewModel.deleteCommand(command.text)
+                    if (!isComposite) {
+                        if (!command.pinned) {
+                            actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
+                                viewModel.pinCommand(command.text)
+                            })
                         }
-                    ))
+
+                        actions.addAll(listOf(
+                            Triple(renameLabel, Icons.Default.Edit) {
+                                showRenameDialog = command
+                            },
+                            Triple(editLabel, Icons.Default.Edit) {
+                                showEditDialog = command
+                            },
+                            Triple(stringResource(R.string.cmd_history_copy), Ico.ContentCopy) {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(ClipData.newPlainText("Command", command.text))
+                            },
+                            Triple(stringResource(R.string.cmd_history_delete), Ico.Delete) {
+                                viewModel.deleteCommand(command.text)
+                            }
+                        ))
+                    }
 
                     actions.forEach { (label, icon, action) ->
                         Surface(

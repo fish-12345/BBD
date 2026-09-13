@@ -498,11 +498,17 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (result != null) {
+                            val resultColor = when {
+                                result.percentage == 100 -> Color(0xFF4CAF50)
+                                result.percentage > 0 -> Color(0xFFFFB300)
+                                else -> MaterialTheme.colorScheme.error
+                            }
+                            val msText = stringResource(R.string.test_ms)
                             Text(
                                 text = "${result.successCount}/${result.total} (${result.percentage}%)" +
-                                        if (result.avgPing > 0) " | ${result.avgPing}ms" else "",
+                                        if (result.avgPing > 0) " | ${result.avgPing}$msText" else "",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                color = resultColor
                             )
 
                             if (result.siteResults.isNotEmpty()) {
@@ -527,7 +533,7 @@ fun CommandActionSheet(viewModel: TestViewModel, isTv: Boolean) {
                                         )
                                         Text(
                                             text = "${site.domain}: ${site.successCount}/${site.total}" +
-                                                    if (site.avgPing > 0) " (${site.avgPing}ms)" else "",
+                                                    if (site.avgPing > 0) " (${site.avgPing}${stringResource(R.string.test_ms)})" else "",
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = if (site.successCount > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                                             maxLines = 1,
@@ -737,11 +743,17 @@ fun TestResultCard(
                         fontFamily = FontFamily.Monospace
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+                    val resultColor = when {
+                        result.percentage == 100 -> Color(0xFF4CAF50)
+                        result.percentage > 0 -> Color(0xFFFFB300)
+                        else -> MaterialTheme.colorScheme.error
+                    }
+                    val msText = stringResource(R.string.test_ms)
                     Text(
                         text = "${result.successCount}/${result.total} (${result.percentage}%)" +
-                                if (result.avgPing > 0) " | ${result.avgPing}ms" else "",
+                                if (result.avgPing > 0) " | ${result.avgPing}$msText" else "",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (result.percentage >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        color = resultColor
                     )
                 }
 
@@ -779,6 +791,12 @@ fun TestResultCard(
                             )
                         } else {
                             allSites.forEachIndexed { index, site ->
+                                val sitePercentage = if (site.total > 0) (site.successCount * 100 / site.total) else 0
+                                val siteColor = when {
+                                    sitePercentage == 100 -> Color(0xFF4CAF50)
+                                    sitePercentage > 0 -> Color(0xFFFFB300)
+                                    else -> MaterialTheme.colorScheme.error
+                                }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -795,7 +813,7 @@ fun TestResultCard(
                                         )
                                         if (site.avgPing > 0) {
                                             Text(
-                                                text = "${site.avgPing}ms",
+                                                text = "${site.avgPing}${stringResource(R.string.test_ms)}",
                                                 style = MaterialTheme.typography.labelSmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                             )
@@ -803,17 +821,17 @@ fun TestResultCard(
                                     }
 
                                     Surface(
-                                        color = if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.15f) else MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
+                                        color = siteColor.copy(alpha = 0.15f),
                                         shape = RoundedCornerShape(8.dp),
                                         border = BorderStroke(
                                             1.dp,
-                                            if (site.successCount > 0) Color(0xFF4CAF50).copy(alpha = 0.3f) else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
+                                            siteColor.copy(alpha = 0.3f)
                                         )
                                     ) {
                                         Text(
-                                            text = if (site.successCount > 0) "${site.successCount}/${site.total}" else stringResource(R.string.test_not_connected),
+                                            text = "${site.successCount}/${site.total}",
                                             style = MaterialTheme.typography.labelMedium,
-                                            color = if (site.successCount > 0) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
+                                            color = siteColor,
                                             modifier = Modifier.padding(
                                                 horizontal = 8.dp,
                                                 vertical = 4.dp

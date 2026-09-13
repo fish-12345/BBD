@@ -30,20 +30,30 @@ import io.github.romanvht.byedpi.utility.isTv
 fun SettingsCard(
     modifier: Modifier = Modifier,
     title: String? = null,
+    action: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+        if (title != null || action != null) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, bottom = 8.dp)
-            )
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (title != null) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                action?.invoke()
+            }
         }
         Card(
             modifier = Modifier.fillMaxWidth(),

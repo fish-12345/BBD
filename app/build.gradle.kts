@@ -7,7 +7,7 @@ kotlin {
     jvmToolchain(25)
 }
 
-val abis = setOf("arm64-v8a")
+val abis = setOf("arm64-v8a", "x86")
 
 android {
     namespace = "io.github.romanvht.byedpi"

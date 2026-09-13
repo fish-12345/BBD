@@ -255,7 +255,9 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
                             inMemoryResults.addAll(sorted)
                         }
                     }
-                    appendToResults("$successfulCount/$totalRequests ($successPercentage%) | Ping: ${avgPing}ms\n\n")
+                    val pingText = context.getString(R.string.test_ping)
+                    val msText = context.getString(R.string.test_ms)
+                    appendToResults("$successfulCount/$totalRequests ($successPercentage%) | $pingText: ${avgPing}$msText\n\n")
                 }
 
                 delay((delaySec * 500L).milliseconds)

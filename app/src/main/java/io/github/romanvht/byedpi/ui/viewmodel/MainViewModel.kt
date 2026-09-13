@@ -32,16 +32,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val currentStatus get() = appStatus.first
     val currentMode get() = appStatus.second
 
+    // Простые поля — через composeState, без ручных observe()
+    val isCmdEnabled by dataStore.composeState(viewModelScope, "byedpi_enable_cmd_settings", false)
+    val isTrafficMonitoringEnabled by dataStore.composeState(viewModelScope, "traffic_monitoring", true)
+
+    // preferredMode требует маппинга String -> Mode, оставляем как отдельное состояние
     var preferredMode by mutableStateOf(appPrefs.mode)
         private set
 
-    var isCmdEnabled by mutableStateOf(appPrefs.cmdEnable)
-        private set
-
+    // currentProfileName зависит от двух разных ключей (cmdArgs и history) — тоже отдельно
     var currentProfileName by mutableStateOf(appPrefs.getProfileName(appPrefs.cmdArgs))
-        private set
-
-    var isTrafficMonitoringEnabled by mutableStateOf(appPrefs.trafficMonitoring)
         private set
 
     val proxyAddress: Pair<String, String>
@@ -59,10 +59,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         dataStore.run {
             observe(viewModelScope, "byedpi_mode", "vpn") { preferredMode = Mode.fromString(it) }
-            observe(viewModelScope, "byedpi_enable_cmd_settings", false) { isCmdEnabled = it }
             observe(viewModelScope, "byedpi_cmd_args", "") { currentProfileName = appPrefs.getProfileName(it) }
             observe(viewModelScope, "byedpi_command_history", "") { currentProfileName = appPrefs.getProfileName(appPrefs.cmdArgs) }
-            observe(viewModelScope, "traffic_monitoring", true) { isTrafficMonitoringEnabled = it }
         }
     }
 

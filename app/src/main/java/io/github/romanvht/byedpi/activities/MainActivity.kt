@@ -393,6 +393,9 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToUISettings = {
                                     navController.navigate("settings/ui")
                                 },
+                                onNavigateToDomainSettings = {
+                                    navController.navigate("settings/domain")
+                                },
                                 onOpenTelegram = {
                                     openUrl("https://t.me/ByeByeDPI_group")
                                 },
@@ -418,6 +421,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("settings/apps") {
                             AppSelectionScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("settings/domain") {
+                            DomainSettingsScreen(onBack = { navController.popBackStack() })
                         }
                         composable("test") {
                             TestScreen(
