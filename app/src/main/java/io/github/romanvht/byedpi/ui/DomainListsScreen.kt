@@ -150,10 +150,8 @@ fun DomainListsScreen(
                                         clipboardManager.setPrimaryClip(clip)
 
                                         viewModel.hideActionDialog()
-                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
-                                               },
-                                leadingContent = { Icon(Ico.ContentCopy, contentDescription = null)
-                                                 },
+                                        Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show() },
+                                leadingContent = { Icon(Ico.ContentCopy, contentDescription = null) },
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                                 content = { Text("Копировать") },
                             )
@@ -171,15 +169,10 @@ fun DomainListsScreen(
                                         .clickable {
                                             viewModel.deleteList(list.id)
                                             viewModel.hideActionDialog()
-                                            Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show()
-                                                   },
-                                    leadingContent = {
-                                        Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                                                     },
+                                            Toast.makeText(context, "Список удален", Toast.LENGTH_SHORT).show() },
+                                    leadingContent = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                    content = {
-                                        Text("Удалить", color = MaterialTheme.colorScheme.error)
-                                              },
+                                    content = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
                                 )
                             }
                         }

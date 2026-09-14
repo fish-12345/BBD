@@ -43,11 +43,6 @@ fun DomainSettingsScreen(
                 title = {
                     Column {
                         Text(stringResource(R.string.domain_settings_title))
-                        Text(
-                            text = stringResource(R.string.composite_strategy_hint),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
                     }
                 },
                 navigationIcon = {
@@ -291,22 +286,23 @@ fun EditGroupDialog(
                     onValueChange = { name = it },
                     label = { Text(stringResource(R.string.group_name_label)) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = domains,
                     onValueChange = { domains = it },
                     label = { Text(stringResource(R.string.domains_label)) },
-                    placeholder = { Text("example.com\n:googlevideo.com") },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 3,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    minLines = 10,
                     shape = MaterialTheme.shapes.medium
                 )
                 OutlinedTextField(
                     value = strategy,
                     onValueChange = { strategy = it },
                     label = { Text(stringResource(R.string.strategy_label)) },
-                    placeholder = { Text("-o1 -r-5+se -a1") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium
                 )

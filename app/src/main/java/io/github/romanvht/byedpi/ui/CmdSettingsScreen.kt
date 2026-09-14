@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import io.github.romanvht.byedpi.data.icons.*
 import androidx.compose.material3.*
@@ -259,21 +258,11 @@ fun CmdSettingsScreen(
                     Column {
                         val actions = mutableListOf(
                             Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
-                                if (isComposite) {
-                                    viewModel.applyComposite(command.text)
-                                } else {
-                                    viewModel.updateCmdArgs(command.text)
-                                }
+                                viewModel.updateCmdArgs(command.text)
                             }
                         )
 
                         if (!isComposite) {
-                            if (!command.pinned) {
-                                actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
-                                    viewModel.pinCommand(command.text)
-                                })
-                            }
-
                             actions.addAll(listOf(
                                 Triple(renameLabel, Icons.Default.Edit) {
                                     showRenameDialog = command
@@ -330,21 +319,11 @@ fun CmdSettingsScreen(
                     )
                     val actions = mutableListOf(
                         Triple(stringResource(R.string.cmd_history_apply), Ico.Terminal) {
-                            if (isComposite) {
-                                viewModel.applyComposite(command.text)
-                            } else {
-                                viewModel.updateCmdArgs(command.text)
-                            }
+                            viewModel.updateCmdArgs(command.text)
                         }
                     )
 
                     if (!isComposite) {
-                        if (!command.pinned) {
-                            actions.add(Triple(stringResource(R.string.profiles_add), Icons.Default.Add) {
-                                viewModel.pinCommand(command.text)
-                            })
-                        }
-
                         actions.addAll(listOf(
                             Triple(renameLabel, Icons.Default.Edit) {
                                 showRenameDialog = command

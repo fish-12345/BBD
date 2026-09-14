@@ -41,7 +41,7 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
 
     private fun updateFullAssembled() {
         val groupsJson = dataStore.get("byedpi_domain_strategies", "[]")
-        fullAssembledCommand = CommandUtils.assembleFullCommand(cmdArgs, groupsJson)
+        fullAssembledCommand = CommandUtils.assembleFullCommand("", groupsJson)
     }
 
     fun updateCmdArgs(newValue: String) {
@@ -78,11 +78,6 @@ class CmdSettingsViewModel(application: Application) : AndroidViewModel(applicat
     fun unpinCommand(command: String) {
         historyUtils.unpinCommand(command)
         refreshHistory()
-    }
-
-    fun applyComposite(text: String) {
-        updateCmdArgs(text)
-        dataStore.setAsync("byedpi_domain_strategies", "[]")
     }
 
     fun renameCommand(command: String, newName: String) {

@@ -8,12 +8,10 @@ object CommandUtils {
     private val gson = Gson()
 
     fun assembleFullCommand(baseCmd: String, groupsJson: String): String {
-        if (groupsJson == "[]" || groupsJson.isBlank()) return baseCmd
-
         val type = object : TypeToken<List<StrategyGroup>>() {}.type
         val groups: List<StrategyGroup> = try {
             gson.fromJson(groupsJson, type) ?: emptyList()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
 
