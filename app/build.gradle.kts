@@ -19,7 +19,6 @@ android {
         targetSdk = 37
         versionCode = 1709
         versionName = "1.7.9"
-        buildToolsVersion = "37.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
