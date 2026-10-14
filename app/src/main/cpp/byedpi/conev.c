@@ -17,33 +17,37 @@ struct poolhd *init_pool(int count)
     pool->count = 0;
     pool->iters = 0;
 
-    #ifndef NOEPOLL
+#ifndef NOEPOLL
     int efd = epoll_create(count);
     if (efd < 0) {
         free(pool);
         return 0;
     }
     pool->efd = efd;
-    #endif
+#endif
     pool->pevents = malloc(sizeof(*pool->pevents) * count);
-    pool->links = malloc(sizeof(*pool->links) * count);
-    pool->items = malloc(sizeof(*pool->items) * count);
+    pool->links   = malloc(sizeof(*pool->links) * count);
+    pool->items   = malloc(sizeof(*pool->items) * count);
 
     if (!pool->pevents || !pool->links || !pool->items) {
         uniperror("init pool");
         destroy_pool(pool);
         return 0;
     }
+
+    /* FIX: зануляем весь массив items, а не только первый элемент */
+    memset(pool->items, 0, sizeof(*pool->items) * count);
+
     for (int i = 0; i < count; i++) {
         pool->links[i] = &(pool->items[i]);
+        pool->items[i].fd = -1;
+        pool->items[i].index = i;
     }
-    memset(pool->items, 0, sizeof(*pool->items));
     return pool;
 }
 
 
-struct eval *add_event(struct poolhd *pool, evcb_t cb,
-        int fd, int e)
+struct eval *add_event(struct poolhd *pool, evcb_t cb, int fd, int e)
 {
     assert(fd > 0);
     if (pool->count >= pool->max) {
@@ -54,26 +58,24 @@ struct eval *add_event(struct poolhd *pool, evcb_t cb,
     struct eval *val = pool->links[pool->count];
     memset(val, 0, sizeof(*val));
 
-    val->mod_iter = pool->iters;
     val->fd = fd;
     val->index = pool->count;
+    val->mod_iter = pool->iters;
     val->cb = cb;
 
-    #ifndef NOEPOLL
+#ifndef NOEPOLL
     struct epoll_event ev = { .events = _POLLDEF | e, .data = {val} };
     if (epoll_ctl(pool->efd, EPOLL_CTL_ADD, fd, &ev)) {
         uniperror("add event");
-        /* fix: не оставляем fd висеть, если epoll_ctl упал */
         val->fd = -1;
         return 0;
     }
-    #else
+#else
     struct pollfd *pfd = &(pool->pevents[pool->count]);
-    
     pfd->fd = fd;
     pfd->events = _POLLDEF | e;
     pfd->revents = 0;
-    #endif
+#endif
 
     pool->count++;
     return val;
@@ -90,40 +92,57 @@ void eval_set_log_addr(struct eval *val)
                       addr_str, sizeof(addr_str));
         if (p) {
             (void)snprintf(val->log_addr, sizeof(val->log_addr),
-                     "%s:%d", p, ntohs(val->addr.in.sin_port));
+                           "%s:%d", p, ntohs(val->addr.in.sin_port));
         } else {
             (void)snprintf(val->log_addr, sizeof(val->log_addr),
-                     "?:%d", ntohs(val->addr.in.sin_port));
+                           "?:%d", ntohs(val->addr.in.sin_port));
         }
     } else if (val->addr.sa.sa_family == AF_INET6) {
         p = inet_ntop(AF_INET6, &val->addr.in6.sin6_addr,
                       addr_str, sizeof(addr_str));
         if (p) {
             (void)snprintf(val->log_addr, sizeof(val->log_addr),
-                     "[%s]:%d", p, ntohs(val->addr.in6.sin6_port));
+                           "[%s]:%d", p, ntohs(val->addr.in6.sin6_port));
         } else {
             (void)snprintf(val->log_addr, sizeof(val->log_addr),
-                     "[?]:%d", ntohs(val->addr.in6.sin6_port));
+                           "[?]:%d", ntohs(val->addr.in6.sin6_port));
         }
     } else {
         (void)snprintf(val->log_addr, sizeof(val->log_addr), "unknown");
     }
 }
 
-void del_event(struct poolhd *pool, struct eval *val) 
+
+/* FIX: закрытие события. Порядок: лог -> отписка от epoll -> чистка -> close.
+   remove_timer вынесен ДО close: убираем запись из очереди таймеров,
+   чтобы не ждать следующего прохода. */
+void del_event(struct poolhd *pool, struct eval *val)
 {
     assert(val->fd >= -1 && val->mod_iter <= pool->iters);
-    LOG(LOG_S, "close: fd=%d (pair=%d), recv: %zd, rounds: %d\n", 
-        val->fd, val->pair ? val->pair->fd : -1, 
-        val->recv_count, val->round_count);
+
     if (val->fd == -1) {
         return;
     }
-    #ifdef NOEPOLL
+
+    /* Информативный лог закрытия с host, если он известен. */
+    if (val->host && val->host_len) {
+        LOG(LOG_S, "close: fd=%d host=%.*s, recv=%zd, rounds=%u\n",
+            val->fd, val->host_len, val->host,
+            val->recv_count, val->round_count);
+    } else {
+        LOG(LOG_S, "close: fd=%d addr=%s, recv=%zd, rounds=%u\n",
+            val->fd, val->log_addr,
+            val->recv_count, val->round_count);
+    }
+
+#ifdef NOEPOLL
     assert(val->fd == pool->pevents[val->index].fd);
-    #else
+#else
     epoll_ctl(pool->efd, EPOLL_CTL_DEL, val->fd, 0);
-    #endif
+#endif
+
+    remove_timer(pool, val);
+
     if (val->buff) {
         buff_push(pool, val->buff);
         val->buff = 0;
@@ -132,12 +151,12 @@ void del_event(struct poolhd *pool, struct eval *val)
         buff_push(pool, val->sq_buff);
         val->sq_buff = 0;
     }
-    #ifndef _WIN32
+#ifndef _WIN32
     if (val->restore_fake) {
         munmap(val->restore_fake, val->restore_fake_len);
         val->restore_fake = 0;
     }
-    #endif
+#endif
     if (val->host) {
         free(val->host);
         val->host = 0;
@@ -145,19 +164,19 @@ void del_event(struct poolhd *pool, struct eval *val)
     close(val->fd);
     val->fd = -1;
     val->mod_iter = pool->iters;
-    remove_timer(pool, val);
+
     pool->count--;
-    
+
     struct eval *ev = pool->links[pool->count];
-    if (ev != val) 
-    {
+    if (ev != val) {
         int index = val->index;
         pool->links[index] = ev;
         pool->links[pool->count] = val;
-        #ifdef NOEPOLL
+#ifdef NOEPOLL
         pool->pevents[index] = pool->pevents[pool->count];
-        #endif
+#endif
         ev->index = index;
+        val->index = pool->count;
     }
     if (val->pair) {
         if (val->pair->pair == val) {
@@ -180,10 +199,10 @@ void destroy_pool(struct poolhd *pool)
     free(pool->items);
     free(pool->links);
     free(pool->pevents);
-    #ifndef NOEPOLL
+#ifndef NOEPOLL
     if (pool->efd)
         close(pool->efd);
-    #endif
+#endif
     buff_destroy(pool->root_buff);
     memset(pool, 0, sizeof(*pool));
     free(pool);
@@ -220,7 +239,7 @@ int mod_etype(struct poolhd *pool, struct eval *val, int type)
 {
     assert(val->fd > 0);
     struct epoll_event ev = {
-        .events = _POLLDEF | type, .data = {val}
+            .events = _POLLDEF | type, .data = {val}
     };
     return epoll_ctl(pool->efd, EPOLL_CTL_MOD, val->fd, &ev);
 }
@@ -258,23 +277,24 @@ struct eval *next_event(struct poolhd *pool, int *offs, int *typel, int ms)
 
 int mod_etype(struct poolhd *pool, struct eval *val, int type)
 {
-   assert(val->index >= 0 && val->index < pool->count);
-   pool->pevents[val->index].events = _POLLDEF | type;
-   return 0;
+    assert(val->index >= 0 && val->index < pool->count);
+    pool->pevents[val->index].events = _POLLDEF | type;
+    return 0;
 }
 #endif
 
+
 static long time_ms(void)
 {
-    #ifndef _WIN32
+#ifndef _WIN32
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1e3 + (t.tv_nsec / 1e6);
-    #else
+    return t.tv_sec * 1000L + (t.tv_nsec / 1000000L);
+#else
     FILETIME st;
     GetSystemTimeAsFileTime(&st);
-    return (((((uint64_t)st.dwHighDateTime) << 32) | st.dwLowDateTime) / 1e4);
-    #endif
+    return (long)(((((uint64_t)st.dwHighDateTime) << 32) | st.dwLowDateTime) / 10000ULL);
+#endif
 }
 
 
@@ -285,43 +305,30 @@ void set_timer(struct poolhd *pool, struct eval *val, long ms)
     }
     struct eval *next = 0, *prev = pool->tv_end;
     val->tv_ms = time_ms() + ms;
-    
+
     while (prev && prev->tv_ms >= val->tv_ms) {
         next = prev;
         prev = prev->tv_prev;
     }
     val->tv_next = next;
     val->tv_prev = prev;
-    
-    if (next) {
-        next->tv_prev = val;
-    }
-    if (prev) {
-        prev->tv_next = val;
-    }
-    if (!pool->tv_start || next == pool->tv_start) {
-        pool->tv_start = val;
-    }
-    if (!pool->tv_end || prev == pool->tv_end) {
-        pool->tv_end = val;
-    }
+
+    if (next) next->tv_prev = val;
+    if (prev) prev->tv_next = val;
+    if (!pool->tv_start || next == pool->tv_start) pool->tv_start = val;
+    if (!pool->tv_end   || prev == pool->tv_end)   pool->tv_end   = val;
 }
 
 
 void remove_timer(struct poolhd *pool, struct eval *val)
 {
-    if (val->tv_prev) {
-        val->tv_prev->tv_next = val->tv_next;
+    if (!val->tv_ms) {
+        return;
     }
-    if (val->tv_next) {
-        val->tv_next->tv_prev = val->tv_prev;
-    }
-    if (pool->tv_start == val) {
-        pool->tv_start = val->tv_next;
-    }
-    if (pool->tv_end == val) {
-        pool->tv_end = val->tv_prev;
-    }
+    if (val->tv_prev) val->tv_prev->tv_next = val->tv_next;
+    if (val->tv_next) val->tv_next->tv_prev = val->tv_prev;
+    if (pool->tv_start == val) pool->tv_start = val->tv_next;
+    if (pool->tv_end   == val) pool->tv_end   = val->tv_prev;
     val->tv_ms = 0;
     val->tv_next = 0;
     val->tv_prev = 0;
@@ -334,13 +341,13 @@ struct eval *next_event_tv(struct poolhd *pool, int *offs, int *type)
         return next_event(pool, offs, type, -1);
     }
     struct eval *val = 0;
-    
-    int ms = pool->tv_start->tv_ms - time_ms();
+
+    int ms = (int)(pool->tv_start->tv_ms - time_ms());
     if (ms > 0) {
         val = next_event(pool, offs, type, ms);
+    } else {
+        *type = POLLTIMEOUT;
     }
-    else *type = POLLTIMEOUT;
-    
     if (!val && pool->tv_start && *type == POLLTIMEOUT) {
         val = pool->tv_start;
         remove_timer(pool, val);
@@ -352,17 +359,18 @@ struct eval *next_event_tv(struct poolhd *pool, int *offs, int *type)
 void loop_event(struct poolhd *pool)
 {
     int i = -1, etype = -1;
-    
+
     while (!pool->brk) {
         struct eval *val = next_event_tv(pool, &i, &etype);
         if (!val) {
-            if (get_e() == EINTR) 
+            if (get_e() == EINTR)
                 continue;
             uniperror("(e)poll");
             break;
         }
-        LOG(LOG_L, "new event: fd: %d, type: %d\n", val->fd, etype);
-        
+        /* FIX: убран лог "new event" из hot path.
+           Полезная инфа (host/addr) уже пишется в accept/close/desync. */
+
         int ret = (*val->cb)(pool, val, etype);
         if (ret < 0) {
             del_event(pool, val);
@@ -373,19 +381,18 @@ void loop_event(struct poolhd *pool)
 
 struct buffer *buff_pop(struct poolhd *pool, size_t size)
 {
-    struct buffer *buff = pool->root_buff;  
+    struct buffer *buff = pool->root_buff;
     if (buff) {
         pool->root_buff = buff->next;
         pool->buff_count--;
-    }
-    else {
+    } else {
         buff = malloc(sizeof(struct buffer) + size);
         if (!buff) {
             uniperror("malloc");
             return 0;
         }
-        LOG(LOG_S, "alloc new buffer\n");
-        
+        /* FIX: alloc new buffer теперь LOG_L, чтобы не спамить */
+        LOG(LOG_L, "alloc new buffer (%zu)\n", size);
         memset(buff, 0, sizeof(struct buffer));
         buff->size = size;
     }
@@ -405,7 +412,7 @@ void buff_push(struct poolhd *pool, struct buffer *buff)
     buff->lock = 0;
     buff->offset = 0;
     buff->next = pool->root_buff;
-    
+
     pool->root_buff = buff;
     pool->buff_count++;
 }
