@@ -6,10 +6,10 @@
 #include <errno.h>
 
 #ifdef _WIN32
-    #include <winsock2.h>
+#include <winsock2.h>
 #endif
 #ifdef ANDROID_APP
-    #include <android/log.h>
+#include "log.h"
 #endif
 
 #include "params.h"
@@ -23,22 +23,21 @@
 #endif
 
 #ifdef _WIN32
-    #define uniperror(str) \
+#define uniperror(str) \
         fprintf(stderr, "%s: %ld\n", str, GetLastError())
 #else
-    #ifdef ANDROID_APP
-    #define uniperror(str) \
-        __android_log_print(ANDROID_LOG_ERROR, "proxy", \
-            "%s: %s\n", str, strerror(errno))
-    #else
-    #define uniperror(str) \
+#ifdef ANDROID_APP
+#define uniperror(str) \
+        log_printf("%s: %s\n", str, strerror(errno))
+#else
+#define uniperror(str) \
         perror(str)
-    #endif
+#endif
 #endif
 
 static int unie(int e)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     switch (e) {
         case WSAEWOULDBLOCK:
             return EAGAIN;
@@ -53,19 +52,19 @@ static int unie(int e)
         case WSAECONNRESET:
             return ECONNRESET;
     }
-    #endif
+#endif
     return e;
 }
 
 #ifdef ANDROID_APP
-    #define LOG_E ANDROID_LOG_ERROR
-    #define LOG_S ANDROID_LOG_DEBUG
-    #define LOG_L ANDROID_LOG_VERBOSE
-    #define LOG(s, str, ...) \
-        __android_log_print(s, "proxy", str, ##__VA_ARGS__)
-    #define LOG_ENABLED 1
+#define LOG_E (-1)
+#define LOG_S 1
+#define LOG_L 2
+#define LOG(s, str, ...) \
+        log_printf(str, ##__VA_ARGS__)
+#define LOG_ENABLED 1
 #else
-    #define LOG_E -1
+#define LOG_E -1
     #define LOG_S 1
     #define LOG_L 2
     static void LOG(int s, const char *str, ...) {

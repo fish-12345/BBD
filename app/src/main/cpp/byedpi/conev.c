@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 #include <assert.h>
 #include "error.h"
 
@@ -48,7 +47,8 @@ struct eval *add_event(struct poolhd *pool, evcb_t cb,
 {
     assert(fd > 0);
     if (pool->count >= pool->max) {
-        LOG(LOG_E, "add_event: pool is full\n");
+        LOG(LOG_E, "add_event: pool is full (fd=%d, count=%d, max=%d)\n",
+            fd, pool->count, pool->max);
         return 0;
     }
     struct eval *val = pool->links[pool->count];
@@ -63,6 +63,8 @@ struct eval *add_event(struct poolhd *pool, evcb_t cb,
     struct epoll_event ev = { .events = _POLLDEF | e, .data = {val} };
     if (epoll_ctl(pool->efd, EPOLL_CTL_ADD, fd, &ev)) {
         uniperror("add event");
+        /* fix: не оставляем fd висеть, если epoll_ctl упал */
+        val->fd = -1;
         return 0;
     }
     #else
@@ -77,6 +79,36 @@ struct eval *add_event(struct poolhd *pool, evcb_t cb,
     return val;
 }
 
+
+void eval_set_log_addr(struct eval *val)
+{
+    const char *p = 0;
+    char addr_str[INET6_ADDRSTRLEN];
+
+    if (val->addr.sa.sa_family == AF_INET) {
+        p = inet_ntop(AF_INET, &val->addr.in.sin_addr,
+                      addr_str, sizeof(addr_str));
+        if (p) {
+            (void)snprintf(val->log_addr, sizeof(val->log_addr),
+                     "%s:%d", p, ntohs(val->addr.in.sin_port));
+        } else {
+            (void)snprintf(val->log_addr, sizeof(val->log_addr),
+                     "?:%d", ntohs(val->addr.in.sin_port));
+        }
+    } else if (val->addr.sa.sa_family == AF_INET6) {
+        p = inet_ntop(AF_INET6, &val->addr.in6.sin6_addr,
+                      addr_str, sizeof(addr_str));
+        if (p) {
+            (void)snprintf(val->log_addr, sizeof(val->log_addr),
+                     "[%s]:%d", p, ntohs(val->addr.in6.sin6_port));
+        } else {
+            (void)snprintf(val->log_addr, sizeof(val->log_addr),
+                     "[?]:%d", ntohs(val->addr.in6.sin6_port));
+        }
+    } else {
+        (void)snprintf(val->log_addr, sizeof(val->log_addr), "unknown");
+    }
+}
 
 void del_event(struct poolhd *pool, struct eval *val) 
 {
@@ -389,4 +421,3 @@ void buff_destroy(struct buffer *root)
     }
     LOG(LOG_S, "buffers count: %d\n", i);
 }
-

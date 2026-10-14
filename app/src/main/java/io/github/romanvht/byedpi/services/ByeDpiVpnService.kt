@@ -239,7 +239,7 @@ class ByeDpiVpnService : LifecycleVpnService() {
 
             if (completed == null) {
                 Log.w(TAG, "proxy not finish in time, cancelling...")
-                byeDpiProxy.jniForceClose()
+                ByeDpiProxy.jniForceClose()
             }
 
             proxyJob = null

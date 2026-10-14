@@ -43,7 +43,7 @@
 #endif
 #define POLLTIMEOUT 0
 
-#define MAX_BUFF_INP 8
+#define MAX_BUFF_INP 64
 
 struct poolhd;
 struct eval;
@@ -102,7 +102,11 @@ struct eval {
     const char *restore_orig;
     size_t restore_orig_len;
     unsigned int part_sent;
+
+    char log_addr[INET6_ADDRSTRLEN + 8];
 };
+
+void eval_set_log_addr(struct eval *val);
 
 struct poolhd {
     int max;

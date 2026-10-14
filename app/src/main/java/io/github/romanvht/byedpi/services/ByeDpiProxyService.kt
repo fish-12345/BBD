@@ -144,12 +144,7 @@ class ByeDpiProxyService : LifecycleService() {
         }
         updateStatus(ServiceStatus.Disconnected)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
 
         stopSelf()
     }
@@ -202,7 +197,7 @@ class ByeDpiProxyService : LifecycleService() {
 
             if (completed == null) {
                 Log.w(TAG, "proxy not finish in time, cancelling...")
-                proxy.jniForceClose()
+                ByeDpiProxy.jniForceClose()
             }
 
             proxyJob = null
@@ -243,9 +238,7 @@ class ByeDpiProxyService : LifecycleService() {
         intent.putExtra(SENDER, Sender.Proxy.ordinal)
         sendBroadcast(intent)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            QuickTileService.updateTile()
-        }
+        QuickTileService.updateTile()
     }
 
     private fun createNotification(

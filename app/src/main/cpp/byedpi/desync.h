@@ -28,6 +28,7 @@ int post_desync(int sfd, struct desync_params *dp);
 struct proto_info {
     char init, type;
     int host_len, host_pos;
+    int sld_pos, sld_len;
 };
 
 static long gen_offset(long pos, int flag,

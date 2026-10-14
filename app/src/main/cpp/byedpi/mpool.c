@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 
 static int bit_cmp(const struct elem *p, const struct elem *q)
@@ -192,7 +191,7 @@ void load_cache(struct mphdr *hdr, FILE *in, struct desync_params *dp)
         uint16_t port;
         time_t cache_time;
         
-        int c = fscanf(in, "0 %39s %d %hu %jd %255s\n", 
+        int c = fscanf(in, "0 %39s %d %hu %ld %255s\n",
             addr_str, &bitlen, &port, &cache_time, host);
         if (c < 1) {
             return;

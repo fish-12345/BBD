@@ -28,6 +28,7 @@
 #define OFFSET_SNI 8
 #define OFFSET_HOST 16
 #define OFFSET_START 32
+#define OFFSET_MIDSLD 64
 
 #define DETECT_HTTP_LOCAT 1
 #define DETECT_TLS_ERR 2
@@ -37,6 +38,17 @@
 #define AUTO_ONRECONN 1
 #define AUTO_NORECONN 2
 #define AUTO_SORT 4
+
+#define MODE_SOCKS5 1
+#define MODE_SOCKS4 2
+#define MODE_HTTP 4
+#define MODE_TRANSPARENT 8
+#define MODE_SHADOWSOCKS 16
+#define MODE_RAWTLS 32
+#define MODE_TCP 64
+#define MODE_SOCKS (MODE_SOCKS4 | MODE_SOCKS5)
+
+#define OUT_SUPPORT (MODE_SOCKS5 | MODE_TCP)
 
 #define FM_RAND 1
 #define FM_ORIG 2
@@ -110,7 +122,8 @@ struct desync_params {
     uint16_t pf[2];
     int rounds[2];
     
-    union sockaddr_u ext_socks;
+    uint16_t out_type;
+    union sockaddr_u out_addr;
     
     int _optind;
     int id;
@@ -139,12 +152,10 @@ struct params {
     int to_count_lim;
     int to_bytes_lim;
     char cache_pre;
+    int mode;
     bool ipv6;
     bool resolve;
     bool udp;
-    bool transparent;
-    bool http_connect;
-    bool shadowsocks;
     bool delay_conn;
     bool auto_reconnect;
     int max_open;

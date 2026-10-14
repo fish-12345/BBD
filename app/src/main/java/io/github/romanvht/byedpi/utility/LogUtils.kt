@@ -7,18 +7,16 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import io.github.romanvht.byedpi.R
+import io.github.romanvht.byedpi.core.ByeDpiProxy
 import java.io.IOException
 
 object LogUtils {
     private const val TAG = "LogUtils"
 
+    /** Читает накопленный буфер логов из native-слоя и очищает его. */
     fun collectLogs(): String? =
         try {
-            val pid = android.os.Process.myPid()
-            Runtime.getRuntime()
-                .exec("logcat -d -t 2000 --pid=$pid *:D")
-                .inputStream.bufferedReader()
-                .use { it.readText() }
+            ByeDpiProxy.jniReadLogs()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to collect logs", e)
             null
@@ -27,24 +25,27 @@ object LogUtils {
     fun saveLogs(context: Context, uri: Uri) {
         val logs = collectLogs()
 
-        if (logs == null) {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(
-                    context,
-                    R.string.logs_failed,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        } else {
+        if (logs.isNullOrEmpty()) {
+            showToast(context, R.string.logs_failed)
+            return
+        }
+
+        try {
             context.contentResolver.openOutputStream(uri)?.use {
-                try {
-                    it.write(logs.toByteArray())
-                } catch (e: IOException) {
-                    Log.e(TAG, "Failed to save logs", e)
-                }
+                it.write(logs.toByteArray())
             } ?: run {
                 Log.e(TAG, "Failed to open output stream")
+                showToast(context, R.string.logs_failed)
             }
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to save logs", e)
+            showToast(context, R.string.logs_failed)
+        }
+    }
+
+    private fun showToast(context: Context, resId: Int) {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(context, resId, Toast.LENGTH_SHORT).show()
         }
     }
 }
