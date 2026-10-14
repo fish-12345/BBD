@@ -35,13 +35,29 @@ struct poolhd *init_pool(int count)
         return 0;
     }
 
-    /* FIX: зануляем весь массив items, а не только первый элемент */
+    /* Fix: зануляем весь массив items */
     memset(pool->items, 0, sizeof(*pool->items) * count);
 
     for (int i = 0; i < count; i++) {
         pool->links[i] = &(pool->items[i]);
         pool->items[i].fd = -1;
         pool->items[i].index = i;
+    }
+
+    /* B1: prealloc пула буферов, чтобы hot path не дёргал malloc */
+    {
+        int pre = count < MAX_BUFF_INP ? count : MAX_BUFF_INP;
+        size_t bs = params.bfsize ? params.bfsize : 16384;
+        int made = 0;
+        for (int i = 0; i < pre; i++) {
+            struct buffer *b = malloc(sizeof(struct buffer) + bs);
+            if (!b) break;
+            memset(b, 0, sizeof(struct buffer));
+            b->size = bs;
+            buff_push(pool, b);
+            made++;
+        }
+        LOG(LOG_S, "preallocated %d buffers (%zu bytes each)\n", made, bs);
     }
     return pool;
 }
@@ -113,9 +129,6 @@ void eval_set_log_addr(struct eval *val)
 }
 
 
-/* FIX: закрытие события. Порядок: лог -> отписка от epoll -> чистка -> close.
-   remove_timer вынесен ДО close: убираем запись из очереди таймеров,
-   чтобы не ждать следующего прохода. */
 void del_event(struct poolhd *pool, struct eval *val)
 {
     assert(val->fd >= -1 && val->mod_iter <= pool->iters);
@@ -124,7 +137,6 @@ void del_event(struct poolhd *pool, struct eval *val)
         return;
     }
 
-    /* Информативный лог закрытия с host, если он известен. */
     if (val->host && val->host_len) {
         LOG(LOG_S, "close: fd=%d host=%.*s, recv=%zd, rounds=%u\n",
             val->fd, val->host_len, val->host,
@@ -293,7 +305,8 @@ static long time_ms(void)
 #else
     FILETIME st;
     GetSystemTimeAsFileTime(&st);
-    return (long)(((((uint64_t)st.dwHighDateTime) << 32) | st.dwLowDateTime) / 10000ULL);
+    return (long)(((((uint64_t)st.dwHighDateTime) << 32) |
+                   st.dwLowDateTime) / 10000ULL);
 #endif
 }
 
@@ -368,9 +381,6 @@ void loop_event(struct poolhd *pool)
             uniperror("(e)poll");
             break;
         }
-        /* FIX: убран лог "new event" из hot path.
-           Полезная инфа (host/addr) уже пишется в accept/close/desync. */
-
         int ret = (*val->cb)(pool, val, etype);
         if (ret < 0) {
             del_event(pool, val);
@@ -391,7 +401,6 @@ struct buffer *buff_pop(struct poolhd *pool, size_t size)
             uniperror("malloc");
             return 0;
         }
-        /* FIX: alloc new buffer теперь LOG_L, чтобы не спамить */
         LOG(LOG_L, "alloc new buffer (%zu)\n", size);
         memset(buff, 0, sizeof(struct buffer));
         buff->size = size;

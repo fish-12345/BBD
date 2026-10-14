@@ -2,7 +2,6 @@
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
-    
     #ifndef TCP_MAXRT
     #define TCP_MAXRT 5
     #endif
@@ -11,6 +10,11 @@
 #include <netinet/tcp.h>
 #include <sys/un.h>
 #include <sys/time.h>
+#ifndef __linux__
+#include <pthread.h>
+#else
+#include <pthread.h>
+#endif
 #endif
 
 #include <string.h>
@@ -22,6 +26,9 @@
 
 #include "desync.h"
 #include "packets.h"
+
+/* Определено в proxy.c */
+extern pthread_mutex_t g_cache_lock;
 
 
 static int set_timeout(int fd, unsigned int s)
@@ -47,7 +54,7 @@ static int set_timeout(int fd, unsigned int s)
 
 
 static ssize_t serialize_addr(const union sockaddr_u *dst,
-        struct cache_key *out)
+                              struct cache_key *out)
 {
     out->port = dst->in.sin_port;
     out->family = dst->sa.sa_family;
@@ -56,8 +63,7 @@ static ssize_t serialize_addr(const union sockaddr_u *dst,
     if (dst->sa.sa_family == AF_INET) {
         out->ip.v4 = dst->in.sin_addr;
         return c + sizeof(out->ip.v4);
-    }
-    else {
+    } else {
         out->ip.v6 = dst->in6.sin6_addr;
         return c + sizeof(out->ip.v6);
     }
@@ -67,8 +73,7 @@ static ssize_t serialize_addr(const union sockaddr_u *dst,
 static int eq_bitlen(const char *a, const char *b, int n)
 {
     int by = 0, bi = 0;
-    for (; by < n && a[by] == b[by]; by++) {
-    }
+    for (; by < n && a[by] == b[by]; by++) {}
     if (by != n) {
         for (; bi < 8
                && (a[by] >> bi) != (b[by] >> bi); bi++) {}
@@ -82,18 +87,22 @@ static struct elem_i *cache_get(const union sockaddr_u *dst)
     struct cache_key key = { 0 };
     int len = serialize_addr(dst, &key);
 
+    pthread_mutex_lock(&g_cache_lock);
     struct elem_i *val = mem_get(params.mempool, (char *)&key, len * 8);
     if (!val) {
+        pthread_mutex_unlock(&g_cache_lock);
         return 0;
     }
     struct desync_params *dp = val->dp;
-
     time_t t = time(0);
     if (dp->cache_ttl && t > val->time + dp->cache_ttl) {
-        LOG(LOG_S, "time=%jd, now=%jd, ignore\n", (intmax_t)val->time, (intmax_t)t);
+        LOG(LOG_S, "time=%jd, now=%jd, ignore\n",
+            (intmax_t)val->time, (intmax_t)t);
         mem_delete(params.mempool, (char *)&key, len);
+        pthread_mutex_unlock(&g_cache_lock);
         return 0;
     }
+    pthread_mutex_unlock(&g_cache_lock);
     return val;
 }
 
@@ -101,6 +110,8 @@ static struct elem_i *cache_get(const union sockaddr_u *dst)
 static struct elem_i *cache_add(
         const union sockaddr_u *dst, char **host, int host_len)
 {
+    pthread_mutex_lock(&g_cache_lock);
+
     struct cache_key key = { 0 };
     int bytes = serialize_addr(dst, &key);
     int cmp_len = bytes * 8;
@@ -115,14 +126,17 @@ static struct elem_i *cache_add(
     }
     struct cache_key *data = calloc(1, bytes);
     if (!data) {
+        pthread_mutex_unlock(&g_cache_lock);
         return 0;
     }
     memcpy(data, &key, bytes);
 
-    struct elem_i *val = mem_add(params.mempool, (char *)data, cmp_len, sizeof(struct elem_i));
+    struct elem_i *val = mem_add(params.mempool, (char *)data,
+                                 cmp_len, sizeof(struct elem_i));
     if (!val) {
         uniperror("mem_add");
         free(data);
+        pthread_mutex_unlock(&g_cache_lock);
         return 0;
     }
     val->time = t;
@@ -131,6 +145,7 @@ static struct elem_i *cache_add(
         val->extra = *host;
         *host = 0;
     }
+    pthread_mutex_unlock(&g_cache_lock);
     return val;
 }
 
@@ -165,6 +180,7 @@ static int on_socks_recv(struct poolhd *pool, struct eval *val, int t)
 
     return (val->cb)(pool, val, POLLOUT);
 }
+
 
 static int on_socks_conn(struct poolhd *pool, struct eval *val, int t)
 {
@@ -233,9 +249,7 @@ static bool check_host(
         len = parse_http(buffer, n, &host, 0);
     }
     assert(len == 0 || host != 0);
-    if (len <= 0) {
-        return 0;
-    }
+    if (len <= 0) return 0;
     struct elem *v = mem_get(hosts, host, len);
     return v && v->len <= len;
 }
@@ -251,41 +265,27 @@ static bool check_ip(
         len = sizeof(dst->in6.sin6_addr);
         data = (const char *)&dst->in6.sin6_addr;
     }
-    if (mem_get(ipset, data, len * 8)) {
-        return 1;
-    }
+    if (mem_get(ipset, data, len * 8)) return 1;
     return 0;
 }
 
 
 static bool check_proto_tcp(int proto, const char *buffer, ssize_t n)
 {
-    if (!(proto & ~IS_IPV4)) {
-        return 1;
-    }
-    else if ((proto & IS_HTTP) &&
-             is_http(buffer, n)) {
-        return 1;
-    }
-    else if ((proto & IS_HTTPS) &&
-             is_tls_chello(buffer, n)) {
-        return 1;
-    }
+    if (!(proto & ~IS_IPV4)) return 1;
+    else if ((proto & IS_HTTP) && is_http(buffer, n)) return 1;
+    else if ((proto & IS_HTTPS) && is_tls_chello(buffer, n)) return 1;
     return 0;
 }
 
 
-static bool check_l34(struct desync_params *dp, int st, const union sockaddr_u *dst)
+static bool check_l34(struct desync_params *dp, int st,
+                      const union sockaddr_u *dst)
 {
-    if ((dp->proto & IS_UDP) && (st != SOCK_DGRAM)) {
-        return 0;
-    }
-    if ((dp->proto & IS_TCP) && (st != SOCK_STREAM)) {
-        return 0;
-    }
+    if ((dp->proto & IS_UDP) && (st != SOCK_DGRAM)) return 0;
+    if ((dp->proto & IS_TCP) && (st != SOCK_STREAM)) return 0;
     if (dp->proto & IS_IPV4) {
         static const char *pat = "\0\0\0\0\0\0\0\0\0\0\xff\xff";
-
         if (dst->sa.sa_family != AF_INET
             && memcmp(&dst->in6.sin6_addr, pat, 12)) {
             return 0;
@@ -295,9 +295,7 @@ static bool check_l34(struct desync_params *dp, int st, const union sockaddr_u *
         (dst->in.sin_port < dp->pf[0] || dst->in.sin_port > dp->pf[1])) {
         return 0;
     }
-    if (dp->ipset && !check_ip(dp->ipset, dst)) {
-        return 0;
-    }
+    if (dp->ipset && !check_ip(dp->ipset, dst)) return 0;
     return 1;
 }
 
@@ -319,17 +317,13 @@ static void swop_groups(struct desync_params *dpc, struct desync_params *dpn)
     dpn->prev = dpc_cp.prev;
     dpn->next = dpc_cp.next;
 
-    if (dpn->prev)
-        dpn->prev->next = dpn;
-
-    if (dpc->next)
-        dpc->next->prev = dpc;
+    if (dpn->prev) dpn->prev->next = dpn;
+    if (dpc->next) dpc->next->prev = dpc;
 
     if (dpc_cp.next != dpn) {
         dpn->next->prev = dpn;
         dpc->prev->next = dpc;
-    }
-    else {
+    } else {
         dpc->prev = dpn;
         dpn->next = dpc;
     }
@@ -342,19 +336,18 @@ static void swop_groups(struct desync_params *dpc, struct desync_params *dpn)
 }
 
 
-int on_trigger(int type, struct poolhd *pool, struct eval *val, bool client_alive)
+int on_trigger(int type, struct poolhd *pool, struct eval *val,
+               bool client_alive)
 {
     struct eval *lav = val->pair;
 
     bool before_req = !lav->recv_count && !val->recv_count;
-
     bool can_reconn = ((lav->sq_buff || before_req) && client_alive);
     INIT_ADDR_STR((val->addr));
 
     struct elem_i *cache = cache_add(&val->addr, &lav->host, lav->host_len);
-    if (!cache) {
-        return -1;
-    }
+    if (!cache) return -1;
+
     lav->dp->fail_count++;
     lav->dp_mask |= lav->dp->bit;
     lav->detect = type;
@@ -363,9 +356,7 @@ int on_trigger(int type, struct poolhd *pool, struct eval *val, bool client_aliv
     struct desync_params *dp = params.dp, *next = 0;
 
     for (; dp; dp = dp->next) {
-        if (!uncheked && !dp->detect) {
-            break;
-        }
+        if (!uncheked && !dp->detect) break;
         if (!(dp->bit & lav->dp_mask)
             && (!dp->detect || (dp->detect & type))
             && (!(dp->auto_level & AUTO_ONRECONN) || can_reconn)) {
@@ -375,8 +366,7 @@ int on_trigger(int type, struct poolhd *pool, struct eval *val, bool client_aliv
         uncheked &= ~dp->bit;
         lav->dp_mask |= dp->bit;
     }
-    if (!(lav->dp->bit & cache->dp_mask))
-    {
+    if (!(lav->dp->bit & cache->dp_mask)) {
         if (next && (next->auto_level & AUTO_SORT)
             && lav->dp->pri > next->pri
             && !(lav->dp->bit & uncheked)) {
@@ -406,9 +396,8 @@ int on_trigger(int type, struct poolhd *pool, struct eval *val, bool client_aliv
 
 static int on_torst(struct poolhd *pool, struct eval *val)
 {
-    if (on_trigger(DETECT_TORST, pool, val, 1) == 0) {
-        return 0;
-    }
+    if (on_trigger(DETECT_TORST, pool, val, 1) == 0) return 0;
+
     struct linger l = { .l_onoff = 1 };
     if (setsockopt(val->pair->fd, SOL_SOCKET,
                    SO_LINGER, (char *)&l, sizeof(l)) < 0) {
@@ -421,24 +410,15 @@ static int on_torst(struct poolhd *pool, struct eval *val)
 static int on_fin(struct poolhd *pool, struct eval *val)
 {
     bool is_client = val->flag != FLAG_CONN;
-
-    if (is_client) {
-        val = val->pair;
-    }
-    if (!val || !(val->pair->mark && val->round_count <= 1)) {
-        return -1;
-    }
-    if (on_trigger(DETECT_TLS_ERR, pool, val, !is_client) == 0) {
-        return 0;
-    }
+    if (is_client) val = val->pair;
+    if (!val || !(val->pair->mark && val->round_count <= 1)) return -1;
+    if (on_trigger(DETECT_TLS_ERR, pool, val, !is_client) == 0) return 0;
     return -1;
 }
 
 
 int on_timeout(struct poolhd *pool, struct eval *val) {
-    if (++val->to_count >= params.to_count_lim) {
-        return on_torst(pool, val);
-    }
+    if (++val->to_count >= params.to_count_lim) return on_torst(pool, val);
     set_timer(pool, val, params.ptimeout);
     return 0;
 }
@@ -461,22 +441,17 @@ static int on_response(struct poolhd *pool, struct eval *val,
     val->pair->dp_mask |= val->pair->dp->bit;
 
     for (; dp; dp = dp->next) {
-        if (dp->bit & val->pair->dp_mask) {
-            continue;
-        }
+        if (dp->bit & val->pair->dp_mask) continue;
         if ((dp->detect & DETECT_HTTP_LOCAT)
             && is_http_redirect(req, qn, resp, sn)) {
             break;
-        }
-        else if ((dp->detect & DETECT_TLS_ERR)
-                 && ((is_tls_chello(req, qn) && !is_tls_shello(resp, sn))
-                     || neq_tls_sid(req, qn, resp, sn))) {
+        } else if ((dp->detect & DETECT_TLS_ERR)
+                   && ((is_tls_chello(req, qn) && !is_tls_shello(resp, sn))
+                       || neq_tls_sid(req, qn, resp, sn))) {
             break;
         }
     }
-    if (dp) {
-        return on_trigger(dp->detect, pool, val, 1);
-    }
+    if (dp) return on_trigger(dp->detect, pool, val, 1);
     return -1;
 }
 
@@ -495,28 +470,24 @@ static int try_set_tls_timer(struct poolhd *pool,
             val->tls_rec[val->tls_rec_pos] = buff[pos];
             val->tls_rec_pos++; pos++;
             continue;
-        }
-        else if (val->tls_rec_pos == 5) {
+        } else if (val->tls_rec_pos == 5) {
             val->tls_rec_size = ANTOHS(val->tls_rec, 3) + 5;
             uint8_t t = val->tls_rec[0];
-
             if (t < 0x14 || t > 0x18) {
                 LOG(LOG_E, "unknown record type: 0x%x\n", t);
                 return -1;
             }
-        }
-        else if (val->tls_rec_pos == val->tls_rec_size) {
+        } else if (val->tls_rec_pos == val->tls_rec_size) {
             val->tls_rec_pos = 0;
             val->tls_rec_size = 0;
             continue;
         }
         ssize_t end = val->tls_rec_size - val->tls_rec_pos;
-        if (end <= 0)  {
+        if (end <= 0) {
             LOG(LOG_E, "invalid record size: %d\n", val->tls_rec_size);
             return -1;
         }
         if (pos + end > n) end = n - pos;
-
         val->tls_rec_pos += end; pos += end;
     } while (pos < n);
 
@@ -539,19 +510,13 @@ static inline void free_first_req(struct poolhd *pool, struct eval *client)
 
 static void save_hostname(struct eval *client, const char *buffer, ssize_t n)
 {
-    if (client->host) {
-        return;
-    }
+    if (client->host) return;
     char *host = 0;
     int len = parse_tls(buffer, n, &host);
     if (!len) {
-        if (!(len = parse_http(buffer, n, &host, 0))) {
-            return;
-        }
+        if (!(len = parse_http(buffer, n, &host, 0))) return;
     }
-    if (!(client->host = malloc(len))) {
-        return;
-    }
+    if (!(client->host = malloc(len))) return;
     memcpy(client->host, host, len);
     client->host_len = len;
 }
@@ -568,14 +533,15 @@ static struct desync_params *find_dp(struct eval *client,
 
     for (; ; dp = dp->next) {
         if (!dp) dp = params.dp;
-        if (client->dp_mask == params.dp_full_mask) {
-            break;
-        }
+        if (client->dp_mask == params.dp_full_mask) break;
         if (!(dp->bit & client->dp_mask)
-            && (dp == init_dp || !dp->detect || (client->detect & dp->detect))
+            && (dp == init_dp || !dp->detect
+                || (client->detect & dp->detect))
             && (check_l34(dp, SOCK_STREAM, dst))
-            && (!dp->proto || !buff || check_proto_tcp(dp->proto, buff, n))
-            && (!dp->hosts || !buff || check_host(dp->hosts, buff, n))) {
+            && (!dp->proto || !buff
+                || check_proto_tcp(dp->proto, buff, n))
+            && (!dp->hosts || !buff
+                || check_host(dp->hosts, buff, n))) {
             return dp;
         }
         client->dp_mask |= dp->bit;
@@ -586,13 +552,10 @@ static struct desync_params *find_dp(struct eval *client,
 
 static int recv_and_connect(struct poolhd *pool, struct eval *val, int t)
 {
-    if (!(val->buff = buff_pop(pool, params.bfsize))) {
-        return -1;
-    }
+    (void)t;
+    if (!(val->buff = buff_pop(pool, params.bfsize))) return -1;
     val->buff->lock = tcp_recv_hook(pool, val, val->buff);
-    if (val->buff->lock <= 0) {
-        return -1;
-    }
+    if (val->buff->lock <= 0) return -1;
     return connect_hook(pool, val, &val->addr, &on_connect);
 }
 
@@ -650,22 +613,17 @@ static int setup_conn(struct eval *client, const char *buffer, ssize_t n)
     client->mark = is_tls_chello(buffer, n);
     client->dp = dp;
 
-    if (params.timeout
-        && set_timeout(client->pair->fd, params.timeout)) {
+    if (params.timeout && set_timeout(client->pair->fd, params.timeout)) {
         return -1;
     }
-    if (pre_desync(client->pair->fd, client->dp)) {
-        return -1;
-    }
+    if (pre_desync(client->pair->fd, client->dp)) return -1;
     return 0;
 }
 
 
 static int cancel_setup(struct eval *remote)
 {
-    if (post_desync(remote->fd, remote->pair->dp)) {
-        return -1;
-    }
+    if (post_desync(remote->fd, remote->pair->dp)) return -1;
     return 0;
 }
 
@@ -677,10 +635,8 @@ static int handle_err(struct poolhd *pool, struct eval *val, int e)
         case ECONNREFUSED:
         case ETIMEDOUT:
         case EHOSTUNREACH:
-            if (val->flag == FLAG_CONN)
-                return on_torst(pool, val);
-            else
-                return on_fin(pool, val);
+            if (val->flag == FLAG_CONN) return on_torst(pool, val);
+            else return on_fin(pool, val);
     }
     return -1;
 }
@@ -703,9 +659,9 @@ ssize_t tcp_send_hook(struct poolhd *pool,
         int r = client->round_count;
         if (!check_round(client->dp->rounds, r)) {
             skip = 1;
-        }
-        else {
-            LOG(LOG_S, "desync TCP: group=%d, round=%d, fd=%d, dst=%s, host=%.*s\n",
+        } else {
+            LOG(LOG_S,
+                "desync TCP: group=%d, round=%d, fd=%d, dst=%s, host=%.*s\n",
                 client->dp->id, r, remote->fd, remote->log_addr,
                 client->host_len, client->host ? client->host : "-");
             sn = desync(pool, remote, buff, n, wait);
@@ -713,9 +669,7 @@ ssize_t tcp_send_hook(struct poolhd *pool,
     }
     if (skip) {
         sn = send(remote->fd, buff->data + off, *n - off, 0);
-        if (sn < 0 && get_e() == EAGAIN) {
-            return 0;
-        }
+        if (sn < 0 && get_e() == EAGAIN) return 0;
     }
     if (sn < 0) {
         struct eval *client = remote->pair;
@@ -736,12 +690,8 @@ ssize_t tcp_recv_hook(struct poolhd *pool,
 {
     ssize_t n = recv(val->fd, buff->data, buff->size, 0);
     if (n < 1) {
-        if (!n) {
-            return on_fin(pool, val);
-        }
-        if (get_e() == EAGAIN) {
-            return 0;
-        }
+        if (!n) return on_fin(pool, val);
+        if (get_e() == EAGAIN) return 0;
         LOG(LOG_E, "recv error: fd=%d, addr=%s, err=%s\n",
             val->fd, val->log_addr, strerror(get_e()));
         return handle_err(pool, val, get_e());
@@ -757,47 +707,38 @@ ssize_t tcp_recv_hook(struct poolhd *pool,
     }
     if (val->flag == FLAG_CONN && !val->round_sent) {
         int *nr = val->pair->dp->rounds;
-
         if (check_round(nr, val->round_count)
             && !check_round(nr, val->round_count + 1)
             && cancel_setup(val)) {
             return -1;
         }
     }
-    //
     if (val->flag == FLAG_CONN) {
         if (val->pair->mark
             && try_set_tls_timer(pool, val, buff->data, n)) {
             val->pair->mark = 0;
         }
         if (val->to_count >= 0 && params.timeout
-            && (params.to_bytes_lim && val->recv_count > params.to_bytes_lim)) {
+            && (params.to_bytes_lim
+                && val->recv_count > params.to_bytes_lim)) {
             set_timeout(val->fd, 0);
             val->to_count = -1;
         }
-        //
         if (val->pair->sq_buff) {
-            if (on_response(pool, val, buff->data, n) == 0) {
-                return 0;
-            }
+            if (on_response(pool, val, buff->data, n) == 0) return 0;
             free_first_req(pool, val->pair);
         }
-    }
-    else if (params.auto_reconnect
-             && (val->sq_buff || val->recv_count == n))
-    {
+    } else if (params.auto_reconnect
+               && (val->sq_buff || val->recv_count == n)) {
         if (!val->sq_buff) {
-            if (!(val->sq_buff = buff_pop(pool, buff->size))) {
-                return -1;
-            }
+            if (!(val->sq_buff = buff_pop(pool, buff->size))) return -1;
         }
         val->sq_buff->lock += n;
-
         if ((size_t )val->sq_buff->lock >= val->sq_buff->size) {
             free_first_req(pool, val);
-        }
-        else {
-            memcpy(val->sq_buff->data + val->sq_buff->lock - n, buff->data, n);
+        } else {
+            memcpy(val->sq_buff->data + val->sq_buff->lock - n,
+                   buff->data, n);
         }
     }
     return n;
@@ -813,13 +754,8 @@ ssize_t udp_hook(struct eval *val,
     struct desync_params *dp = pair->dp;
     if (!dp) {
         for (dp = params.dp; ; dp = dp->next) {
-            if (!dp) {
-                return -1;
-            }
-            if (!dp->detect
-                && check_l34(dp, SOCK_DGRAM, dst)) {
-                break;
-            }
+            if (!dp) return -1;
+            if (!dp->detect && check_l34(dp, SOCK_DGRAM, dst)) break;
         }
         pair->dp = dp;
     }
@@ -845,10 +781,7 @@ static int protect(int conn_fd, const char *path)
     strcpy(sa.sun_path, path);
 
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd < 0) {
-        uniperror("socket");
-        return -1;
-    }
+    if (fd < 0) { uniperror("socket"); return -1; }
     struct timeval tv = { .tv_sec = 1 };
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));

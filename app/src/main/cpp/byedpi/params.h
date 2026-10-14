@@ -7,12 +7,12 @@
 #include <assert.h>
 
 #ifdef _WIN32
-    #include <ws2tcpip.h>
+#include <ws2tcpip.h>
 #else
-    #include <arpa/inet.h>
-    #include <netinet/in.h>
-    #include <unistd.h>
-    #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <sys/socket.h>
 #endif
 
 #include "mpool.h"
@@ -104,16 +104,16 @@ struct desync_params {
     int fake_tls_size;
     bool drop_sack;
     char oob_char[2];
-    
+
     int parts_n;
     struct part *parts;
-    
+
     int mod_http;
     int tlsrec_n;
     struct part *tlsrec;
     uint8_t tlsminor;
     bool tlsminor_set;
-    
+
     int proto;
     short detect;
     short auto_level;
@@ -121,10 +121,10 @@ struct desync_params {
     struct mphdr *ipset;
     uint16_t pf[2];
     int rounds[2];
-    
+
     uint16_t out_type;
     union sockaddr_u out_addr;
-    
+
     int _optind;
     int id;
     uint64_t bit;
@@ -133,7 +133,7 @@ struct desync_params {
     const char *str;
     long cache_ttl;
     const char *cache_file;
-    
+
     struct desync_params *prev;
     struct desync_params *next;
 };
@@ -146,7 +146,7 @@ struct params {
     bool wait_send;
     int def_ttl;
     bool custom_ttl;
-    
+
     bool tfo;
     unsigned int timeout, ptimeout;
     int to_count_lim;
@@ -160,14 +160,15 @@ struct params {
     bool auto_reconnect;
     int max_open;
     int debug;
+    int workers;
     size_t bfsize;
     union sockaddr_u baddr;
     union sockaddr_u laddr;
     struct mphdr *mempool;
-    
+
     char **need_free;
     int need_free_n;
-    
+
     const char *protect_path;
     bool daemonize;
     const char *pid_file;

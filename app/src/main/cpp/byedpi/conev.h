@@ -7,43 +7,43 @@
 #include "params.h"
 
 #ifndef __linux__
-    #define NOEPOLL
+#define NOEPOLL
 #endif
 
 #ifdef _WIN32
-    #include <ws2tcpip.h>
+#include <ws2tcpip.h>
     #define poll(fds, cnt, to) WSAPoll(fds, cnt, to)
     #define close(fd) closesocket(fd)
 #else
-    #include <netinet/in.h>
-    #include <sys/socket.h>
-    #include <unistd.h>
-    #include <time.h>
-    #include <sys/mman.h>
-    
-    #ifndef NOEPOLL
-        #include <sys/epoll.h>
-        #define POLLIN EPOLLIN
-        #define POLLOUT EPOLLOUT
-        #define POLLERR EPOLLERR
-        #define POLLHUP EPOLLHUP
-        #define POLLRDHUP EPOLLRDHUP
-    #else
-        #include <sys/poll.h>
-    #endif
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/mman.h>
+
+#ifndef NOEPOLL
+#include <sys/epoll.h>
+#define POLLIN EPOLLIN
+#define POLLOUT EPOLLOUT
+#define POLLERR EPOLLERR
+#define POLLHUP EPOLLHUP
+#define POLLRDHUP EPOLLRDHUP
+#else
+#include <sys/poll.h>
+#endif
 #endif
 
 #ifdef __APPLE__
-    #define _POLLDEF POLLHUP
+#define _POLLDEF POLLHUP
 #else
-    #define _POLLDEF 0
+#define _POLLDEF 0
 #endif
 #ifndef POLLRDHUP
-    #define POLLRDHUP 0
+#define POLLRDHUP 0
 #endif
 #define POLLTIMEOUT 0
 
-#define MAX_BUFF_INP 64
+#define MAX_BUFF_INP 512    /* было 64, увеличено для prealloc */
 
 struct poolhd;
 struct eval;
@@ -62,39 +62,46 @@ struct buffer {
     char data[];
 };
 
+/* G1: proto_info вынесен в conev.h, чтобы кэшировать в struct eval */
+struct proto_info {
+    char init, type;
+    int host_len, host_pos;
+    int sld_pos, sld_len;
+};
+
 struct eval {
-    int fd;    
+    int fd;
     int index;
     unsigned long long mod_iter;
     evcb_t cb;
-    
+
     long tv_ms;
     struct eval *tv_next, *tv_prev;
-    
+
     evcb_t after_conn_cb;
     int conn_state;
-    
+
     struct eval *pair;
     struct buffer *buff, *sq_buff;
     int flag;
     union sockaddr_u addr;
     char *host;
     int host_len;
-    
+
     ssize_t recv_count;
     ssize_t round_sent;
     unsigned int round_count;
-    
+
     struct desync_params *dp;
     uint64_t dp_mask;
     int detect;
-    bool mark; //
-    int to_count; 
-    
+    bool mark;
+    int to_count;
+
     int tls_rec_size;
     int tls_rec_pos;
     uint8_t tls_rec[5];
-    
+
     bool restore_ttl;
     bool restore_md5;
     char *restore_fake;
@@ -102,6 +109,9 @@ struct eval {
     const char *restore_orig;
     size_t restore_orig_len;
     unsigned int part_sent;
+
+    /* G1: кэш распарсенного TLS/HTTP ClientHello */
+    struct proto_info pinfo;
 
     char log_addr[INET6_ADDRSTRLEN + 8];
 };
@@ -121,7 +131,7 @@ struct poolhd {
 #endif
     unsigned long long iters;
     bool brk;
-    
+
     struct eval *tv_start, *tv_end;
     struct buffer *root_buff;
     int buff_count;

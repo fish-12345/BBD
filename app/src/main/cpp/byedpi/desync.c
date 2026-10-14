@@ -26,10 +26,14 @@
 
 #include "packets.h"
 #include "error.h"
+#include "fastrand.h"
 
 #define DEFAULT_TTL 8
 #define ERR_WAIT -12
 
+static long gen_offset(long pos, int flag,
+                       const char *buffer, size_t n, long lp,
+                       struct proto_info *info);
 
 int setttl(int fd, int ttl)
 {
@@ -124,7 +128,7 @@ static struct packet get_tcp_fake(const char *buffer, ssize_t n,
     }
     const char *sni = 0;
     if (opt->fake_sni_count) {
-        sni = opt->fake_sni_list[rand() % opt->fake_sni_count];
+        sni = opt->fake_sni_list[fast_rand() % opt->fake_sni_count];
     }
     do {
         ssize_t f_size = opt->fake_tls_size;
@@ -224,17 +228,26 @@ static ssize_t send_fake(struct eval *val, const char *buffer,
 
 #ifdef _WIN32
 #define MAX_TF 2
-struct tf_s { HANDLE tfile; OVERLAPPED ov; };
+
+struct tf_s {
+    HANDLE tfile;
+    OVERLAPPED ov;
+};
+
 int tf_count = 0;
 struct tf_s tf_exems[MAX_TF] = { 0 };
+
 
 static struct tf_s *getTFE(void)
 {
     struct tf_s *s = 0;
-    if (tf_count < MAX_TF) s = &tf_exems[tf_count];
-    else {
+    if (tf_count < MAX_TF) {
+        s = &tf_exems[tf_count];
+    } else {
         HANDLE events[MAX_TF];
-        for (int i = 0; i < MAX_TF; i++) events[i] = tf_exems[i].ov.hEvent;
+        for (int i = 0; i < MAX_TF; i++) {
+            events[i] = tf_exems[i].ov.hEvent;
+        }
         DWORD ret = WaitForMultipleObjects(MAX_TF, events, FALSE, 0);
         if (ret >= WAIT_OBJECT_0 && ret < WAIT_OBJECT_0 + MAX_TF) {
             s = &tf_exems[ret - WAIT_OBJECT_0];
@@ -246,45 +259,72 @@ static struct tf_s *getTFE(void)
     return s;
 }
 
+
 static HANDLE openTempFile(void)
 {
     char path[MAX_PATH], temp[MAX_PATH + 1];
-    if (!GetTempPath(sizeof(temp), temp)) { uniperror("GetTempPath"); return 0; }
-    if (!GetTempFileName(temp, "t", 0, path)) { uniperror("GetTempFileName"); return 0; }
+    if (!GetTempPath(sizeof(temp), temp)) {
+        uniperror("GetTempPath");
+        return 0;
+    }
+    if (!GetTempFileName(temp, "t", 0, path)) {
+        uniperror("GetTempFileName");
+        return 0;
+    }
+    LOG(LOG_L, "temp file: %s\n", path);
+
     HANDLE hfile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
-        FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
-    if (hfile == INVALID_HANDLE_VALUE) { uniperror("CreateFileA"); return 0; }
+            FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+    if (hfile == INVALID_HANDLE_VALUE) {
+        uniperror("CreateFileA");
+        return 0;
+    }
     return hfile;
 }
+
 
 static ssize_t send_fake(struct eval *val, const char *buffer,
         long pos, const struct desync_params *opt, struct packet pkt)
 {
-    /* ... оставлено как было, без изменений ... */
     struct tf_s *s = getTFE();
     if (!s) return ERR_WAIT;
+
     HANDLE hfile = openTempFile();
     if (!hfile) return -1;
+
     s->tfile = hfile;
     ssize_t len = -1, ps = pkt.size - pkt.off;
+
     while (1) {
         DWORD wrtcnt = 0;
-        if (!WriteFile(hfile, pkt.data + pkt.off, ps < pos ? ps : pos, &wrtcnt, 0)) {
-            uniperror("WriteFile"); break;
+        if (!WriteFile(hfile, pkt.data + pkt.off,
+                       ps < pos ? ps : pos, &wrtcnt, 0)) {
+            uniperror("WriteFile");
+            break;
         }
         if (ps < pos) {
-            if (SetFilePointer(hfile, pos, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
-                uniperror("SetFilePointer"); break;
+            if (SetFilePointer(hfile, pos, 0, FILE_BEGIN) ==
+                    INVALID_SET_FILE_POINTER) {
+                uniperror("SetFilePointer");
+                break;
             }
-            if (!SetEndOfFile(hfile)) { uniperror("SetFileEnd"); break; }
+            if (!SetEndOfFile(hfile)) {
+                uniperror("SetFileEnd");
+                break;
+            }
         }
-        if (SetFilePointer(hfile, 0, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
-            uniperror("SetFilePointer"); break;
+        if (SetFilePointer(hfile, 0, 0, FILE_BEGIN) ==
+                INVALID_SET_FILE_POINTER) {
+            uniperror("SetFilePointer");
+            break;
         }
         if (setttl(val->fd, opt->ttl ? opt->ttl : DEFAULT_TTL) < 0) break;
         s->ov.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        if (!s->ov.hEvent) { uniperror("CreateEvent"); break; }
+        if (!s->ov.hEvent) {
+            uniperror("CreateEvent");
+            break;
+        }
         if (!TransmitFile(val->fd, s->tfile, pos, pos, &s->ov,
                 NULL, TF_USE_KERNEL_APC | TF_WRITE_BEHIND)) {
             if ((GetLastError() != ERROR_IO_PENDING)
@@ -294,11 +334,14 @@ static ssize_t send_fake(struct eval *val, const char *buffer,
                 break;
             }
         }
-        if (SetFilePointer(hfile, 0, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
-            uniperror("SetFilePointer"); break;
+        if (SetFilePointer(hfile, 0, 0, FILE_BEGIN) ==
+                INVALID_SET_FILE_POINTER) {
+            uniperror("SetFilePointer");
+            break;
         }
         if (!WriteFile(hfile, buffer, pos, &wrtcnt, 0)) {
-            uniperror("WriteFile"); break;
+            uniperror("WriteFile");
+            break;
         }
         if (setttl(val->fd, params.def_ttl) < 0) break;
         len = pos;
@@ -344,7 +387,10 @@ static ssize_t send_oob(int sfd, char *buffer,
     ssize_t len = send(sfd, buffer, pos + 1, MSG_OOB);
     buffer[pos] = rchar;
 
-    if (len < 0) { uniperror("send"); return -1; }
+    if (len < 0) {
+        uniperror("send");
+        return -1;
+    }
     len--;
     if (len != pos) return len;
     return len;
@@ -356,9 +402,16 @@ static void find_sld(const char *host, int host_len,
 {
     int last_dot = -1, prev_dot = -1;
     for (int i = 0; i < host_len; i++) {
-        if (host[i] == '.') { prev_dot = last_dot; last_dot = i; }
+        if (host[i] == '.') {
+            prev_dot = last_dot;
+            last_dot = i;
+        }
     }
-    if (last_dot <= 0) { *sld_pos = 0; *sld_len = host_len; return; }
+    if (last_dot <= 0) {
+        *sld_pos = 0;
+        *sld_len = host_len;
+        return;
+    }
     *sld_pos = prev_dot + 1;
     *sld_len = last_dot - *sld_pos;
 }
@@ -404,10 +457,10 @@ static long gen_offset(long pos, int flag,
         } else if (flag & OFFSET_MID) {
             pos += info->host_len / 2;
         } else if (flag & OFFSET_RAND) {
-            pos += (rand() % info->host_len);
+            pos += fast_rand() % info->host_len;
         }
     } else if (flag & OFFSET_RAND) {
-        pos += lp + (rand() % (n - lp));
+        pos += lp + (fast_rand() % (n - lp));
     } else if (flag & OFFSET_MID) {
         pos += (n / 2);
     } else if (pos < 0 || (flag & OFFSET_END)) {
@@ -425,6 +478,7 @@ static void tamp(char *buffer, size_t bfsize, ssize_t *n,
     }
 
     if (dp->mod_http && info->type == IS_HTTP) {
+        LOG(LOG_S, "modify HTTP: n=%zd\n", *n);
         if (mod_http(buffer, *n, dp->mod_http)) {
             LOG(LOG_E, "mod http error\n");
         }
@@ -445,8 +499,16 @@ static void tamp(char *buffer, size_t bfsize, ssize_t *n,
                                   buffer, *n - pos, lp, info);
                 if (part.pos < 0 || part.flag) pos -= 5;
                 pos += (long)part.s * (part.r - r);
-                if (pos < lp) break;
-                if (!part_tls(buffer + lp, bfsize - lp, *n - lp, pos - lp)) break;
+                if (pos < lp) {
+                    LOG(LOG_E, "tlsrec cancel: %ld < %ld\n", pos, lp);
+                    break;
+                }
+                if (!part_tls(buffer + lp,
+                              bfsize - lp, *n - lp, pos - lp)) {
+                    LOG(LOG_E, "tlsrec error: pos=%ld, n=%zd\n", pos, *n);
+                    break;
+                }
+                LOG(LOG_L, "tlsrec: pos=%ld, n=%zd\n", pos, *n);
                 *n += 5;
                 lp = pos + 5;
             }
@@ -478,7 +540,8 @@ ssize_t desync(struct poolhd *pool,
                struct eval *val, struct buffer *buff, ssize_t *np, bool *wait)
 {
     struct desync_params dp = *val->pair->dp;
-    struct proto_info info = { 0 };
+    /* G1: используем кэш в клиенте */
+    struct proto_info *info = &val->pair->pinfo;
 
     int sfd = val->fd;
 
@@ -490,12 +553,12 @@ ssize_t desync(struct poolhd *pool,
     unsigned int part_skip = val->pair->part_sent;
 
     if (!skip) {
-        init_proto_info(buffer, *np, &info);
-        if (LOG_ENABLED && info.host_pos) {
+        init_proto_info(buffer, *np, info);
+        if (LOG_ENABLED && info->host_pos) {
             LOG(LOG_S, "host: %.*s\n",
-                info.host_len, buffer + info.host_pos);
+                info->host_len, buffer + info->host_pos);
         }
-        tamp(buffer, bfsize, np, &dp, &info);
+        tamp(buffer, bfsize, np, &dp, info);
     }
     ssize_t n = *np;
 
@@ -506,10 +569,13 @@ ssize_t desync(struct poolhd *pool,
     unsigned int curr_part = 0;
 
     for (; r > 0 || i < dp.parts_n; r--) {
-        if (r <= 0) { part = dp.parts[i]; r = part.r; i++; }
+        if (r <= 0) {
+            part = dp.parts[i];
+            r = part.r; i++;
+        }
         curr_part++;
 
-        long pos = gen_offset(part.pos, part.flag, buffer, n, lp, &info);
+        long pos = gen_offset(part.pos, part.flag, buffer, n, lp, info);
         pos += (long)part.s * (part.r - r);
 
         if (((skip && pos < skip)
@@ -531,9 +597,10 @@ ssize_t desync(struct poolhd *pool,
             switch (part.m) {
 #ifdef FAKE_SUPPORT
                 case DESYNC_FAKE:;
-                    struct packet pkt = get_tcp_fake(buffer, n, &info, &dp);
+                    struct packet pkt = get_tcp_fake(buffer, n, info, &dp);
                     if (!pkt.data) return -1;
-                    if (pos != lp) s = send_fake(val, buffer + lp, pos - lp, &dp, pkt);
+                    if (pos != lp)
+                        s = send_fake(val, buffer + lp, pos - lp, &dp, pkt);
 #ifndef __linux__
                     free(pkt.data);
 #endif
@@ -558,10 +625,11 @@ ssize_t desync(struct poolhd *pool,
                         s = xsend(sfd, buffer + lp, pos - lp);
 
                     if (s < 0) {
-                        LOG(LOG_E, "send error (disorder): dst=%s, host=%.*s, err=%s\n",
+                        LOG(LOG_E,
+                            "send error (disorder): dst=%s, host=%.*s, err=%s\n",
                             val->log_addr,
-                            info.host_len,
-                            info.host_pos ? buffer + info.host_pos : "-",
+                            info->host_len,
+                            info->host_pos ? buffer + info->host_pos : "-",
                             strerror(get_e()));
                     }
                     break;
@@ -572,7 +640,6 @@ ssize_t desync(struct poolhd *pool,
                     s = xsend(sfd, buffer + lp, pos - lp);
                     break;
             }
-            /* FIX: лог деталей split переведён в LOG_L */
             LOG(LOG_L, "split: pos=%ld-%ld (%zd), m: %s\n",
                 lp, pos, s, demode_str[part.m]);
         }
@@ -587,7 +654,7 @@ ssize_t desync(struct poolhd *pool,
             if (get_e() == EAGAIN) return lp - offset;
             LOG(LOG_E, "desync send error: dst=%s, host=%.*s, err=%s\n",
                 val->log_addr,
-                info.host_len, info.host_pos ? buffer + info.host_pos : "-",
+                info->host_len, info->host_pos ? buffer + info->host_pos : "-",
                 strerror(get_e()));
             return -1;
         }
@@ -596,8 +663,7 @@ ssize_t desync(struct poolhd *pool,
             return lp + s - offset;
         }
 
-        /* FIX: sock_has_notsent только для случаев, где порядок важен
-           (дисордер/OOB/fake). Для чистого SPLIT проверка не нужна. */
+        /* A/C-оптимизация: sock_has_notsent только там, где важен порядок */
         bool order_matters =
                 (part.m == DESYNC_DISORDER ||
                  part.m == DESYNC_DISOOB ||
@@ -605,21 +671,22 @@ ssize_t desync(struct poolhd *pool,
 
         if ((order_matters && sock_has_notsent(sfd))
             || (params.wait_send && curr_part > part_skip)) {
+            LOG(LOG_L, "sock_has_notsent\n");
             set_timer(pool, val, params.await_int);
             *wait = true;
             return pos - offset;
         }
         restore_state(val);
-
         lp = pos;
     }
 
     if (lp < n) {
+        LOG((lp ? LOG_S : LOG_L), "send: pos=%ld-%zd\n", lp, n);
         if (xsend(sfd, buffer + lp, n - lp) < 0) {
             if (get_e() == EAGAIN) return lp - offset;
             LOG(LOG_E, "send error: dst=%s, host=%.*s, err=%s\n",
                 val->log_addr,
-                info.host_len, info.host_pos ? buffer + info.host_pos : "-",
+                info->host_len, info->host_pos ? buffer + info->host_pos : "-",
                 strerror(get_e()));
             return -1;
         }
@@ -656,7 +723,7 @@ int post_desync(int sfd, struct desync_params *dp)
 ssize_t desync_udp(int sfd, char *buffer,
                    ssize_t n, const struct sockaddr *dst, struct desync_params *dp)
 {
-    /* FIX: если fake не нужен — сразу send без парсинга и логирования */
+    /* Короткий путь: если fake UDP не нужен, сразу send */
     if (dp->udp_fake_count == 0) {
         return send(sfd, buffer, n, 0);
     }

@@ -24,12 +24,14 @@
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 #include <netdb.h>
+#include <pthread.h>
 
 #if defined(__linux__) && defined(__GLIBC__)
 extern int accept4(int, struct sockaddr *__restrict,
                            socklen_t *__restrict, int);
 #endif
 #ifdef __linux__
+#include <sys/eventfd.h>
 #include "linux/netfilter_ipv4.h"
 #ifndef IP6T_SO_ORIGINAL_DST
 #define IP6T_SO_ORIGINAL_DST SO_ORIGINAL_DST
@@ -40,7 +42,26 @@ extern int accept4(int, struct sockaddr *__restrict,
 
 int server_fd;
 
-static void on_cancel(int sig) { (void)sig; shutdown(server_fd, SHUT_RDWR); }
+/* A4: mutex для общей mempool */
+pthread_mutex_t g_cache_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* A4: worker'ы */
+#define MAX_WORKERS 32
+static int g_listen_fds[MAX_WORKERS];
+static int g_wake_fds[MAX_WORKERS];
+static int g_worker_count = 0;
+
+
+static void on_cancel(int sig)
+{
+    (void)sig;
+    /* async-signal-safe: только write() */
+    for (int i = 0; i < g_worker_count; i++) {
+        uint64_t v = 1;
+        ssize_t r = write(g_wake_fds[i], &v, sizeof(v));
+        (void)r;
+    }
+}
 
 void dump_all_cache(void);
 
@@ -121,9 +142,7 @@ static int resolve(const char *chost, int len,
 
     LOG(LOG_S, "resolve: %s\n", host);
 
-    if (getaddrinfo(host, 0, &hints, &res) || !res) {
-        return -1;
-    }
+    if (getaddrinfo(host, 0, &hints, &res) || !res) return -1;
     memcpy(addr, res->ai_addr, SA_SIZE(res->ai_addr));
     freeaddrinfo(res);
     return 0;
@@ -366,8 +385,12 @@ int create_conn(struct poolhd *pool,
         uniperror("setsockopt TCP_NODELAY");
         close(sfd); return -1;
     }
+#ifdef TCP_QUICKACK
+    /* A2: ускоряем ACK */
+    int qa = 1;
+    setsockopt(sfd, IPPROTO_TCP, TCP_QUICKACK, &qa, sizeof(qa));
+#endif
 
-    /* FIX: лог "new conn" с host (если уже известен) или addr */
     if (val->host && val->host_len) {
         LOG(LOG_S, "conn: fd=%d host=%.*s -> %s\n",
             sfd, val->host_len, val->host, val->log_addr);
@@ -491,8 +514,6 @@ static inline int transp_conn(struct poolhd *pool, struct eval *val)
 #endif
 
 
-/* FIX: ограничиваем количество accept'ов за одну итерацию,
-   чтобы не забивать event loop. */
 #define MAX_ACCEPT_PER_ITER 32
 
 static int on_accept(struct poolhd *pool, struct eval *val, int et)
@@ -544,7 +565,6 @@ static int on_accept(struct poolhd *pool, struct eval *val, int et)
         rval->addr = client;
         eval_set_log_addr(rval);
 
-        /* FIX: логируем адрес клиента, а не безликий fd */
         LOG(LOG_S, "accept: fd=%d from %s\n", c, rval->log_addr);
 
 #ifdef __linux__
@@ -594,12 +614,10 @@ int on_tunnel(struct poolhd *pool, struct eval *val, int etype)
     if (!buff) return -1;
     val->buff = buff;
 
-    /* FIX: читаем сокет до тех пор, пока recv не вернёт EAGAIN
-       (частичное чтение), чтобы не дёргать epoll на каждый чанк. */
     for (;;) {
         ssize_t n = tcp_recv_hook(pool, val, buff);
         if (n == 0) break;               /* EAGAIN */
-        if (n < 0) return -1;            /* ошибка/hup */
+        if (n < 0) return -1;
 
         ssize_t sn = tcp_send_hook(pool, pair, buff, &n, &wait);
         if (sn < 0) return -1;
@@ -617,8 +635,6 @@ int on_tunnel(struct poolhd *pool, struct eval *val, int etype)
             }
             return 0;
         }
-        /* если recv вернул меньше размера буфера — данных в ядре
-           больше нет, выходим из цикла; иначе — читаем ещё. */
         if (n < (ssize_t)buff->size) break;
     }
     buff_push(pool, val->buff);
@@ -627,27 +643,121 @@ int on_tunnel(struct poolhd *pool, struct eval *val, int etype)
 }
 
 
+/* C1: обработка одного UDP-пакета (вынесено из on_udp_tunnel) */
+static int udp_process_one(struct eval *val,
+                           struct eval *pair,
+                           union sockaddr_u *addr,
+                           char *data, ssize_t n)
+{
+    val->recv_count += n;
+    if (val->round_sent == 0) {
+        val->round_count++;
+        val->round_sent += n;
+        pair->round_sent = 0;
+    }
+    ssize_t ns;
+
+    if (val->flag == FLAG_CONN) {
+        if (!val->addr.in.sin_port) {
+            if (!addr_equ(addr, &val->addr)) return 0;
+            if (connect(val->fd, &addr->sa, SA_SIZE(addr)) < 0) {
+                uniperror("connect");
+                return -1;
+            }
+            val->addr = *addr;
+        }
+        if (*(data + 2) != 0) return 0;   /* frag */
+        int offs = s5_get_addr(data, n, addr, SOCK_DGRAM);
+        if (offs < 0) {
+            LOG(LOG_E, "udp parse error\n");
+            return -1;
+        }
+        if (!pair->addr.in.sin_port) {
+            if (params.baddr.sa.sa_family == AF_INET6) map_fix(addr, 6);
+            if (params.baddr.sa.sa_family != addr->sa.sa_family) return -1;
+            if (connect(pair->fd, &addr->sa, SA_SIZE(addr)) < 0) {
+                uniperror("connect");
+                return -1;
+            }
+            pair->addr = *addr;
+        }
+        ns = udp_hook(pair, data + offs, n - offs, &pair->addr);
+    } else {
+        map_fix(addr, 0);
+        int offs = s5_set_addr(data, S_SIZE_I6, addr, 1);
+        if (offs < 0 || offs > S_SIZE_I6) return -1;
+        ns = send(pair->fd, data - offs, offs + n, 0);
+    }
+    if (ns < 0) {
+        int err = get_e();
+        if (err == EMSGSIZE || err == ECONNREFUSED) return 0;
+        if (err == EAGAIN || err == EWOULDBLOCK) return 0;
+        uniperror("sendto");
+        return -1;
+    }
+    return 1;
+}
+
+
 int on_udp_tunnel(struct poolhd *pool, struct eval *val, int et)
 {
     (void)et;
     struct buffer *buff = buff_ppop(pool, params.bfsize);
     if (!buff) return -1;
-    char *data = buff->data;
-    size_t data_len = buff->size;
 
+    char *base = buff->data;
+    size_t base_len = buff->size;
     if (val->flag != FLAG_CONN) {
-        data += S_SIZE_I6;
-        data_len -= S_SIZE_I6;
+        base += S_SIZE_I6;
+        base_len -= S_SIZE_I6;
     }
-    union sockaddr_u addr = {0};
     struct eval *pair = val->flag == FLAG_CONN ?
                         val->pair : val->pair->pair;
 
-    /* FIX: читаем до EAGAIN, но с ограничением, чтобы не забить CPU */
+#ifdef __linux__
+#define UDP_BATCH 8
+    if (base_len >= UDP_BATCH * 512) {
+        struct mmsghdr mmsgs[UDP_BATCH];
+        struct iovec   iovs[UDP_BATCH];
+        union sockaddr_u addrs[UDP_BATCH];
+        size_t chunk = base_len / UDP_BATCH;
+
+        memset(mmsgs, 0, sizeof(mmsgs));
+        for (int i = 0; i < UDP_BATCH; i++) {
+            iovs[i].iov_base = base + i * chunk;
+            iovs[i].iov_len  = chunk;
+            mmsgs[i].msg_hdr.msg_iov    = &iovs[i];
+            mmsgs[i].msg_hdr.msg_iovlen = 1;
+            mmsgs[i].msg_hdr.msg_name    = &addrs[i];
+            mmsgs[i].msg_hdr.msg_namelen = sizeof(addrs[i]);
+        }
+        int nrecv = recvmmsg(val->fd, mmsgs, UDP_BATCH,
+                             MSG_DONTWAIT, NULL);
+        if (nrecv < 0) {
+            int err = get_e();
+            if (err == EAGAIN || err == EWOULDBLOCK) return 0;
+            if (err == EMSGSIZE || err == ECONNREFUSED) return 0;
+            uniperror("recvmmsg");
+            return -1;
+        }
+        for (int i = 0; i < nrecv; i++) {
+            int r = udp_process_one(val, pair,
+                                    &addrs[i],
+                                    iovs[i].iov_base,
+                                    (ssize_t)mmsgs[i].msg_len);
+            if (r < 0) return -1;
+        }
+        return 0;
+    }
+#endif
+
+    /* Fallback: одиночный recvfrom */
+    union sockaddr_u addr = {0};
     int loop_guard = 64;
     do {
         socklen_t asz = sizeof(addr);
-        ssize_t n = recvfrom(val->fd, data, data_len, 0, &addr.sa, &asz);
+        ssize_t n = recvfrom(val->fd, base, base_len, 0,
+                             &addr.sa, &asz);
         if (n < 0) {
             int err = get_e();
             if (err == EAGAIN || err == EWOULDBLOCK) break;
@@ -655,57 +765,8 @@ int on_udp_tunnel(struct poolhd *pool, struct eval *val, int et)
             uniperror("recv udp");
             return -1;
         }
-        val->recv_count += n;
-        if (val->round_sent == 0) {
-            val->round_count++;
-            val->round_sent += n;
-            pair->round_sent = 0;
-        }
-        ssize_t ns;
-        if (val->flag == FLAG_CONN) {
-            if (!val->addr.in.sin_port) {
-                if (!addr_equ(&addr, &val->addr)) return 0;
-                if (connect(val->fd, &addr.sa, SA_SIZE(&addr)) < 0) {
-                    uniperror("connect");
-                    return -1;
-                }
-                val->addr = addr;
-            }
-            if (*(data + 2) != 0) continue; /* frag */
-            int offs = s5_get_addr(data, n, &addr, SOCK_DGRAM);
-            if (offs < 0) {
-                LOG(LOG_E, "udp parse error\n");
-                return -1;
-            }
-            if (!pair->addr.in.sin_port) {
-                if (params.baddr.sa.sa_family == AF_INET6) map_fix(&addr, 6);
-                if (params.baddr.sa.sa_family != addr.sa.sa_family) return -1;
-                if (LOG_ENABLED) {
-                    INIT_ADDR_STR((addr));
-                    LOG(LOG_S, "udp dst fd=%d -> %s:%d\n",
-                        pair->fd, ADDR_STR, ntohs(addr.in.sin_port));
-                }
-                if (connect(pair->fd, &addr.sa, SA_SIZE(&addr)) < 0) {
-                    uniperror("connect");
-                    return -1;
-                }
-                pair->addr = addr;
-            }
-            ns = udp_hook(pair, data + offs, n - offs, &pair->addr);
-        } else {
-            map_fix(&addr, 0);
-            memset(buff->data, 0, S_SIZE_I6);
-            int offs = s5_set_addr(data, S_SIZE_I6, &addr, 1);
-            if (offs < 0 || offs > S_SIZE_I6) return -1;
-            ns = send(pair->fd, data - offs, offs + n, 0);
-        }
-        if (ns < 0) {
-            int err = get_e();
-            if (err == EMSGSIZE || err == ECONNREFUSED) continue;
-            if (err == EAGAIN || err == EWOULDBLOCK) break;
-            uniperror("sendto");
-            return -1;
-        }
+        int r = udp_process_one(val, pair, &addr, base, n);
+        if (r < 0) return -1;
     } while (--loop_guard > 0);
     return 0;
 }
@@ -721,11 +782,8 @@ static int save_buffer(struct poolhd *pool,
     val->recv_count = val->buff->lock;
     val->round_count++;
 
-    /* FIX: sq_buff нужен только если auto_reconnect реально включён */
     if (params.auto_reconnect) {
-        if (!(val->sq_buff = buff_pop(pool, params.bfsize))) {
-            return -1;
-        }
+        if (!(val->sq_buff = buff_pop(pool, params.bfsize))) return -1;
         val->sq_buff->lock = val->buff->lock;
         memcpy(val->sq_buff->data, val->buff->data, val->buff->lock);
     }
@@ -870,8 +928,87 @@ int on_connect(struct poolhd *pool, struct eval *val, int et)
 
 int on_ignore(struct poolhd *pool, struct eval *val, int etype)
 {
-    (void)pool;
+    (void)pool; (void)val;
     return (etype & (POLLHUP | POLLERR | POLLRDHUP)) ? -1 : 0;
+}
+
+
+int listen_socket(const union sockaddr_u *srv)
+{
+    int srvfd = nb_socket(srv->sa.sa_family, SOCK_STREAM);
+    if (srvfd < 0) { uniperror("socket"); return -1; }
+
+    int opt = 1;
+    if (setsockopt(srvfd, SOL_SOCKET, SO_REUSEADDR,
+                   (char *)&opt, sizeof(opt)) == -1) {
+        uniperror("setsockopt SO_REUSEADDR");
+        close(srvfd); return -1;
+    }
+#ifdef SO_REUSEPORT
+    if (params.workers > 1) {
+        if (setsockopt(srvfd, SOL_SOCKET, SO_REUSEPORT,
+                       (char *)&opt, sizeof(opt)) == -1) {
+            uniperror("setsockopt SO_REUSEPORT");
+        }
+    }
+#endif
+
+#ifdef TCP_DEFER_ACCEPT
+    int secs = 1;
+    setsockopt(srvfd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &secs, sizeof(secs));
+#endif
+
+    if (bind(srvfd, &srv->sa, SA_SIZE(srv)) < 0) {
+        uniperror("bind"); close(srvfd); return -1;
+    }
+    if (listen(srvfd, 128)) {
+        uniperror("listen"); close(srvfd); return -1;
+    }
+    return srvfd;
+}
+
+
+/* A4: callback пробуждения воркера */
+static int on_wake(struct poolhd *pool, struct eval *val, int et)
+{
+    (void)et;
+    uint64_t v;
+    ssize_t r = read(val->fd, &v, sizeof(v));
+    (void)r;
+    pool->brk = 1;
+    return 0;
+}
+
+
+struct worker_arg {
+    int listen_fd;
+    int wake_fd;
+    int idx;
+};
+
+
+static void *worker_main(void *arg)
+{
+    struct worker_arg *wa = arg;
+    struct poolhd *pool = init_pool(params.max_open * 2 + 1);
+    if (!pool) {
+        close(wa->listen_fd);
+        return 0;
+    }
+    if (!add_event(pool, &on_accept, wa->listen_fd, POLLIN)) {
+        destroy_pool(pool);
+        close(wa->listen_fd);
+        return 0;
+    }
+    if (!add_event(pool, &on_wake, wa->wake_fd, POLLIN)) {
+        destroy_pool(pool);
+        close(wa->listen_fd);
+        return 0;
+    }
+    loop_event(pool);
+    LOG(LOG_S, "worker %d exit\n", wa->idx);
+    destroy_pool(pool);
+    return 0;
 }
 
 
@@ -890,25 +1027,6 @@ int start_event_loop(int srvfd)
 }
 
 
-int listen_socket(const union sockaddr_u *srv)
-{
-    int srvfd = nb_socket(srv->sa.sa_family, SOCK_STREAM);
-    if (srvfd < 0) { uniperror("socket"); return -1; }
-    int opt = 1;
-    if (setsockopt(srvfd, SOL_SOCKET, SO_REUSEADDR,
-                   (char *)&opt, sizeof(opt)) == -1) {
-        uniperror("setsockopt"); close(srvfd); return -1;
-    }
-    if (bind(srvfd, &srv->sa, SA_SIZE(srv)) < 0) {
-        uniperror("bind"); close(srvfd); return -1;
-    }
-    if (listen(srvfd, 10)) {
-        uniperror("listen"); close(srvfd); return -1;
-    }
-    return srvfd;
-}
-
-
 int run(const union sockaddr_u *srv)
 {
 #ifdef SIGPIPE
@@ -920,6 +1038,66 @@ int run(const union sockaddr_u *srv)
 #ifdef SIGHUP
     signal(SIGHUP, on_hup);
 #endif
+
+    int N = params.workers > 0 ? params.workers : 1;
+
+#ifndef __linux__
+    if (N > 1) {
+        LOG(LOG_E, "multi-worker supported only on Linux, using 1\n");
+        N = 1;
+    }
+#endif
+    if (N > MAX_WORKERS) N = MAX_WORKERS;
+
+#ifdef __linux__
+    if (N > 1) {
+        /* multi-worker path */
+        for (int i = 0; i < N; i++) {
+            g_listen_fds[i] = listen_socket(srv);
+            if (g_listen_fds[i] < 0) {
+                for (int j = 0; j < i; j++) close(g_listen_fds[j]);
+                return -1;
+            }
+            g_wake_fds[i] = eventfd(0, EFD_NONBLOCK);
+            if (g_wake_fds[i] < 0) {
+                uniperror("eventfd");
+                for (int j = 0; j <= i; j++) close(g_listen_fds[j]);
+                return -1;
+            }
+        }
+        g_worker_count = N;
+        server_fd = g_listen_fds[0];
+
+        pthread_t tids[MAX_WORKERS];
+        struct worker_arg args[MAX_WORKERS];
+        int spawned = 0;
+        for (int i = 1; i < N; i++) {
+            args[i].listen_fd = g_listen_fds[i];
+            args[i].wake_fd = g_wake_fds[i];
+            args[i].idx = i;
+            if (pthread_create(&tids[i], NULL, worker_main, &args[i]) != 0) {
+                uniperror("pthread_create");
+                break;
+            }
+            spawned++;
+        }
+        args[0].listen_fd = g_listen_fds[0];
+        args[0].wake_fd = g_wake_fds[0];
+        args[0].idx = 0;
+        worker_main(&args[0]);
+
+        for (int i = 1; i <= spawned; i++) {
+            pthread_join(tids[i], NULL);
+        }
+        for (int i = 0; i < N; i++) {
+            close(g_listen_fds[i]);
+            close(g_wake_fds[i]);
+        }
+        return 0;
+    }
+#endif
+
+    /* single-worker: используем старый путь */
     int fd = listen_socket(srv);
     if (fd < 0) return -1;
     return start_event_loop(fd);
