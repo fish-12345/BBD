@@ -44,8 +44,6 @@ android {
         }
     }
 
-
-
     lint {
         checkReleaseBuilds = false
     }
@@ -69,6 +67,7 @@ android {
         abi {
             isEnable = true
             reset()
+            //noinspection ChromeOsAbiSupport
             include(*abis.toTypedArray())
             isUniversalApk = true
         }
@@ -103,4 +102,38 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+val buildHevSocks = tasks.register<Exec>("buildHevSocks") {
+    group = "build"
+    description = "Build libhev-socks5-tunnel.so via WSL NDK and copy into jniLibs"
+
+    inputs.dir(layout.projectDirectory.dir("src/main/jni"))
+        .withPropertyName("jniSources")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.file(layout.projectDirectory.file("build.gradle.kts"))
+        .withPropertyName("buildScript")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.property("abis", "arm64-v8a x86")
+
+    outputs.file(layout.projectDirectory.file("src/main/jniLibs/arm64-v8a/libhev-socks5-tunnel.so"))
+        .withPropertyName("hevSoArm64")
+    outputs.file(layout.projectDirectory.file("src/main/jniLibs/x86/libhev-socks5-tunnel.so"))
+        .withPropertyName("hevSoX86")
+
+    commandLine(
+        "wsl.exe",
+        "bash",
+        "-lc",
+        "~/BBD-build/build-hev.sh"
+    )
+
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn(buildHevSocks)
 }
