@@ -10,6 +10,7 @@
 #include "extend.h"
 #include "error.h"
 #include "packets.h"
+#include "conn_stats.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -223,6 +224,7 @@ static int s4_get_addr(const char *buff, size_t n, union sockaddr_u *dst)
         if (len < 3 || len > 255) return -1;
         if (resolve(id_end + 1, len, dst, SOCK_STREAM)) {
             LOG(LOG_E, "not resolved: %.*s\n", len, id_end + 1);
+            conn_stats_failed(id_end + 1, len, "домен не разрешён");
             return -1;
         }
     } else {
@@ -261,6 +263,8 @@ static int s5_get_addr(const char *buffer, size_t n,
                 resolve(r->dst.id.domain, r->dst.id.len, addr, type)) {
                 LOG(LOG_E, "not resolved: %.*s\n",
                     r->dst.id.len, r->dst.id.domain);
+                conn_stats_failed(r->dst.id.domain, r->dst.id.len,
+                                  "домен не разрешён");
                 return -S_ER_HOST;
             }
             break;
@@ -305,6 +309,7 @@ static int http_get_addr(
     if (host_len < 3 || host_len > 255) return -1;
     if (resolve(host, host_len, dst, SOCK_STREAM)) {
         LOG(LOG_E, "not resolved: %.*s\n", host_len, host);
+        conn_stats_failed(host, host_len, "домен не разрешён");
         return -1;
     }
     dst->in.sin_port = htons(port);
@@ -321,6 +326,7 @@ static int tls_get_addr(
     if (host_len < 3 || host_len > 255) return -1;
     if (params.resolve && resolve(host, host_len, dst, SOCK_STREAM)) {
         LOG(LOG_E, "not resolved: %.*s\n", host_len, host);
+        conn_stats_failed(host, host_len, "домен не разрешён");
         return -1;
     }
     dst->in.sin_port = htons(443);
@@ -356,10 +362,34 @@ static int remote_sock(union sockaddr_u *dst, int type)
 }
 
 
+/* "ip:port" для таблицы соединений. */
+static void stat_addr(const union sockaddr_u *dst, char *out, size_t cap)
+{
+    char ip[INET6_ADDRSTRLEN] = {0};
+    const char *p = NULL;
+    int port = 0;
+
+    if (!out || !cap) return;
+    out[0] = 0;
+
+    if (dst->sa.sa_family == AF_INET) {
+        p = inet_ntop(AF_INET, &dst->in.sin_addr, ip, sizeof(ip));
+        port = ntohs(dst->in.sin_port);
+    } else if (dst->sa.sa_family == AF_INET6) {
+        p = inet_ntop(AF_INET6, &dst->in6.sin6_addr, ip, sizeof(ip));
+        port = ntohs(dst->in6.sin6_port);
+    }
+    if (!p) return;
+
+    snprintf(out, cap, "%s:%d", ip, port);
+}
+
+
 int create_conn(struct poolhd *pool,
                 struct eval *val, const union sockaddr_u *dst, evcb_t next)
 {
     union sockaddr_u addr = *dst;
+    char stat_dst[CONN_STATS_ADDR_MAX] = {0};
     int sfd = remote_sock(&addr, SOCK_STREAM);
     if (sfd < 0) return -1;
 
@@ -419,6 +449,16 @@ int create_conn(struct poolhd *pool,
     eval_set_log_addr(pair);
     pair->flag = FLAG_CONN;
     val->cb = &on_ignore;
+
+    stat_addr(dst, stat_dst, sizeof(stat_dst));
+    {
+        uint64_t sid = conn_stats_open(sfd, val->fd, CONN_PROTO_TCP,
+                                       val->host, val->host_len, stat_dst);
+        val->stat_id = sid;
+        val->stat_side = CONN_SIDE_CLIENT;
+        pair->stat_id = sid;
+        pair->stat_side = CONN_SIDE_REMOTE;
+    }
     return 0;
 }
 
@@ -463,6 +503,18 @@ static int udp_associate(struct poolhd *pool,
     client->flag = FLAG_CONN;
     client->addr = val->addr;
     client->addr.in.sin_port = 0;
+
+    {
+        char stat_dst[CONN_STATS_ADDR_MAX] = {0};
+        uint64_t sid;
+
+        stat_addr(dst, stat_dst, sizeof(stat_dst));
+        sid = conn_stats_open(ufd, cfd, CONN_PROTO_UDP, NULL, 0, stat_dst);
+        client->stat_id = sid;
+        client->stat_side = CONN_SIDE_CLIENT;
+        pair->stat_id = sid;
+        pair->stat_side = CONN_SIDE_REMOTE;
+    }
 
     sz = sizeof(addr);
     if (getsockname(cfd, &addr.sa, &sz)) {
@@ -587,6 +639,7 @@ int on_tunnel(struct poolhd *pool, struct eval *val, int etype)
 
     if (etype == POLLTIMEOUT && !pair->buff && val->round_count) {
         LOG(LOG_S, "timeout (%d) fd=%d\n", val->to_count, val->fd);
+        conn_stats_error(val->stat_id, CONN_STATE_TIMEOUT, "таймаут");
         return on_timeout(pool, val);
     }
     if (etype & POLLOUT || etype == POLLTIMEOUT) {
@@ -650,6 +703,8 @@ static int udp_process_one(struct eval *val,
                            char *data, ssize_t n)
 {
     val->recv_count += n;
+    conn_stats_tick(val->stat_id, val->stat_side,
+                    (long long)val->recv_count, (int)val->round_count);
     if (val->round_sent == 0) {
         val->round_count++;
         val->round_sent += n;
@@ -915,6 +970,9 @@ int on_connect(struct poolhd *pool, struct eval *val, int et)
     if (resp_error(val->pair->fd, error, val->pair->flag) < 0) {
         uniperror("send");
         return -1;
+    }
+    if (error) {
+        conn_stats_error(val->stat_id, CONN_STATE_ERROR, strerror(error));
     }
     if (error && val->pair) {
         struct eval *pair = val->pair;

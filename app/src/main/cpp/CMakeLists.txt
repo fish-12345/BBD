@@ -4,7 +4,7 @@ project(byedpi_native)
 
 add_compile_options(-O3 -ffast-math)
 
-file(GLOB BYE_DPI_SRC byedpi/*.c)
+file(GLOB BYE_DPI_SRC CONFIGURE_DEPENDS byedpi/*.c)
 list(REMOVE_ITEM BYE_DPI_SRC ${CMAKE_CURRENT_SOURCE_DIR}/byedpi/win_service.c)
 
 add_library(byedpi SHARED ${BYE_DPI_SRC} native-lib.c)

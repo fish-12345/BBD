@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <jni.h>
@@ -7,6 +8,7 @@
 
 #include "byedpi/log.h"
 #include "byedpi/error.h"
+#include "byedpi/conn_stats.h"
 #include "main.h"
 
 extern int server_fd;
@@ -55,6 +57,7 @@ Java_io_github_romanvht_byedpi_core_ByeDpiProxy_jniStartProxy(
     clear_params(NULL, NULL);
 
     log_init();
+    conn_stats_reset();
 
     g_proxy_running = 1;
     optind = 1;
@@ -97,6 +100,55 @@ Java_io_github_romanvht_byedpi_core_ByeDpiProxy_jniReadLogs(
     }
     jstring out = (*env)->NewStringUTF(env, s);
     free(s);
+    return out;
+}
+
+/* Неразрушающее чтение лога: первая строка результата — общее число
+   записанных в буфер байт, дальше идёт хвост лога (до 128 КиБ).
+   Буфер при этом не очищается, поэтому "Сохранить логи" продолжает работать. */
+JNIEXPORT jstring JNICALL
+Java_io_github_romanvht_byedpi_core_ByeDpiProxy_jniPeekLogs(
+        JNIEnv *env, __attribute__((unused)) jclass clazz)
+{
+    size_t total = 0;
+    char *snap = log_peek_str(128 * 1024, &total);
+    size_t snap_len = snap ? strlen(snap) : 0;
+
+    char head[32];
+    int head_len = snprintf(head, sizeof(head), "%zu\n", total);
+    if (head_len < 0) {
+        head_len = 0;
+    }
+
+    char *out = malloc((size_t)head_len + snap_len + 1);
+    if (!out) {
+        free(snap);
+        return NULL;
+    }
+    if (head_len) {
+        memcpy(out, head, (size_t)head_len);
+    }
+    if (snap_len) {
+        memcpy(out + head_len, snap, snap_len);
+    }
+    out[head_len + snap_len] = 0;
+
+    jstring res = (*env)->NewStringUTF(env, out);
+    free(out);
+    free(snap);
+    return res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_io_github_romanvht_byedpi_core_ByeDpiProxy_jniConnStats(
+        JNIEnv *env, __attribute__((unused)) jclass clazz)
+{
+    char *snap = conn_stats_snapshot(NULL);
+    if (!snap) {
+        return NULL;
+    }
+    jstring out = (*env)->NewStringUTF(env, snap);
+    free(snap);
     return out;
 }
 

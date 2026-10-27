@@ -31,6 +31,8 @@ class AppPreferences(private val dataStore: DataStoreManager) {
     var cmdArgs by dataStore.pref("byedpi_cmd_args", "")
     var trafficMonitoring by dataStore.pref("traffic_monitoring", true)
     var domainStrategiesJson by dataStore.pref("byedpi_domain_strategies", "[]")
+    var connectionsHideClosed by dataStore.pref("connections_hide_closed", false)
+    var connectionsHideDns by dataStore.pref("connections_hide_dns", false)
 
     fun getProfileName(command: String): String? {
         try {

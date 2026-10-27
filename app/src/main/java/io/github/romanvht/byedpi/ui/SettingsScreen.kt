@@ -29,8 +29,10 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.BuildConfig
 import io.github.romanvht.byedpi.R
+import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.Mode
 import io.github.romanvht.byedpi.data.icons.*
+import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.ui.components.*
 import io.github.romanvht.byedpi.ui.viewmodel.SettingsViewModel
 import io.github.romanvht.byedpi.utility.isTablet
@@ -47,7 +49,7 @@ fun SettingsScreen(
     onNavigateToAppSelection: () -> Unit = {},
     onNavigateToCmdSettings: () -> Unit = {},
     onNavigateToUISettings: () -> Unit = {},
-    onNavigateToDomainSettings: () -> Unit = {},
+    onNavigateToConnections: () -> Unit = {},
     onOpenTelegram: () -> Unit = {},
     onOpenSourceCode: () -> Unit = {},
     onRequestStorageAccess: () -> Unit = {},
@@ -57,6 +59,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
     val isTablet = remember { context.isTablet() }
+    val isRunning = appStatus.first == AppStatus.Running
     var showMenu by remember { mutableStateOf(false) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -132,6 +135,34 @@ fun SettingsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (isRunning) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Surface(
+                            modifier = Modifier.widthIn(max = 800.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    Ico.NetworkCheck,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.settings_running_hint),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             item {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     SettingsCard(
@@ -168,10 +199,10 @@ fun SettingsScreen(
                         )
 
                         PreferenceItem(
-                            title = stringResource(R.string.domain_settings_title),
-                            enabled = viewModel.cmdEnable,
-                            onClick = onNavigateToDomainSettings,
-                            icon = Ico.Language
+                            title = stringResource(R.string.connections_title),
+                            summary = stringResource(R.string.connections_summary),
+                            onClick = onNavigateToConnections,
+                            icon = Ico.NetworkCheck
                         )
 
                         if ((!isTv && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R))

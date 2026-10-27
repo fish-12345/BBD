@@ -393,8 +393,8 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToUISettings = {
                                     navController.navigate("settings/ui")
                                 },
-                                onNavigateToDomainSettings = {
-                                    navController.navigate("settings/domain")
+                                onNavigateToConnections = {
+                                    navController.navigate("settings/connections")
                                 },
                                 onOpenTelegram = {
                                     openUrl("https://t.me/ByeByeDPI_group")
@@ -422,6 +422,12 @@ class MainActivity : ComponentActivity() {
                         composable("settings/apps") {
                             AppSelectionScreen(onBack = { navController.popBackStack() })
                         }
+                        composable("settings/connections") {
+                            ConnectionsScreen(
+                                onBack = { navController.popBackStack() },
+                                onManageGroups = { navController.navigate("settings/domain") }
+                            )
+                        }
                         composable("settings/domain") {
                             DomainSettingsScreen(onBack = { navController.popBackStack() })
                         }
@@ -437,14 +443,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("settings/test") {
                             TestSettingsScreen(
-                                onBack = { navController.popBackStack() },
-                                onNavigateToDomainLists = {
-                                    navController.navigate("settings/domain-lists")
-                                }
-                            )
-                        }
-                        composable("settings/domain-lists") {
-                            DomainListsScreen(
                                 onBack = { navController.popBackStack() }
                             )
                         }

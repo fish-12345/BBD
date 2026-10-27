@@ -92,6 +92,11 @@ struct eval {
     ssize_t round_sent;
     unsigned int round_count;
 
+    /* Запись в таблице статистики (см. conn_stats.h). Один id на пару
+       клиент/сервер; stat_side говорит, чей recv_count куда писать. */
+    uint64_t stat_id;
+    int stat_side;
+
     struct desync_params *dp;
     uint64_t dp_mask;
     int detect;

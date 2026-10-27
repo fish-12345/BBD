@@ -133,7 +133,6 @@
     <string name="test_ping">Пинг</string>
     <string name="test_ms">мс</string>
     <string name="traffic_monitoring_setting">Трафик мониторингі</string>
-    <string name="domain_lists">Домен тізімдері</string>
     <string name="domain_settings_title">Домен баптаулары</string>
     <string name="add_group">Топ қосу</string>
     <string name="edit_group">Топты өңдеу</string>

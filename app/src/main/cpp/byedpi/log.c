@@ -12,6 +12,7 @@ static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 static char   *g_buf  = NULL;
 static size_t  g_len  = 0;
 static size_t  g_cap  = 0;
+static size_t  g_total = 0; /* сколько байт всего записано, не уменьшается */
 
 #define LOG_INITIAL_CAP (64 * 1024)
 #define LOG_MAX_CAP     (2 * 1024 * 1024)
@@ -70,6 +71,7 @@ static void write_locked(const char *data, size_t n)
     if (g_buf && g_len + n <= g_cap) {
         memcpy(g_buf + g_len, data, n);
         g_len += n;
+        g_total += n;
     }
 }
 
@@ -131,6 +133,30 @@ char *log_take_str(void)
             s[g_len] = 0;
         }
         g_len = 0;
+    }
+    pthread_mutex_unlock(&g_lock);
+    return s;
+}
+
+char *log_peek_str(size_t max_len, size_t *total_out)
+{
+    pthread_mutex_lock(&g_lock);
+    if (total_out) {
+        *total_out = g_total;
+    }
+
+    size_t len = g_len;
+    if (len > max_len) {
+        len = max_len;
+    }
+
+    char *s = NULL;
+    if (len) {
+        s = malloc(len + 1);
+        if (s) {
+            memcpy(s, g_buf + (g_len - len), len);
+            s[len] = 0;
+        }
     }
     pthread_mutex_unlock(&g_lock);
     return s;

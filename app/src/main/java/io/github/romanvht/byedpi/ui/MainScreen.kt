@@ -161,8 +161,7 @@ fun MainScreen(
                     DashboardAction(
                         icon = Icons.Default.Settings,
                         label = R.string.settings,
-                        onClick = { viewModel.performActionIfStopped(onOpenSettings) },
-                        enabled = !isRunning
+                        onClick = onOpenSettings
                     ),
                     DashboardAction(
                         icon = if (preferredMode == Mode.VPN) Ico.VpnKey else Ico.Router,

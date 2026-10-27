@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include "error.h"
+#include "conn_stats.h"
 
 
 struct poolhd *init_pool(int count)
@@ -137,14 +138,51 @@ void del_event(struct poolhd *pool, struct eval *val)
         return;
     }
 
+    if (val->stat_id) {
+        long long up = -1, down = -1;
+        struct eval *peer = val->pair;
+        struct eval *cli = val->stat_side == CONN_SIDE_CLIENT ? val : peer;
+
+        if (val->stat_side == CONN_SIDE_CLIENT) {
+            up = (long long)val->recv_count;
+            if (peer) down = (long long)peer->recv_count;
+        } else {
+            down = (long long)val->recv_count;
+            if (peer) up = (long long)peer->recv_count;
+        }
+        conn_stats_bytes(val->stat_id, up, down);
+        conn_stats_rounds(val->stat_id,
+                          (int)(cli ? cli->round_count : val->round_count));
+        conn_stats_close(val->stat_id, CONN_STATE_CLOSED);
+    }
+
+    struct eval *close_pair = val->pair;
+    ssize_t up = 0, down = 0;
+
     if (val->host && val->host_len) {
-        LOG(LOG_S, "close: fd=%d host=%.*s, recv=%zd, rounds=%u\n",
-            val->fd, val->host_len, val->host,
-            val->recv_count, val->round_count);
+        /* клиентская сторона: recv_count — отправлено приложением */
+        up = val->recv_count;
+        down = close_pair ? close_pair->recv_count : 0;
+        if (close_pair) {
+            LOG(LOG_S, "close: fd=%d host=%.*s, recv=%zd, rounds=%u,"
+                       " remote=%d, up=%zd, down=%zd\n",
+                val->fd, val->host_len, val->host,
+                val->recv_count, val->round_count,
+                close_pair->fd, up, down);
+        } else {
+            LOG(LOG_S, "close: fd=%d host=%.*s, recv=%zd, rounds=%u,"
+                       " up=%zd, down=%zd\n",
+                val->fd, val->host_len, val->host,
+                val->recv_count, val->round_count, up, down);
+        }
     } else {
-        LOG(LOG_S, "close: fd=%d addr=%s, recv=%zd, rounds=%u\n",
+        /* удалённая сторона: recv_count — получено от сервера */
+        down = val->recv_count;
+        up = close_pair ? close_pair->recv_count : 0;
+        LOG(LOG_S, "close: fd=%d addr=%s, recv=%zd, rounds=%u,"
+                   " up=%zd, down=%zd\n",
             val->fd, val->log_addr,
-            val->recv_count, val->round_count);
+            val->recv_count, val->round_count, up, down);
     }
 
 #ifdef NOEPOLL

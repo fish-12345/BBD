@@ -19,8 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
+import io.github.romanvht.byedpi.data.AppStatus
 import io.github.romanvht.byedpi.data.StrategyGroup
 import io.github.romanvht.byedpi.data.icons.*
+import io.github.romanvht.byedpi.services.appStatus
 import io.github.romanvht.byedpi.ui.viewmodel.DomainSettingsViewModel
 import io.github.romanvht.byedpi.utility.isTv
 
@@ -32,6 +34,7 @@ fun DomainSettingsScreen(
 ) {
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
+    val isRunning = appStatus.first == AppStatus.Running
 
     var showAddDialog by remember { mutableStateOf(false) }
     var editingGroup by remember { mutableStateOf<StrategyGroup?>(null) }
@@ -67,6 +70,22 @@ fun DomainSettingsScreen(
             contentPadding = PaddingValues(if (isTv) 48.dp else 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            if (isRunning) {
+                item {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_running_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                }
+            }
+
             if (viewModel.groups.isEmpty()) {
                 item {
                     Box(

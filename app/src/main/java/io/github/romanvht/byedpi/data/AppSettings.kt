@@ -7,6 +7,5 @@ data class AppSettings(
     @SerializedName("version") val version: String,
     @SerializedName("history") val history: List<Command>?,
     @SerializedName("apps") val apps: List<String>?,
-    @SerializedName("domainLists") val domainLists: List<DomainList>?,
     @SerializedName("settings") val settings: Map<String, Any?>
 )

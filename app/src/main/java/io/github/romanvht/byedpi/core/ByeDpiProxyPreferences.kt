@@ -8,7 +8,7 @@ import io.github.romanvht.byedpi.data.StrategyGroup
 import io.github.romanvht.byedpi.data.UISettings
 import io.github.romanvht.byedpi.utility.CommandUtils
 import io.github.romanvht.byedpi.utility.DataStoreManager
-import io.github.romanvht.byedpi.utility.DomainListUtils
+import io.github.romanvht.byedpi.utility.TestDomains
 import io.github.romanvht.byedpi.utility.getProxyIpAndPort
 import io.github.romanvht.byedpi.utility.shellSplit
 
@@ -59,11 +59,10 @@ class ByeDpiProxyCmdPreferences(val args: Array<String>) : ByeDpiProxyPreference
         private fun getLists(cmd: String, context: Context): String {
             return Regex("""\{list:([^}]+)\}""").replace(cmd) { matchResult ->
                 val listName = matchResult.groupValues[1].trim()
-                val lists = DomainListUtils.getLists(context)
-                val domainList = lists.find { it.name.equals(listName, ignoreCase = true) }
+                val domains = TestDomains.read(context, listName)
 
-                if (domainList != null && domainList.domains.isNotEmpty()) {
-                    domainList.domains.joinToString(" ")
+                if (!domains.isNullOrEmpty()) {
+                    domains.joinToString(" ")
                 } else {
                     Log.w("ProxyPref", "List '$listName' not found or empty")
                     ""

@@ -77,10 +77,6 @@ class DataStoreManager(context: Context) {
         dataStore.edit { it.remove(keyFor(keyName, typeDefault)) }
     }
 
-    fun <T> removeAsync(keyName: String, typeDefault: T) {
-        scope.launch { remove(keyName, typeDefault) }
-    }
-
     suspend fun clear() {
         dataStore.edit { it.clear() }
     }

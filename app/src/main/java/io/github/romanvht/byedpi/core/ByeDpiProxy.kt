@@ -7,6 +7,10 @@ class ByeDpiProxy {
         }
 
         @JvmStatic external fun jniReadLogs(): String?
+        /** Неразрушающее чтение лога: "<всего байт>\n<хвост лога>". */
+        @JvmStatic external fun jniPeekLogs(): String?
+        /** Снимок таблицы соединений (см. conn_stats.h). */
+        @JvmStatic external fun jniConnStats(): String?
         @JvmStatic external fun jniForceClose(): Int
         @JvmStatic private external fun jniStartProxy(args: Array<String>): Int
         @JvmStatic private external fun jniStopProxy(): Int

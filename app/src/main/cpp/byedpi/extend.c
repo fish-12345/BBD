@@ -26,6 +26,7 @@
 
 #include "desync.h"
 #include "packets.h"
+#include "conn_stats.h"
 
 /* Определено в proxy.c */
 extern pthread_mutex_t g_cache_lock;
@@ -519,6 +520,8 @@ static void save_hostname(struct eval *client, const char *buffer, ssize_t n)
     if (!(client->host = malloc(len))) return;
     memcpy(client->host, host, len);
     client->host_len = len;
+
+    conn_stats_host(client->stat_id, client->host, len);
 }
 
 
@@ -664,6 +667,7 @@ ssize_t tcp_send_hook(struct poolhd *pool,
                 "desync TCP: group=%d, round=%d, fd=%d, dst=%s, host=%.*s\n",
                 client->dp->id, r, remote->fd, remote->log_addr,
                 client->host_len, client->host ? client->host : "-");
+            conn_stats_desync(client->stat_id);
             sn = desync(pool, remote, buff, n, wait);
         }
     }
@@ -678,6 +682,7 @@ ssize_t tcp_send_hook(struct poolhd *pool,
             client && client->host ? client->host_len : 0,
             client && client->host ? client->host : "-",
             strerror(get_e()));
+        conn_stats_error(remote->stat_id, CONN_STATE_ERROR, strerror(get_e()));
         return handle_err(pool, remote, get_e());
     }
     remote->pair->round_sent += sn;
@@ -694,9 +699,12 @@ ssize_t tcp_recv_hook(struct poolhd *pool,
         if (get_e() == EAGAIN) return 0;
         LOG(LOG_E, "recv error: fd=%d, addr=%s, err=%s\n",
             val->fd, val->log_addr, strerror(get_e()));
+        conn_stats_error(val->stat_id, CONN_STATE_ERROR, strerror(get_e()));
         return handle_err(pool, val, get_e());
     }
     val->recv_count += n;
+    conn_stats_tick(val->stat_id, val->stat_side,
+                    (long long)val->recv_count, (int)val->round_count);
 
     if (val->round_sent == 0) {
         val->round_count++;
@@ -764,11 +772,13 @@ ssize_t udp_hook(struct eval *val,
         if (ret < 0) {
             LOG(LOG_E, "udp send error: fd=%d, addr=%s, err=%s\n",
                 val->fd, val->log_addr, strerror(get_e()));
+            conn_stats_error(val->stat_id, CONN_STATE_ERROR, strerror(get_e()));
         }
         return ret;
     }
     LOG(LOG_S, "desync UDP: group=%d, round=%d, fd=%d, dst=%s\n",
         dp->id, r, val->fd, val->log_addr);
+    conn_stats_desync(val->stat_id);
     return desync_udp(val->fd, buffer, n, &dst->sa, dp);
 }
 
