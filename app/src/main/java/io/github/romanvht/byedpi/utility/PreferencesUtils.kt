@@ -30,9 +30,15 @@ class AppPreferences(private val dataStore: DataStoreManager) {
     var proxyPort by dataStore.pref("byedpi_proxy_port", "1080")
     var cmdArgs by dataStore.pref("byedpi_cmd_args", "")
     var trafficMonitoring by dataStore.pref("traffic_monitoring", true)
-    var domainStrategiesJson by dataStore.pref("byedpi_domain_strategies", "[]")
     var connectionsHideClosed by dataStore.pref("connections_hide_closed", false)
     var connectionsHideDns by dataStore.pref("connections_hide_dns", false)
+    var connectionsHideErrors by dataStore.pref("connections_hide_errors", false)
+    var connectionsHideUnnamed by dataStore.pref("connections_hide_unnamed", false)
+    var connectionsHideTcp by dataStore.pref("connections_hide_tcp", false)
+    var connectionsHideUdp by dataStore.pref("connections_hide_udp", false)
+    var connectionsHideUnknownKind by dataStore.pref("connections_hide_unknown_kind", false)
+    /** Скрытые протоколы: коды ConnectionKind через запятую. */
+    var connectionsHiddenKinds by dataStore.pref("connections_hidden_kinds", "")
 
     fun getProfileName(command: String): String? {
         try {

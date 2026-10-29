@@ -397,7 +397,8 @@ class TestViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadSites(): List<String> {
         val context = getApplication<Application>()
-        return TestDomains.all(context).filter { checkDomain(it) }
+        DomainListUtils.syncLists(context)
+        return DomainListUtils.getActiveDomains(context).filter { checkDomain(it) }
     }
 
     private fun loadCmds(): List<String> {

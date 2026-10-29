@@ -425,11 +425,15 @@ class MainActivity : ComponentActivity() {
                         composable("settings/connections") {
                             ConnectionsScreen(
                                 onBack = { navController.popBackStack() },
-                                onManageGroups = { navController.navigate("settings/domain") }
+                                onOpenFilters = {
+                                    navController.navigate("settings/connections/filters")
+                                }
                             )
                         }
-                        composable("settings/domain") {
-                            DomainSettingsScreen(onBack = { navController.popBackStack() })
+                        composable("settings/connections/filters") {
+                            ConnectionsFiltersScreen(
+                                onBack = { navController.popBackStack() }
+                            )
                         }
                         composable("test") {
                             TestScreen(
@@ -443,6 +447,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("settings/test") {
                             TestSettingsScreen(
+                                onBack = { navController.popBackStack() },
+                                onNavigateToDomainLists = {
+                                    navController.navigate("settings/domain-lists")
+                                }
+                            )
+                        }
+                        composable("settings/domain-lists") {
+                            DomainListsScreen(
                                 onBack = { navController.popBackStack() }
                             )
                         }

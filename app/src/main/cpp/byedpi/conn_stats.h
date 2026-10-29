@@ -38,6 +38,7 @@ struct conn_stat {
     int       state;
     int       proto;
     int       is_dns;
+    int       kind;    /* CONN_KIND_* из classify.h */
     int       rounds;
     long long up;
     long long down;
@@ -55,6 +56,9 @@ void     conn_stats_reset(void);
 uint64_t conn_stats_open(int fd, int peer_fd, int proto,
                          const char *host, int host_len, const char *dst);
 void     conn_stats_host(uint64_t id, const char *host, int host_len);
+/* Протокол по первым байтам; пишется только один раз на соединение.
+   Для CONN_KIND_DNS заодно выставляет is_dns. */
+void     conn_stats_kind(uint64_t id, int kind);
 void     conn_stats_desync(uint64_t id);
 void     conn_stats_rounds(uint64_t id, int rounds);
 /* -1 в аргументе — «не менять» */

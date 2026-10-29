@@ -1,14 +1,21 @@
 package io.github.romanvht.byedpi.ui
 
 import android.text.format.Formatter
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -20,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.romanvht.byedpi.R
 import io.github.romanvht.byedpi.data.icons.*
 import io.github.romanvht.byedpi.ui.viewmodel.ConnectionEvent
+import io.github.romanvht.byedpi.ui.viewmodel.ConnectionGroup
+import io.github.romanvht.byedpi.ui.viewmodel.ConnectionKind
 import io.github.romanvht.byedpi.ui.viewmodel.ConnectionProtocol
 import io.github.romanvht.byedpi.ui.viewmodel.ConnectionState
 import io.github.romanvht.byedpi.ui.viewmodel.ConnectionsViewModel
@@ -37,7 +46,7 @@ import kotlinx.coroutines.delay
 fun ConnectionsScreen(
     viewModel: ConnectionsViewModel = viewModel(),
     onBack: () -> Unit,
-    onManageGroups: () -> Unit
+    onOpenFilters: () -> Unit
 ) {
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
@@ -57,6 +66,7 @@ fun ConnectionsScreen(
 
     var selectedId by remember { mutableStateOf<Long?>(null) }
     val selected = selectedId?.let { id -> viewModel.events.firstOrNull { it.id == id } }
+    val expandedGroups = remember { mutableStateMapOf<String, Boolean>() }
 
     Scaffold(
         topBar = {
@@ -68,6 +78,22 @@ fun ConnectionsScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenFilters) {
+                        BadgedBox(
+                            badge = {
+                                if (viewModel.activeFilterCount > 0) {
+                                    Badge {
+                                        Text(viewModel.activeFilterCount.toString())
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                Ico.FilterList,
+                                contentDescription = stringResource(R.string.connections_filters_title)
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = viewModel::clear,
                         enabled = viewModel.events.isNotEmpty()
@@ -75,12 +101,6 @@ fun ConnectionsScreen(
                         Icon(
                             Ico.DeleteSweep,
                             contentDescription = stringResource(R.string.connections_clear)
-                        )
-                    }
-                    IconButton(onClick = onManageGroups) {
-                        Icon(
-                            Ico.EditNote,
-                            contentDescription = stringResource(R.string.connections_manage)
                         )
                     }
                 }
@@ -101,12 +121,8 @@ fun ConnectionsScreen(
                 ConnectionsHeader(viewModel)
             }
 
-            item(key = "filters") {
-                ConnectionFilters(viewModel)
-            }
-
-            val visible = viewModel.visibleEvents()
-            if (visible.isEmpty()) {
+            val groups = viewModel.groupedEvents()
+            if (groups.isEmpty()) {
                 item(key = "empty") {
                     ConnectionsEmpty(
                         isRunning = viewModel.isRunning,
@@ -114,12 +130,26 @@ fun ConnectionsScreen(
                     )
                 }
             } else {
-                items(visible, key = { it.id }) { event ->
-                    ConnectionRow(
-                        event = event,
-                        nowEpoch = nowEpoch,
-                        onClick = { selectedId = event.id }
-                    )
+                items(groups, key = { it.key }) { group ->
+                    if (group.size == 1) {
+                        val event = group.entries.first()
+                        ConnectionRow(
+                            event = event,
+                            nowEpoch = nowEpoch,
+                            onClick = { selectedId = event.id }
+                        )
+                    } else {
+                        ConnectionGroupCard(
+                            group = group,
+                            nowEpoch = nowEpoch,
+                            expanded = expandedGroups[group.key] == true,
+                            onToggle = {
+                                expandedGroups[group.key] =
+                                    !(expandedGroups[group.key] ?: false)
+                            },
+                            onSelect = { selectedId = it.id }
+                        )
+                    }
                 }
             }
 
@@ -194,23 +224,46 @@ private fun ConnectionsHeader(viewModel: ConnectionsViewModel) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StatTile(
-                        value = viewModel.totalCount,
-                        label = stringResource(R.string.connections_total_label),
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatTile(
-                        value = viewModel.openCount,
-                        label = stringResource(R.string.connections_open_label),
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatTile(
-                        value = viewModel.errorCount,
-                        label = stringResource(R.string.connections_errors_label),
-                        modifier = Modifier.weight(1f),
-                        highlight = viewModel.errorCount > 0
-                    )
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CompactStat(
+                            value = viewModel.totalCount,
+                            label = stringResource(R.string.connections_total_label),
+                            modifier = Modifier.weight(1f)
+                        )
+                        VerticalDivider(
+                            modifier = Modifier.height(22.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        CompactStat(
+                            value = viewModel.openCount,
+                            label = stringResource(R.string.connections_open_label),
+                            modifier = Modifier.weight(1f),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        VerticalDivider(
+                            modifier = Modifier.height(22.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        CompactStat(
+                            value = viewModel.errorCount,
+                            label = stringResource(R.string.connections_errors_label),
+                            modifier = Modifier.weight(1f),
+                            tint = if (viewModel.errorCount > 0) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
                 }
 
                 if (viewModel.isPaused) {
@@ -226,75 +279,30 @@ private fun ConnectionsHeader(viewModel: ConnectionsViewModel) {
 }
 
 @Composable
-private fun ConnectionFilters(viewModel: ConnectionsViewModel) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FilterChip(
-            selected = viewModel.hideClosed,
-            onClick = viewModel::toggleHideClosed,
-            label = { Text(stringResource(R.string.connections_hide_closed)) }
-        )
-        FilterChip(
-            selected = viewModel.hideDns,
-            onClick = viewModel::toggleHideDns,
-            label = { Text(stringResource(R.string.connections_hide_dns)) },
-            leadingIcon = {
-                Icon(
-                    Ico.Dns,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
-                )
-            }
-        )
-    }
-}
-
-@Composable
-private fun StatTile(
+private fun CompactStat(
     value: Int,
     label: String,
     modifier: Modifier = Modifier,
-    highlight: Boolean = false
+    tint: Color? = null
 ) {
-    Surface(
+    Column(
         modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = if (highlight) {
-            MaterialTheme.colorScheme.errorContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
-        }
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = value.toString(),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (highlight) {
-                    MaterialTheme.colorScheme.onErrorContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-                maxLines = 1
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (highlight) {
-                    MaterialTheme.colorScheme.onErrorContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = tint ?: MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -355,11 +363,15 @@ private fun ConnectionRow(
                     )
                     if (event.protocol == ConnectionProtocol.Udp) {
                         Spacer(modifier = Modifier.width(6.dp))
-                        Badge(stringResource(R.string.connections_udp))
+                        KindBadge(stringResource(R.string.connections_udp))
                     }
-                    if (event.isDns) {
+                    event.kind.label?.let { label ->
                         Spacer(modifier = Modifier.width(6.dp))
-                        Badge(stringResource(R.string.connections_dns_badge))
+                        KindBadge(label)
+                    }
+                    if (event.isDns && event.kind != ConnectionKind.Dns) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        KindBadge(stringResource(R.string.connections_dns_badge))
                     }
                 }
 
@@ -445,7 +457,192 @@ private fun ConnectionRow(
 }
 
 @Composable
-private fun Badge(text: String) {
+private fun ConnectionGroupCard(
+    group: ConnectionGroup,
+    nowEpoch: Long,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    onSelect: (ConnectionEvent) -> Unit
+) {
+    val context = LocalContext.current
+    val accent = when {
+        group.isOpen -> MaterialTheme.colorScheme.primary
+        group.hasError -> MaterialTheme.colorScheme.error
+        else -> SuccessColor
+    }
+    val status = stringResource(
+        when {
+            group.isOpen -> R.string.connections_group_active
+            group.hasError -> R.string.connections_group_errors
+            else -> R.string.connections_group_closed
+        }
+    )
+    val kinds = group.kinds.mapNotNull { it.label }.joinToString(" · ")
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        )
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onToggle)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = accent.copy(alpha = 0.14f),
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = group.size.toString(),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = accent
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = group.title,
+                            style = if (group.byHost) {
+                                MaterialTheme.typography.bodyMedium
+                            } else {
+                                MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily.Monospace
+                                )
+                            },
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        if (kinds.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            KindBadge(kinds)
+                        }
+                        if (group.isDns && ConnectionKind.Dns !in group.kinds) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            KindBadge(stringResource(R.string.connections_dns_badge))
+                        }
+                    }
+
+                    if (group.byHost) {
+                        if (group.ips.isNotEmpty()) {
+                            Text(
+                                text = stringResource(
+                                    R.string.connections_group_ips,
+                                    group.ips.take(3).joinToString(", ")
+                                ),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontFamily = FontFamily.Monospace
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    } else if (group.hosts.isNotEmpty()) {
+                        Text(
+                            text = stringResource(
+                                R.string.connections_group_hosts,
+                                group.hosts.take(3).joinToString(", ")
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    val downloaded = group.downloaded
+                    val uploaded = group.uploaded
+                    if (downloaded > 0 || uploaded > 0) {
+                        Text(
+                            text = listOfNotNull(
+                                downloaded.takeIf { it > 0 }?.let {
+                                    stringResource(
+                                        R.string.connections_downloaded_short,
+                                        Formatter.formatShortFileSize(context, it)
+                                    )
+                                },
+                                uploaded.takeIf { it > 0 }?.let {
+                                    stringResource(
+                                        R.string.connections_uploaded_short,
+                                        Formatter.formatShortFileSize(context, it)
+                                    )
+                                }
+                            ).joinToString("  "),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = status,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = accent,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+                    Icon(
+                        imageVector = Ico.ChevronRight,
+                        contentDescription = stringResource(
+                            if (expanded) R.string.connections_group_collapse
+                            else R.string.connections_group_expand
+                        ),
+                        modifier = Modifier
+                            .size(20.dp)
+                            .rotate(if (expanded) 90f else 0f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (expanded) {
+                HorizontalDivider()
+                Column(
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    group.entries
+                        .sortedWith(compareBy({ stateRankFor(it) }, { -it.startEpoch }))
+                        .forEach { event ->
+                            ConnectionRow(
+                                event = event,
+                                nowEpoch = nowEpoch,
+                                onClick = { onSelect(event) }
+                            )
+                        }
+                }
+            }
+        }
+    }
+}
+
+private fun stateRankFor(event: ConnectionEvent): Int = when {
+    event.isOpen -> 0
+    event.state == ConnectionState.Error || event.state == ConnectionState.Timeout -> 1
+    else -> 2
+}
+
+@Composable
+private fun KindBadge(text: String) {
     Surface(
         shape = MaterialTheme.shapes.extraSmall,
         color = MaterialTheme.colorScheme.tertiaryContainer
@@ -511,32 +708,47 @@ private fun ConnectionDetailsSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (event.destination.isNotBlank()) {
-                DetailRow(
-                    label = stringResource(R.string.connections_label_destination),
-                    value = event.destination,
-                    monospace = true
-                )
-            }
-            DetailRow(
-                label = stringResource(R.string.connections_label_protocol),
-                value = if (event.protocol == ConnectionProtocol.Udp) {
-                    stringResource(R.string.connections_udp)
-                } else {
-                    "TCP"
+            SelectionContainer {
+                Column {
+                    if (event.hasName) {
+                        DetailRow(
+                            label = stringResource(R.string.connections_label_host),
+                            value = event.host,
+                            copyable = true
+                        )
+                    }
+                    if (event.destination.isNotBlank()) {
+                        DetailRow(
+                            label = stringResource(R.string.connections_label_destination),
+                            value = event.destination,
+                            monospace = true,
+                            copyable = true
+                        )
+                    }
+                    DetailRow(
+                        label = stringResource(R.string.connections_label_protocol),
+                        value = run {
+                            val base = if (event.protocol == ConnectionProtocol.Udp) {
+                                stringResource(R.string.connections_udp)
+                            } else {
+                                "TCP"
+                            }
+                            event.kind.label?.let { "$base · $it" } ?: base
+                        }
+                    )
+                    DetailRow(
+                        label = stringResource(R.string.connections_label_started),
+                        value = event.time
+                    )
+                    DetailRow(
+                        label = stringResource(R.string.connections_label_duration),
+                        value = formatDuration(
+                            event.durationMs(nowEpoch),
+                            isOpen = event.endEpoch == null
+                        )
+                    )
                 }
-            )
-            DetailRow(
-                label = stringResource(R.string.connections_label_started),
-                value = event.time
-            )
-            DetailRow(
-                label = stringResource(R.string.connections_label_duration),
-                value = formatDuration(
-                    event.durationMs(nowEpoch),
-                    isOpen = event.endEpoch == null
-                )
-            )
+            }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
@@ -596,8 +808,11 @@ private fun DetailRow(
     label: String,
     value: String,
     monospace: Boolean = false,
-    icon: androidx.compose.ui.graphics.vector.ImageVector? = null
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    copyable: Boolean = false
 ) {
+    val context = LocalContext.current
+    val copiedText = stringResource(R.string.connections_copied)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -629,9 +844,32 @@ private fun DetailRow(
             },
             fontWeight = FontWeight.SemiBold,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(2f, fill = false)
         )
+        if (copyable) {
+            IconButton(
+                onClick = {
+                    copyToClipboard(context, label, value)
+                    Toast.makeText(context, copiedText, Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Ico.ContentCopy,
+                    contentDescription = stringResource(R.string.connections_copy),
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
+}
+
+@Suppress("UsePropertyAccessSyntax")
+private fun copyToClipboard(context: Context, label: String, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
 }
 
 @Composable

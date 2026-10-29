@@ -62,6 +62,7 @@ object SettingsUtils {
             val dataStore = context.getDataStore()
             val history = HistoryUtils(context).getHistory()
             val apps = dataStore.get("selected_apps", emptySet<String>()).toList()
+            val domainLists = DomainListUtils.getAllLists(context)
 
             val importantKeys = listOf(
                 "language",
@@ -127,6 +128,7 @@ object SettingsUtils {
                 version = BuildConfig.VERSION_NAME,
                 history = history,
                 apps = apps,
+                domainLists = domainLists,
                 settings = settingsMap
             )
 
@@ -179,6 +181,24 @@ object SettingsUtils {
                     HistoryUtils(context).saveHistory(import.history)
                 }
 
+                if (import.domainLists != null) {
+                    val normalized = import.domainLists.map {
+                        if (it.isBuiltIn) {
+                            it.copy(
+                                isModified = it.isModified,
+                                isDeleted = it.isDeleted
+                            )
+                        } else {
+                            it.copy(
+                                isModified = false,
+                                isDeleted = false
+                            )
+                        }
+                    }
+
+                    DomainListUtils.saveLists(context, normalized)
+                }
+
                 val newLang = dataStore.get("language", "system")
                 val newTheme = dataStore.get("app_theme", "system")
                 setLang(newLang)
@@ -205,6 +225,7 @@ object SettingsUtils {
             }
 
             HistoryUtils(context).saveHistory(emptyList())
+            DomainListUtils.resetLists(context)
 
             setLang("system")
             setTheme("system")

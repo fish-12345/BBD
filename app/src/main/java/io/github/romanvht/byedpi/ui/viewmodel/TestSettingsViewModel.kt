@@ -2,10 +2,17 @@ package io.github.romanvht.byedpi.ui.viewmodel
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.romanvht.byedpi.R
+import io.github.romanvht.byedpi.utility.DomainListUtils
 import io.github.romanvht.byedpi.utility.TestPreferences
 import io.github.romanvht.byedpi.utility.getDataStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TestSettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = application.getDataStore()
@@ -25,6 +32,14 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
     private val commandsRaw by dataStore.composeState(viewModelScope, "byedpi_proxytest_commands", "")
     val commandsList: List<String> get() = commandsRaw.split("\n").filter { it.isNotBlank() }
 
+    /** Названия активных списков доменов — подпись под пунктом «Списки доменов». */
+    var domainListsSummary by mutableStateOf("")
+        private set
+
+    init {
+        updateDomainListsSummary()
+    }
+
     fun updateDelay(newValue: String) { testPrefs.delay = newValue }
     fun updateRequests(newValue: String) { testPrefs.requests = newValue }
     fun updateTimeout(newValue: String) { testPrefs.timeout = newValue }
@@ -36,4 +51,22 @@ class TestSettingsViewModel(application: Application) : AndroidViewModel(applica
     fun updateStrategyLists(newValue: Set<String>) { testPrefs.strategyLists = newValue }
     fun updateCommandsList(newList: List<String>) { testPrefs.commands = newList.joinToString("\n") }
     fun updateConcurrentRequests(newValue: String) { testPrefs.concurrentRequests = newValue }
+
+    fun updateDomainListsSummary() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val app = getApplication<Application>()
+            DomainListUtils.syncLists(app)
+            val activeLists = DomainListUtils.getLists(app).filter { it.isActive }
+
+            val summaryText = if (activeLists.isEmpty()) {
+                app.getString(R.string.domain_list_summary_none)
+            } else {
+                activeLists.joinToString(", ") { it.name }
+            }
+
+            withContext(Dispatchers.Main) {
+                domainListsSummary = summaryText
+            }
+        }
+    }
 }

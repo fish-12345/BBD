@@ -27,6 +27,7 @@
 #include "desync.h"
 #include "packets.h"
 #include "conn_stats.h"
+#include "classify.h"
 
 /* Определено в proxy.c */
 extern pthread_mutex_t g_cache_lock;
@@ -605,6 +606,19 @@ int connect_hook(struct poolhd *pool, struct eval *val,
 }
 
 
+static void stat_classify(struct eval *val, const char *data, ssize_t n)
+{
+    int kind;
+
+    if (val->stat_kind || !val->stat_id || n <= 0) return;
+    kind = classify_stream(data, (size_t)n);
+    if (kind != CONN_KIND_UNKNOWN) {
+        val->stat_kind = kind;
+        conn_stats_kind(val->stat_id, kind);
+    }
+}
+
+
 static int setup_conn(struct eval *client, const char *buffer, ssize_t n)
 {
     struct desync_params *dp = find_dp(client, buffer, n, &client->pair->addr);
@@ -612,6 +626,7 @@ static int setup_conn(struct eval *client, const char *buffer, ssize_t n)
         LOG(LOG_E, "drop connection\n");
         return -1;
     }
+    stat_classify(client, buffer, n);
     save_hostname(client, buffer, n);
     client->mark = is_tls_chello(buffer, n);
     client->dp = dp;
@@ -703,6 +718,7 @@ ssize_t tcp_recv_hook(struct poolhd *pool,
         return handle_err(pool, val, get_e());
     }
     val->recv_count += n;
+    stat_classify(val, buff->data, n);
     conn_stats_tick(val->stat_id, val->stat_side,
                     (long long)val->recv_count, (int)val->round_count);
 

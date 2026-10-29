@@ -96,6 +96,7 @@ struct eval {
        клиент/сервер; stat_side говорит, чей recv_count куда писать. */
     uint64_t stat_id;
     int stat_side;
+    int stat_kind;   /* CONN_KIND_*, определён по первым байтам */
 
     struct desync_params *dp;
     uint64_t dp_mask;

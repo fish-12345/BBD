@@ -1,4 +1,5 @@
 #include "conn_stats.h"
+#include "classify.h"
 
 #include <pthread.h>
 #include <stdio.h>
@@ -39,15 +40,6 @@ static void copy_str(char *dst, size_t cap, const char *src, int len)
     dst[k] = 0;
 }
 
-static int is_dns_addr(const char *dst)
-{
-    size_t len;
-
-    if (!dst) return 0;
-    len = strlen(dst);
-    return len > 3 && strcmp(dst + len - 3, ":53") == 0;
-}
-
 static struct conn_stat *find_locked(uint64_t id)
 {
     struct conn_stat *st;
@@ -84,7 +76,8 @@ uint64_t conn_stats_open(int fd, int peer_fd, int proto,
     st->peer_fd = peer_fd;
     st->state = CONN_STATE_OPEN;
     st->proto = proto;
-    st->is_dns = is_dns_addr(dst);
+    st->is_dns = 0;
+    st->kind = CONN_KIND_UNKNOWN;
     st->start_ms = now_ms();
     copy_str(st->host, sizeof(st->host), host, host_len);
     copy_str(st->dst, sizeof(st->dst), dst, -1);
@@ -104,6 +97,21 @@ void conn_stats_host(uint64_t id, const char *host, int host_len)
     pthread_mutex_lock(&g_lock);
     st = find_locked(id);
     if (st) copy_str(st->host, sizeof(st->host), host, host_len);
+    pthread_mutex_unlock(&g_lock);
+}
+
+void conn_stats_kind(uint64_t id, int kind)
+{
+    struct conn_stat *st;
+
+    if (!id || kind <= CONN_KIND_UNKNOWN) return;
+
+    pthread_mutex_lock(&g_lock);
+    st = find_locked(id);
+    if (st && st->kind == CONN_KIND_UNKNOWN) {
+        st->kind = kind;
+        if (kind == CONN_KIND_DNS) st->is_dns = 1;
+    }
     pthread_mutex_unlock(&g_lock);
 }
 
@@ -303,9 +311,9 @@ char *conn_stats_snapshot(size_t *out_len)
         }
 
         sbuf_append(&b,
-            "%llu\t%d\t%d\t%d\t%d\t%d\t%d\t%lld\t%lld\t%lld\t%lld\t%s\t%s\t%s\n",
+            "%llu\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%lld\t%lld\t%lld\t%lld\t%s\t%s\t%s\n",
             (unsigned long long)st->id,
-            st->fd, st->peer_fd, st->state, st->proto, st->is_dns,
+            st->fd, st->peer_fd, st->state, st->proto, st->is_dns, st->kind,
             st->rounds, st->up, st->down,
             st->start_ms, st->end_ms,
             st->host, st->dst, st->err);

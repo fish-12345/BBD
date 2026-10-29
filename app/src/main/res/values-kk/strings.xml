@@ -133,16 +133,6 @@
     <string name="test_ping">Пинг</string>
     <string name="test_ms">мс</string>
     <string name="traffic_monitoring_setting">Трафик мониторингі</string>
-    <string name="domain_settings_title">Домен баптаулары</string>
-    <string name="add_group">Топ қосу</string>
-    <string name="edit_group">Топты өңдеу</string>
-    <string name="delete_group_title">Топты өшіру</string>
-    <string name="delete_group_confirm">\"%1$s\" тобын өшіруге сенімдісіз бе?</string>
-    <string name="no_domain_strategies">Сізде әлі домендік стратегиялар жоқ</string>
-    <string name="group_name_label">Топ атауы</string>
-    <string name="domains_label">Домендер (әрқайсысы жаңа жолда)</string>
-    <string name="strategy_label">Стратегия</string>
     <string name="save">Сақтау</string>
     <string name="cancel">Болдырмау</string>
-    <string name="composite_badge">Біріктірілген</string>
 </resources>

@@ -11,6 +11,7 @@
 #include "error.h"
 #include "packets.h"
 #include "conn_stats.h"
+#include "classify.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -697,6 +698,19 @@ int on_tunnel(struct poolhd *pool, struct eval *val, int etype)
 
 
 /* C1: обработка одного UDP-пакета (вынесено из on_udp_tunnel) */
+static void stat_classify_udp(struct eval *val, const char *data, ssize_t n)
+{
+    int kind;
+
+    if (val->stat_kind || !val->stat_id || n <= 0) return;
+    kind = classify_datagram(data, (size_t)n);
+    if (kind != CONN_KIND_UNKNOWN) {
+        val->stat_kind = kind;
+        conn_stats_kind(val->stat_id, kind);
+    }
+}
+
+
 static int udp_process_one(struct eval *val,
                            struct eval *pair,
                            union sockaddr_u *addr,
@@ -727,6 +741,7 @@ static int udp_process_one(struct eval *val,
             LOG(LOG_E, "udp parse error\n");
             return -1;
         }
+        stat_classify_udp(val, data + offs, n - offs);
         if (!pair->addr.in.sin_port) {
             if (params.baddr.sa.sa_family == AF_INET6) map_fix(addr, 6);
             if (params.baddr.sa.sa_family != addr->sa.sa_family) return -1;
@@ -741,6 +756,7 @@ static int udp_process_one(struct eval *val,
         map_fix(addr, 0);
         int offs = s5_set_addr(data, S_SIZE_I6, addr, 1);
         if (offs < 0 || offs > S_SIZE_I6) return -1;
+        stat_classify_udp(val, data, n);
         ns = send(pair->fd, data - offs, offs + n, 0);
     }
     if (ns < 0) {

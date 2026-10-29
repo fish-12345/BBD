@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -28,10 +29,15 @@ import io.github.romanvht.byedpi.utility.isTv
 @Composable
 fun TestSettingsScreen(
     viewModel: TestSettingsViewModel = viewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToDomainLists: () -> Unit
 ) {
     val context = LocalContext.current
     val isTv = remember { context.isTv() }
+
+    LaunchedEffect(Unit) {
+        viewModel.updateDomainListsSummary()
+    }
 
     Scaffold(
         topBar = {
@@ -95,6 +101,18 @@ fun TestSettingsScreen(
             item {
                 SettingsCard(title = stringResource(R.string.test_settings_commands)) {
                     Column(modifier = Modifier.fillMaxWidth()) {
+                        NavigationPreference(
+                            title = stringResource(R.string.domain_lists),
+                            summary = viewModel.domainListsSummary,
+                            onClick = onNavigateToDomainLists,
+                            icon = Icons.AutoMirrored.Filled.List
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+
                         val entries = stringArrayResource(R.array.strategy_lists_entries)
                         val values = stringArrayResource(R.array.strategy_lists_values)
                         val entryMap = values.zip(entries).toMap()
@@ -119,13 +137,12 @@ fun TestSettingsScreen(
                                     color = MaterialTheme.colorScheme.outlineVariant
                                 )
 
-                                ListEditPreference(
+                                StrategyListEditor(
                                     title = stringResource(R.string.test_settings_commands),
                                     placeholder = stringResource(R.string.some_strategy),
                                     values = viewModel.commandsList,
                                     onValuesChange = { viewModel.updateCommandsList(it) },
-                                    icon = Ico.Code,
-                                    splitByLinesOnly = true
+                                    icon = Ico.Code
                                 )
                             }
                         }
